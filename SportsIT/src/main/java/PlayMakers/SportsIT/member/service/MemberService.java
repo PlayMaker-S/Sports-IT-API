@@ -4,10 +4,12 @@ import PlayMakers.SportsIT.member.domain.Member;
 import PlayMakers.SportsIT.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 @Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
@@ -26,7 +28,7 @@ public class MemberService {
         validateDuplicateMember(member);
 
         memberRepository.save(member);
-        return member.getId();
+        return member.getUid();
     }
 
     private void validateDuplicateMember(Member member) {

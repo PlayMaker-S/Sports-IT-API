@@ -41,4 +41,15 @@ public class JpaMemberRepository implements MemberRepository{
         return em.createQuery("select m from Member m", Member.class)
                 .getResultList();
     }
+
+    @Override
+    public void update(Long id, Member updateParam) {
+        Member member = em.find(Member.class, id);
+        member.setName(updateParam.getName());
+    }
+
+    @Override
+    public void clearStore() {
+        em.createQuery("delete from Member").executeUpdate();
+    }
 }

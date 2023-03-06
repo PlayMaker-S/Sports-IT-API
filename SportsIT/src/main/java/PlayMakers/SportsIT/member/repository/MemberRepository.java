@@ -10,4 +10,6 @@ public interface MemberRepository {
     Optional<Member> findById(Long id);  // Null을 감싸서 반환하기 위한 자료형
     Optional<Member> findByName(String name);
     List<Member> findAll();
+    public void update(Long id, Member updateParam);
+    public void clearStore();
 }

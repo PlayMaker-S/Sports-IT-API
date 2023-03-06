@@ -1,27 +1,32 @@
 package PlayMakers.SportsIT.member.domain;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
 
-@Entity
+@Getter @Setter
+@Data
 public class Member {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long uid;
+
+    @Column(name = "id")
+    private String id;
+
+    @Column(name = "pw")
+    private String pw;
     @Column(name = "name")
     private String name;
 
-    public String getName() {
-        return name;
+    public Member() {
     }
 
-    public void setName(String name) {
+    public Member(String id, String pw, String name) {
+        this.id = id;
+        this.pw = pw;
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }

@@ -2,15 +2,18 @@ package PlayMakers.SportsIT.member.controller;
 
 import PlayMakers.SportsIT.member.domain.Member;
 import PlayMakers.SportsIT.member.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-@Controller
+@Slf4j
+@RestController
 public class MemberController {
     //private final MemberService memberService = new MemberService();
     // 이런 방식으로 객체를 new로 생성하면 빈에 등록된 Service 객체를 받아와 사용하지 못함
@@ -24,26 +27,26 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @GetMapping("/members/new")
-    public String createForm() {
-        return "members/createMemberForm";
-    }
 
     @PostMapping("/members/new")
-    public String create(MemberForm form){
+    public String create(@RequestBody Member data){
         Member member = new Member();
-        member.setName(form.getName());
+        member.setId(data.getId());
+        member.setPw(data.getPw());
+        member.setName(data.getName());
 
-        System.out.println("member = " + member.getName());
+        log.info("member = {}", member);
+        //System.out.println("member = " + member.toString());
         memberService.join(member);
 
-        return "redirect:/";
+        return "ok";
     }
 
     @GetMapping("/members")
-    public String list(Model model){
-        List<Member> members = memberService.findMembers();
-        model.addAttribute("members", members);
-        return "members/memberList";
+    public Member getProfile(@RequestParam Map<String, Object> paramMap) {
+        Long id = Long.parseLong((String) paramMap.get("id"));
+        Member member = memberService.findOne(id).get();
+
+        return member;
     }
 }
