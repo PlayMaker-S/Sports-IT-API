@@ -12,11 +12,12 @@ public class Member {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long uid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String loginId;
 
     @Column(nullable = false)
     private String pw;
+
     @Column(nullable = false)
     private String name;
 
