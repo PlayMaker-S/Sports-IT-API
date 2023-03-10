@@ -1,6 +1,7 @@
 package PlayMakers.SportsIT.member.controller;
 
 import PlayMakers.SportsIT.member.domain.Member;
+import PlayMakers.SportsIT.member.domain.MemberDto;
 import PlayMakers.SportsIT.member.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +29,11 @@ public class MemberController {
     }
 
 
-    @PostMapping("/members/new")
-    public String create(@RequestBody Member data){
-        Member member = new Member();
-        member.setId(data.getId());
-        member.setPw(data.getPw());
-        member.setName(data.getName());
-
-        log.info("member = {}", member);
+    @PostMapping("/members/join")
+    public String create(@RequestBody MemberDto data){
+        log.info("member = {}", data);
         //System.out.println("member = " + member.toString());
-        memberService.join(member);
+        memberService.join(data);
 
         return "ok";
     }

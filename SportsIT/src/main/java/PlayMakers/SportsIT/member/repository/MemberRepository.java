@@ -1,15 +1,13 @@
 package PlayMakers.SportsIT.member.repository;
 
 import PlayMakers.SportsIT.member.domain.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository {
-    Member save(Member member);
-    Optional<Member> findById(Long id);  // Null을 감싸서 반환하기 위한 자료형
-    Optional<Member> findByName(String name);
-    List<Member> findAll();
-    public void update(Long id, Member updateParam);
-    public void clearStore();
+public interface MemberRepository extends JpaRepository<Member, Long> {
+
+        Optional<Member> findByName(String name);
+        List<Member> findAll();
 }

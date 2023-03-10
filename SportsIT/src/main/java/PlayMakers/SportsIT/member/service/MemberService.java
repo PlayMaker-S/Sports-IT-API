@@ -1,8 +1,10 @@
 package PlayMakers.SportsIT.member.service;
 
 import PlayMakers.SportsIT.member.domain.Member;
+import PlayMakers.SportsIT.member.domain.MemberDto;
 import PlayMakers.SportsIT.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,24 +13,20 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-
-    @Autowired
-    public MemberService(MemberRepository memberRepository) {
-        // DI Injection을 위한 Constructor 정의
-        this.memberRepository = memberRepository;
-    }
 
     /**
      * 회원 가입
      */
-    public Long join(Member member) {
+    public Long join(MemberDto dto) {
         // 같은 이름을 갖는 중복 회원은 X
-        validateDuplicateMember(member);
-
-        memberRepository.save(member);
-        return member.getUid();
+        //validateDuplicateMember(member);
+        //dto.setPw(encoder.encode(dto.getPw()));
+        dto.setPw(dto.getPw()); // 추후 인코드 기능 추가 예정
+        Member newMember = memberRepository.save(dto.toPlayerEntity());
+        return newMember.getUid();
     }
 
     private void validateDuplicateMember(Member member) {
