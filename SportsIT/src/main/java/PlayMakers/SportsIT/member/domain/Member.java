@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Getter @Setter
 @Data
+@Entity (name="member")
 public class Member {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
