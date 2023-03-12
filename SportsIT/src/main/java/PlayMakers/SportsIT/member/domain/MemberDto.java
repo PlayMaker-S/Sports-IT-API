@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,22 +16,33 @@ public class MemberDto {
     private String pw;
     private String name;
 
-    /* DTO -> Entity */
-    public Member toPlayerEntity() {
-        return Member.builder()
-                .loginId(loginId)
-                .pw(pw)
-                .name(name)
-                .memberType(MemberType.PLAYER)
-                .build();
-    }
+    private String memberType;
 
-    public Member toInstitutionEntity() {
+    /* DTO -> Entity */
+    public Member toEntity() {
+        MemberType memberEntityType = null;
+        log.info("memberType = {}", memberType);
+
+        // memberType과 같은 MemberType을 찾아 반환
+        for (MemberType type : MemberType.values()) {
+            log.debug("type = {}", type.getValue());
+            log.debug(memberType);
+
+            if (type.getValue().equals(memberType)) {
+                memberEntityType = type;
+                break;
+            }
+        }
+
+        if (memberEntityType == null) {
+            throw new IllegalArgumentException("MemberType is not valid");
+        }
+
         return Member.builder()
                 .loginId(loginId)
                 .pw(pw)
                 .name(name)
-                .memberType(MemberType.INSTITUTION)
+                .memberType(memberEntityType)
                 .build();
     }
 }

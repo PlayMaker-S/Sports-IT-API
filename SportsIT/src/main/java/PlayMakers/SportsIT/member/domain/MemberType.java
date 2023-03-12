@@ -6,8 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum MemberType {
-    PLAYER("선수"),
-    INSTITUTION("단체");
+    선수("ROLE_USER"),
+    단체("ROLE_INSTITUTION"),
+    관리자("ROLE_ADMIN");
 
     private final String value;
 }

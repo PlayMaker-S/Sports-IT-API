@@ -21,7 +21,6 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MemberType memberType;

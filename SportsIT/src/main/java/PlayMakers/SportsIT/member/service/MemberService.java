@@ -2,6 +2,7 @@ package PlayMakers.SportsIT.member.service;
 
 import PlayMakers.SportsIT.member.domain.Member;
 import PlayMakers.SportsIT.member.domain.MemberDto;
+import PlayMakers.SportsIT.member.domain.MemberType;
 import PlayMakers.SportsIT.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,10 @@ public class MemberService {
         //validateDuplicateMember(member);
         //dto.setPw(encoder.encode(dto.getPw()));
         dto.setPw(dto.getPw()); // 추후 인코드 기능 추가 예정
-        Member newMember = memberRepository.save(dto.toPlayerEntity());
+        String memberType = dto.getMemberType();
+
+        Member newMember = memberRepository.save(dto.toEntity());
+
         return newMember.getUid();
     }
 
