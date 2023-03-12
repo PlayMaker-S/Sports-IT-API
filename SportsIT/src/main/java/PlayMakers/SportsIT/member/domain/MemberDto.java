@@ -25,6 +25,9 @@ public class MemberDto {
 
         // memberType과 같은 MemberType을 찾아 반환
         for (MemberType type : MemberType.values()) {
+            log.debug("type = {}", type.getValue());
+            log.debug(memberType);
+
             if (type.getValue().equals(memberType)) {
                 memberEntityType = type;
                 break;

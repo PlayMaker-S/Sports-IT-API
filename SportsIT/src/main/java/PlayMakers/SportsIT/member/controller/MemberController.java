@@ -40,9 +40,16 @@ public class MemberController {
 
     @GetMapping("/members")
     public Member getProfile(@RequestParam Map<String, Object> paramMap) {
+        log.debug("paramMap = {}", paramMap.get("id"));
         Long id = Long.parseLong((String) paramMap.get("id"));
         Member member = memberService.findOne(id).get();
 
         return member;
+    }
+
+    // Test
+    @GetMapping("/members/home")
+    public String home() {
+        return "home";
     }
 }
