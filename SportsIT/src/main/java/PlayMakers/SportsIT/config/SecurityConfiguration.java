@@ -20,9 +20,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/institution/**").hasAnyRole(MemberType.단체.toString(), MemberType.관리자.toString())
                 .requestMatchers("/admin/**").hasRole(MemberType.관리자.toString())  // 권한도 필요
                 .requestMatchers("/**").permitAll()
-                .and().formLogin().loginPage("/login").defaultSuccessUrl("/")// 로그인 페이지
-                .and().logout().logoutSuccessUrl("/login");  // 로그아웃시 로그인 페이지로 이동
-
+                .and().formLogin().loginPage("/loginform.html").defaultSuccessUrl("/")// 로그인 페이지
+                .and().logout().logoutSuccessUrl("/login")  // 로그아웃시 로그인 페이지로 이동
+                .and().oauth2Login().loginPage("/loginform.html").defaultSuccessUrl("/");  // OAuth2 로그인
 
 
         return http.build();

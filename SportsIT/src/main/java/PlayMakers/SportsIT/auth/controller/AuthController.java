@@ -58,9 +58,15 @@ public class AuthController {
         return "관리자만 볼 수 있음";
     }
 
-    @GetMapping("/error")
+    @GetMapping("/login/oauth2/client/google")
+    public String callback() {
+        return "callback";
+    }
+
+
+    @GetMapping("/login?error")
     public String error() {
-        return "error";
+        return "login error";
     }
 
 }
