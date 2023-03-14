@@ -25,4 +25,9 @@ public class Member {
     @Column(nullable = false)
     private MemberType memberType;
 
+    @Column
+    private String email;
+
+    @Column
+    private String phone;
 }
