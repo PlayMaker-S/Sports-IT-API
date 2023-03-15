@@ -5,6 +5,7 @@ import PlayMakers.SportsIT.member.domain.MemberDto;
 import PlayMakers.SportsIT.member.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
+@RequestMapping("/api")
 public class MemberController {
     //private final MemberService memberService = new MemberService();
     // 이런 방식으로 객체를 new로 생성하면 빈에 등록된 Service 객체를 받아와 사용하지 못함
@@ -29,13 +31,12 @@ public class MemberController {
     }
 
 
-    @PostMapping("/members/join")
-    public String create(@RequestBody MemberDto data){
+    @PostMapping("/signup")
+    public ResponseEntity<Member> signup(@RequestBody MemberDto data){
         log.info("member = {}", data);
         //System.out.println("member = " + member.toString());
-        memberService.join(data);
 
-        return "ok";
+        return ResponseEntity.ok(memberService.join(data));
     }
 
     @GetMapping("/members")
