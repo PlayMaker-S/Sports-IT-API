@@ -1,72 +1,57 @@
 package PlayMakers.SportsIT.auth.controller;
 
+import PlayMakers.SportsIT.auth.dto.LoginDto;
+import PlayMakers.SportsIT.auth.dto.TokenDto;
+import PlayMakers.SportsIT.auth.security.jwt.JwtAuthenticationFilter;
+import PlayMakers.SportsIT.auth.security.jwt.JwtTokenProvider;
 import PlayMakers.SportsIT.member.domain.MemberDto;
 import PlayMakers.SportsIT.member.domain.MemberType;
 import PlayMakers.SportsIT.member.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@RequestMapping("/api")
 public class AuthController {
-    private final MemberService memberService;
+    private final JwtTokenProvider tokenProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    @Autowired
-    public AuthController(MemberService memberService) {
-        this.memberService = memberService;
+
+    public AuthController(JwtTokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+        try {
+            this.tokenProvider = tokenProvider;
+            this.authenticationManagerBuilder = authenticationManagerBuilder;
+        } catch (Exception e) {
+            throw new RuntimeException("생성 실패");
+        }
     }
 
-    //@Autowired
-    //private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @PostMapping("/authenticate")
+    public ResponseEntity<TokenDto> authorize(@RequestBody LoginDto loginDto) {
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginDto.getLoginId(), loginDto.getPw());
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = tokenProvider.createToken(authentication); // JWT Token 생성
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JwtAuthenticationFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+
+        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }
-
-    @PostMapping("/login")
-    public String login(@RequestBody MemberDto data){
-        log.info("member = {}", data);
-        return "ok";
-    }
-
-    @GetMapping("/join")
-    public String join(){
-        return "join";
-    }
-
-    @PostMapping("/join")
-    public String join(@RequestBody MemberDto data){
-        log.info("member = {}", data);
-        String rawPassword = data.getPw();
-        //String encPassword = bCryptPasswordEncoder.encode(rawPassword);
-        //data.setPw(encPassword);
-        memberService.join(data);
-        return "ok";
-    }
-
-    @Secured("ROLE_ADMIN")  // 특정 url만 권한 설정할 때
-    @GetMapping("/admin/test")
-    public String test() {
-        return "관리자만 볼 수 있음";
-    }
-
-    @GetMapping("/login/oauth2/client/google")
-    public String callback() {
-        return "callback";
-    }
-
-
-    @GetMapping("/login?error")
-    public String error() {
-        return "login error";
-    }
-
 }
