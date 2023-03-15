@@ -1,8 +1,11 @@
 package PlayMakers.SportsIT.member.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @AllArgsConstructor @NoArgsConstructor
 @Builder
@@ -21,13 +24,21 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberType memberType;
-
     @Column
     private String email;
 
     @Column
     private String phone;
+
+    @JsonIgnore
+    @Column
+    private boolean activated;
+
+    @ManyToMany
+    @JoinTable(
+            name = "member_authority",
+            joinColumns = {@JoinColumn(name = "member_uid", referencedColumnName = "uid")},
+            inverseJoinColumns = {@JoinColumn(name = "member_type", referencedColumnName = "member_type")})
+    private Set<MemberType> memberType;
+
 }
