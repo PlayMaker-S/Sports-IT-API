@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.member.service;
 
+import PlayMakers.SportsIT.auth.security.SecurityUtil;
 import PlayMakers.SportsIT.member.domain.Member;
 import PlayMakers.SportsIT.member.domain.MemberDto;
 import PlayMakers.SportsIT.member.domain.MemberType;
@@ -7,8 +8,10 @@ import PlayMakers.SportsIT.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,27 +20,45 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원 가입
      */
-    public Long join(MemberDto dto) {
+    public Member join(MemberDto dto) {
         // 같은 이름을 갖는 중복 회원은 X
-        //validateDuplicateMember(member);
-        //dto.setPw(encoder.encode(dto.getPw()));
-        dto.setPw(dto.getPw()); // 추후 인코드 기능 추가 예정
-        String memberType = dto.getMemberType();
+        validateDuplicateMember(dto);  // 중복 회원 검증
 
-        Member newMember = memberRepository.save(dto.toEntity());
+        String memberTypeString = dto.getMemberType();
+        MemberType memberType = MemberType.builder()
+                .roleName(memberTypeString)
+                .build();
 
-        return newMember.getUid();
+        Member member = Member.builder()
+                .loginId(dto.getLoginId())
+                .pw(passwordEncoder.encode(dto.getPw()))
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .memberType(Collections.singleton(memberType))
+                .activated(true)
+                .build();
+
+        return memberRepository.save(member);
     }
 
-    private void validateDuplicateMember(Member member) {
-        memberRepository.findByName(member.getName())
-                .ifPresent(m -> {
-                    throw new IllegalStateException("이미 존재하는 회원입니다.");
-                });
+    private void validateDuplicateMember(MemberDto dto) {
+        if (memberRepository.findOneWithMemberTypeByLoginId(dto.getLoginId()).orElse(null) != null) {
+            throw new IllegalStateException("이미 존재하는 회원입니다.");
+        }
+    }
+
+    public Optional<Member> getMemberWithMemberTypeByLoginId(String loginId) {
+        return memberRepository.findOneWithMemberTypeByLoginId(loginId);
+    }
+
+    public Optional<Member> getMyMemberWithMemberType() {
+        return SecurityUtil.getCurrentLoginId().flatMap(memberRepository::findOneWithMemberTypeByLoginId);
     }
 
     /**

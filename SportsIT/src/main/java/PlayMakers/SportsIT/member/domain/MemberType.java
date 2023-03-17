@@ -1,14 +1,19 @@
 package PlayMakers.SportsIT.member.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
 
-@Getter
-@RequiredArgsConstructor
-public enum MemberType {
-    선수("ROLE_USER"),
-    단체("ROLE_INSTITUTION"),
-    관리자("ROLE_ADMIN");
+@Entity
+@Table(name = "member_type")
+@Getter @Setter @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class MemberType {
 
-    private final String value;
+    @Id
+    @Column(name = "member_type", nullable = false)
+    private String roleName;
 }
