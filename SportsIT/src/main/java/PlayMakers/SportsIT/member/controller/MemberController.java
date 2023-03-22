@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,13 +40,18 @@ public class MemberController {
         return ResponseEntity.ok(memberService.join(data));
     }
 
-    @GetMapping("/members")
+    @GetMapping("/member")
     public Member getProfile(@RequestParam Map<String, Object> paramMap) {
-        log.debug("paramMap = {}", paramMap.get("id"));
-        Long id = Long.parseLong((String) paramMap.get("id"));
-        Member member = memberService.findOne(id).get();
-
+        log.info("paramMap = {}", paramMap.get("id"));
+        String id = String.valueOf(paramMap.get("id"));
+        Member member = memberService.findOne(id);
         return member;
+    }
+
+    @GetMapping("/members/all")
+    public List<Member> getMemberAll(){
+        List<Member> members = memberService.findMembers();
+        return members;
     }
 
     // Test
