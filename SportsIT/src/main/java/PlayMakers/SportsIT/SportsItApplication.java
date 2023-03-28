@@ -17,7 +17,7 @@ public class SportsItApplication {
 		String server = "localhost"; // MySQL 서버 주소
 		String database = "sportsit_test"; // MySQL DATABASE 이름
 		String user_name = "root"; //  MySQL 서버 아이디
-		String password = "1234"; // MySQL 서버 비밀번호
+		String password = "12345678"; // MySQL 서버 비밀번호
 
 		// mysql 드라이버 로딩
 		try {
