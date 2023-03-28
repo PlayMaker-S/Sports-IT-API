@@ -70,10 +70,9 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
-    public Optional<Member> findByName(String name){return memberRepository.findByName(name);}
+    public List<Member> findByName(String name){return memberRepository.findByName(name);}
 
     public Member findOne(String memberId) {
         return memberRepository.findByLoginId(memberId);
-
     }
 }

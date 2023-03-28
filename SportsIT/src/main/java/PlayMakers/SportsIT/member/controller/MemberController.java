@@ -41,21 +41,19 @@ public class MemberController {
     }
 
     @GetMapping("/member")
-    public Member getProfile(@RequestParam Map<String, Object> paramMap) {
-        log.info("paramMap = {}", paramMap.get("id"));
-        String id = String.valueOf(paramMap.get("id"));
-        Member member = memberService.findOne(id);
-        return member;
+    public List<Member> getProfile(@RequestParam Map<String, Object> paramMap, @RequestBody Map<String, Object> data) {
+        log.info("paramMap = {}", data.get("name"));
+        String name = String.valueOf(data.get("name"));
+        return memberService.findByName(name);
     }
 
-    @GetMapping("/members/all")
+    @GetMapping("/member/all")
     public List<Member> getMemberAll(){
-        List<Member> members = memberService.findMembers();
-        return members;
+        return memberService.findMembers();
     }
 
     // Test
-    @GetMapping("/members/home")
+    @GetMapping("/member/home")
     public String home() {
         return "home";
     }
