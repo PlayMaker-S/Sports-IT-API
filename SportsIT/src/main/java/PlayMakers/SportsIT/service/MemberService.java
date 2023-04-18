@@ -7,6 +7,7 @@ import PlayMakers.SportsIT.domain.MemberType;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -29,10 +31,11 @@ public class MemberService {
         validateDuplicateMember(dto);  // 중복 회원 검증
 
         String memberTypeString = dto.getMemberType();
+
         MemberType memberType = MemberType.builder()
                 .roleName(memberTypeString)
                 .build();
-
+        log.info("memberType: {}", memberType);
         Member member = Member.builder()
                 .loginId(dto.getLoginId())
                 .pw(passwordEncoder.encode(dto.getPw()))
@@ -67,8 +70,9 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
-    public Optional<Member> findOne(Long memberId) {
-        return memberRepository.findById(memberId);
+    public List<Member> findByName(String name){return memberRepository.findByName(name);}
 
+    public Member findOne(String memberId) {
+        return memberRepository.findByLoginId(memberId);
     }
 }
