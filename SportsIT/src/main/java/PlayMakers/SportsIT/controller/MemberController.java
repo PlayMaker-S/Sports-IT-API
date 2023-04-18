@@ -1,18 +1,14 @@
-package PlayMakers.SportsIT.member.controller;
+package PlayMakers.SportsIT.controller;
 
-import PlayMakers.SportsIT.member.domain.Member;
-import PlayMakers.SportsIT.member.domain.MemberDto;
-import PlayMakers.SportsIT.member.service.MemberService;
+import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.dto.MemberDto;
+import PlayMakers.SportsIT.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -44,6 +40,10 @@ public class MemberController {
         log.debug("paramMap = {}", paramMap.get("id"));
         Long id = Long.parseLong((String) paramMap.get("id"));
         Member member = memberService.findOne(id).get();
+        log.debug("member = {}", member);
+        log.info("member = {}", member);
+        log.info("member = {}", member);
+
 
         return member;
     }

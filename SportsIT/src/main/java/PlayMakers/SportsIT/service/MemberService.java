@@ -1,13 +1,12 @@
-package PlayMakers.SportsIT.member.service;
+package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.auth.security.SecurityUtil;
-import PlayMakers.SportsIT.member.domain.Member;
-import PlayMakers.SportsIT.member.domain.MemberDto;
-import PlayMakers.SportsIT.member.domain.MemberType;
-import PlayMakers.SportsIT.member.repository.MemberRepository;
+import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.dto.MemberDto;
+import PlayMakers.SportsIT.domain.MemberType;
+import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

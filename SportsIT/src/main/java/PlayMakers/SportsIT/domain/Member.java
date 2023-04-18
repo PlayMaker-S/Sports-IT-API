@@ -1,9 +1,9 @@
-package PlayMakers.SportsIT.member.domain;
+package PlayMakers.SportsIT.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
@@ -24,7 +24,7 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column

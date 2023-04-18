@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.member.controller;
+package PlayMakers.SportsIT.controller;
 
 
 public class MemberForm {

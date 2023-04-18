@@ -1,7 +1,8 @@
 package PlayMakers.SportsIT.member.repository;
 
-import PlayMakers.SportsIT.member.domain.Member;
-import PlayMakers.SportsIT.member.domain.MemberType;
+import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.domain.MemberType;
+import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;

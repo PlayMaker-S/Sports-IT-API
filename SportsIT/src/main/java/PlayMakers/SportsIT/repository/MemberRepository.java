@@ -1,6 +1,6 @@
-package PlayMakers.SportsIT.member.repository;
+package PlayMakers.SportsIT.repository;
 
-import PlayMakers.SportsIT.member.domain.Member;
+import PlayMakers.SportsIT.domain.Member;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
