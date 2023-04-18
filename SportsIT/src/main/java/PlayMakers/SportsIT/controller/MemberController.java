@@ -36,24 +36,12 @@ public class MemberController {
         return ResponseEntity.ok(memberService.join(data));
     }
 
-<<<<<<< HEAD:SportsIT/src/main/java/PlayMakers/SportsIT/controller/MemberController.java
-    @GetMapping("/members")
-    public Member getProfile(@RequestParam Map<String, Object> paramMap) {
-        log.debug("paramMap = {}", paramMap.get("id"));
-        Long id = Long.parseLong((String) paramMap.get("id"));
-        Member member = memberService.findOne(id).get();
-        log.debug("member = {}", member);
-        log.info("member = {}", member);
-        log.info("member = {}", member);
-
-=======
     @GetMapping("/member")
     public List<Member> getProfile(@RequestParam Map<String, Object> paramMap, @RequestBody Map<String, Object> data) {
         log.info("paramMap = {}", data.get("name"));
         String name = String.valueOf(data.get("name"));
         return memberService.findByName(name);
     }
->>>>>>> 2d21fe216a200afba4b9989d787d429e7d575dc6:SportsIT/src/main/java/PlayMakers/SportsIT/member/controller/MemberController.java
 
     @GetMapping("/member/all")
     public List<Member> getMemberAll(){
