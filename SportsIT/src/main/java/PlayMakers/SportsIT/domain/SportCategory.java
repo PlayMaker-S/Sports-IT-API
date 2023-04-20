@@ -1,8 +1,13 @@
 package PlayMakers.SportsIT.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Getter
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum SportCategory {
     SOCCER("축구"),
     TENNIS("테니스"),
@@ -10,8 +15,21 @@ public enum SportCategory {
     GOLF("골프"),
     TABLE_TENNIS("탁구"),
     ARM_WRESTLING("팔씨름");
-    private String name;
-    private SportCategory(String name) {
-        this.name = name;
+
+    private String categoryName;
+
+    SportCategory(String categoryName) {
+        this.categoryName = categoryName;
     }
+
+    public String getCategory() {
+        return categoryName;
+    }
+
+    public static Optional<SportCategory> fromCategoryName(String categoryName) {
+        return Arrays.stream(values())
+                .filter(category -> category.categoryName.equals(categoryName))
+                .findFirst();
+    }
+
 }

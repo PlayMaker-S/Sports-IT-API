@@ -11,15 +11,15 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
-@Getter @Setter
 @Builder
 @AllArgsConstructor @NoArgsConstructor
+@Data // @ToString, @EqualsAndHashCode, @Getter, @Setter, @RequiredArgsConstructor
 public class CompetitionDto {
 
     private Long competitionId;
     private String name;
-    private String hostEmail;
-    private Integer sportsType;
+    private Long hostId;
+    private String sportCategory;
     private Integer viewCount;
     private Integer scrapCount;
     private LocalDateTime startDate;
