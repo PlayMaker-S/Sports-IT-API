@@ -72,8 +72,8 @@ class CompetitionServiceTest {
 
         CompetitionDto dto = CompetitionDto.builder()
                 .name("대회이름")
-                .hostId(host.getUid())
-                .sportCategory(String.valueOf(SportCategory.fromCategoryName("팔씨름").get()))
+                .host(host)
+                .sportCategory(SportCategory.ARM_WRESTLING)
                 .viewCount(0)
                 .scrapCount(0)
                 .startDate(LocalDateTime.now())
