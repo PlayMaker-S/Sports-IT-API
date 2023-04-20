@@ -19,12 +19,12 @@ public class CompetitionService {
 
 
     public Competition createCompetition(CompetitionDto dto) {
-        Member host = memberRepository.findById(dto.getHostId()).orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+        Member host = memberRepository.findById(dto.getHost().getUid()).orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
 
         Competition newCompetition = Competition.builder()
                 .name(dto.getName())
                 .host(host)
-                .category(SportCategory.valueOf(dto.getSportCategory()))
+                .category(dto.getSportCategory())
                 .content(dto.getContent())
                 .location(dto.getLocation())
                 .state(dto.getState())
