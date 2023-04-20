@@ -1,6 +1,9 @@
 package PlayMakers.SportsIT.dto;
 
+import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.CompetitionState;
+import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.domain.SportCategory;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,8 +21,8 @@ public class CompetitionDto {
 
     private Long competitionId;
     private String name;
-    private Long hostId;
-    private String sportCategory;
+    private Member host;
+    private SportCategory sportCategory;
     private Integer viewCount;
     private Integer scrapCount;
     private LocalDateTime startDate;
@@ -32,4 +35,23 @@ public class CompetitionDto {
     private String stateDetail;
     private String createdDate;
     private String updatedDate;
+
+    public Competition toEntity() {
+        return Competition.builder()
+                .competitionId(competitionId)
+                .name(name)
+                .host(host)
+                .category(sportCategory)
+                .viewCount(viewCount)
+                .scrapCount(scrapCount)
+                .startDate(startDate)
+                .recruitingStart(recruitingStart)
+                .recruitingEnd(recruitingEnd)
+                .totalPrize(totalPrize)
+                .content(content)
+                .location(location)
+                .state(state)
+                .stateDetail(stateDetail)
+                .build();
+    }
 }
