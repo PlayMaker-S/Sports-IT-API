@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @Getter @Setter
 @Entity (name="member")
-public class Member {
+public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
     @Column(nullable = false)
@@ -40,12 +40,5 @@ public class Member {
             joinColumns = {@JoinColumn(name = "member_uid", referencedColumnName = "uid")},
             inverseJoinColumns = {@JoinColumn(name = "member_type", referencedColumnName = "member_type")})
     private Set<MemberType> memberType;
-    @Builder.Default
-    @CreatedDate
-    private LocalDateTime createdDate = LocalDateTime.now();
-    @Builder.Default
-    @LastModifiedDate
-    private LocalDateTime updatedDate = LocalDateTime.now();
-
 
 }

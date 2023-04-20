@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @DynamicInsert // null인 필드는
 @Entity(name="competition") // 대회 엔티티 이름 지정
-public class Competition {
+public class Competition extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) // MySQL에서는 AI 해제할 것
     private Long competitionId;
     @Column(nullable = false)
@@ -50,12 +50,7 @@ public class Competition {
     private CompetitionState state = CompetitionState.RECRUITING; // 대회 상태 - enum으로 구현했을 때
     @Column
     private String stateDetail; // 대회 상세 상태
-    @Builder.Default
-    @CreatedDate
-    private LocalDateTime createdDate = LocalDateTime.now();  // dto에서는 제외해도 될듯
-    @Builder.Default
-    @LastModifiedDate
-    private LocalDateTime updatedDate = LocalDateTime.now();  // 마찬가지
+
     @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
     @JoinTable(
             name = "competition_host",
