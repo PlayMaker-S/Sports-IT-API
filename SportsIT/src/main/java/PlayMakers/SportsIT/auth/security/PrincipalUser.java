@@ -40,7 +40,7 @@ public class PrincipalUser extends User {
 
     @Override
     public String getUsername() {
-        return member.getLoginId();
+        return member.getEmail();
     }
 
     @Override

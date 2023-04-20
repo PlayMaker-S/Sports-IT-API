@@ -37,7 +37,6 @@ public class MemberService {
                 .build();
         log.info("memberType: {}", memberType);
         Member member = Member.builder()
-                .loginId(dto.getLoginId())
                 .pw(passwordEncoder.encode(dto.getPw()))
                 .name(dto.getName())
                 .email(dto.getEmail())
@@ -50,17 +49,17 @@ public class MemberService {
     }
 
     private void validateDuplicateMember(MemberDto dto) {
-        if (memberRepository.findOneWithMemberTypeByLoginId(dto.getLoginId()).orElse(null) != null) {
+        if (memberRepository.findOneWithMemberTypeByEmail(dto.getEmail()).orElse(null) != null) {
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
     }
 
     public Optional<Member> getMemberWithMemberTypeByLoginId(String loginId) {
-        return memberRepository.findOneWithMemberTypeByLoginId(loginId);
+        return memberRepository.findOneWithMemberTypeByEmail(loginId);
     }
 
     public Optional<Member> getMyMemberWithMemberType() {
-        return SecurityUtil.getCurrentLoginId().flatMap(memberRepository::findOneWithMemberTypeByLoginId);
+        return SecurityUtil.getCurrentLoginId().flatMap(memberRepository::findOneWithMemberTypeByEmail);
     }
 
     /**
@@ -73,6 +72,6 @@ public class MemberService {
     public List<Member> findByName(String name){return memberRepository.findByName(name);}
 
     public Member findOne(String memberId) {
-        return memberRepository.findByLoginId(memberId);
+        return memberRepository.findByEmail(memberId);
     }
 }

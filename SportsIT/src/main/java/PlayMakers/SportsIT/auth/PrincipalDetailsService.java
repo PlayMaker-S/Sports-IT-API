@@ -26,11 +26,11 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        Member memberEntity = memberRepository.findByLoginId(loginId);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Member memberEntity = memberRepository.findByEmail(email);
 
-        return memberRepository.findOneWithMemberTypeByLoginId(loginId)
-                .map(member -> createUser(loginId, member))
+        return memberRepository.findOneWithMemberTypeByEmail(email)
+                .map(member -> createUser(email, member))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found in DB."));
     }
 
@@ -42,7 +42,7 @@ public class PrincipalDetailsService implements UserDetailsService {
                 .map(memberType -> (GrantedAuthority) () -> memberType.getRoleName())
                 .toList();
         return new User(
-                member.getLoginId(),
+                member.getEmail(),
                 member.getPw(),
                 grantedAuthorities);
     }

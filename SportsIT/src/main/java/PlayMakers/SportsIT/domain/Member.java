@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @AllArgsConstructor @NoArgsConstructor
@@ -12,12 +16,8 @@ import java.util.Set;
 @Getter @Setter
 @Entity (name="member")
 public class Member {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-
-    @Column(nullable = false, unique = true)
-    private String loginId;
-
     @Column(nullable = false)
     private String pw;
 
@@ -27,12 +27,12 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String phone;
 
-    @JsonIgnore
-    @Column
-    private boolean activated;
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean activated = true;
 
     @ManyToMany
     @JoinTable(
@@ -40,5 +40,12 @@ public class Member {
             joinColumns = {@JoinColumn(name = "member_uid", referencedColumnName = "uid")},
             inverseJoinColumns = {@JoinColumn(name = "member_type", referencedColumnName = "member_type")})
     private Set<MemberType> memberType;
+    @Builder.Default
+    @CreatedDate
+    private LocalDateTime createdDate = LocalDateTime.now();
+    @Builder.Default
+    @LastModifiedDate
+    private LocalDateTime updatedDate = LocalDateTime.now();
+
 
 }
