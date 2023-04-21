@@ -45,11 +45,16 @@ public class Competition extends BaseEntity {
     private String content; // 대회 내용
     @Column(nullable = false)
     private String location; // 대회 장소
+    @Column(nullable = false)
+    private String locationDetail; // 대회 장소 상세
     @Builder.Default
     @Enumerated(EnumType.ORDINAL)
     private CompetitionState state = CompetitionState.RECRUITING; // 대회 상태 - enum으로 구현했을 때
-    @Column
+    @Column(nullable = false)
     private String stateDetail; // 대회 상세 상태
+    @Builder.Default
+    @Column(nullable = false)
+    private CompetitionType competitionType = CompetitionType.FREE; // 대회 타입 FREE, PREMIUM, VIP
 
     @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
     @JoinTable(
