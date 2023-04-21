@@ -7,28 +7,27 @@ import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.service.CompetitionService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 실제 DB로 테스트
-//@RunWith(SpringJUnit4ClassRunner.class)
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 class CompetitionServiceUnitTest {
-    @Autowired
+    @Mock
     CompetitionRepository competitionRepository;
-    @Autowired
+    @Mock
     MemberRepository memberRepository;
+
+    @InjectMocks
+    CompetitionService competitionService;
 
     MemberType userTypePlayer = MemberType.builder()
             .roleName("ROLE_INSTITUTION")
@@ -55,35 +54,25 @@ class CompetitionServiceUnitTest {
         memberRepository.save(host);
     }
     @Test
+    @DisplayName("주최자는 대회를 생성할 수 있다.")
     public void 주최자대회생성() {
-        CompetitionService competitionService = new CompetitionService(competitionRepository, memberRepository);
-
-        for (Member member : memberRepository.findAll()) {
-            System.out.println("member email = " + member.getEmail());
-        }
 
         // given 호스트가 대회 생성
         Member host = memberRepository.findByEmail("host@gmail.com");
-        // host가 널일 경우
 
+        // host가 널일 경우
         CompetitionDto dto = CompetitionDto.builder()
                 .name("대회이름")
                 .host(host)
                 .sportCategory(SportCategory.ARM_WRESTLING)
-                .viewCount(0)
-                .scrapCount(0)
-                .startDate(LocalDateTime.now())
-                .recruitingStart(LocalDateTime.now())
-                .recruitingEnd(LocalDateTime.now())
                 .totalPrize(10000)
                 .content("대회내용")
                 .location("대회장소")
                 .state(CompetitionState.RECRUITING)
                 .build();
 
-
         // when 대회 dto 생성
-        Competition created = competitionService.createCompetition(dto);
+        Competition created = competitionService.create(dto);
         Competition saved = competitionRepository.findById(created.getCompetitionId()).get();
 
         // then

@@ -78,12 +78,13 @@ class CompetitionServiceIntegrationTest {
                 .totalPrize(10000)
                 .content("대회내용")
                 .location("대회장소")
+                .locationDetail("대회장소상세")
                 .state(CompetitionState.RECRUITING)
                 .build();
 
 
         // when 대회 dto 생성
-        Competition created = competitionService.createCompetition(dto);
+        Competition created = competitionService.create(dto);
         Competition saved = competitionRepository.findById(created.getCompetitionId()).get();
 
         // then
