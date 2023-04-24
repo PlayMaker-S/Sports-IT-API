@@ -1,38 +1,38 @@
-package PlayMakers.SportsIT.member.domain;
+package PlayMakers.SportsIT.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Component;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @AllArgsConstructor @NoArgsConstructor
 @Builder
 @Getter @Setter
 @Entity (name="member")
-public class Member {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+public class Member extends BaseEntity {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-
-    @Column(nullable = false, unique = true)
-    private String loginId;
-
     @Column(nullable = false)
     private String pw;
 
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String phone;
 
-    @JsonIgnore
-    @Column
-    private boolean activated;
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean activated = true;
 
     @ManyToMany
     @JoinTable(

@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.member.domain;
+package PlayMakers.SportsIT.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

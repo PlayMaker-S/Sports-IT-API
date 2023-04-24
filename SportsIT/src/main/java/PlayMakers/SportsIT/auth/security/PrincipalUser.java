@@ -1,14 +1,10 @@
 package PlayMakers.SportsIT.auth.security;
 
-import PlayMakers.SportsIT.member.domain.Member;
-import PlayMakers.SportsIT.member.domain.MemberDto;
-import lombok.RequiredArgsConstructor;
+import PlayMakers.SportsIT.domain.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Slf4j
@@ -44,7 +40,7 @@ public class PrincipalUser extends User {
 
     @Override
     public String getUsername() {
-        return member.getLoginId();
+        return member.getEmail();
     }
 
     @Override

@@ -5,23 +5,17 @@ import PlayMakers.SportsIT.auth.security.jwt.JwtAccessDeniedHandler;
 import PlayMakers.SportsIT.auth.security.jwt.JwtAuthenticationEntryPoint;
 import PlayMakers.SportsIT.auth.security.jwt.JwtSecurityConfig;
 import PlayMakers.SportsIT.auth.security.jwt.JwtTokenProvider;
-import PlayMakers.SportsIT.member.domain.MemberType;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -86,7 +80,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/login").permitAll()  // 로그인은 누구나 가능
                 .requestMatchers("/api/authenticate").permitAll()
                 .requestMatchers("/members/**").authenticated()  // 인증만 필요
-                .requestMatchers("/institution/**").hasAnyRole("ROLE_IDENTITY", "ROLE_ADMIN")
+                .requestMatchers("/institution/**").hasAnyRole("ROLE_INSTITUTION", "ROLE_ADMIN")
                 .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")  // 권한도 필요
                 .requestMatchers("/**").permitAll()
                 .and().formLogin().loginPage("/loginform.html").defaultSuccessUrl("/")// 로그인 페이지

@@ -1,11 +1,9 @@
-package PlayMakers.SportsIT.auth.service;
+package PlayMakers.SportsIT.auth;
 
-import PlayMakers.SportsIT.auth.security.PrincipalUser;
-import PlayMakers.SportsIT.member.domain.Member;
-import PlayMakers.SportsIT.member.repository.MemberRepository;
+import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -29,11 +26,11 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        Member memberEntity = memberRepository.findByLoginId(loginId);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Member memberEntity = memberRepository.findByEmail(email);
 
-        return memberRepository.findOneWithMemberTypeByLoginId(loginId)
-                .map(member -> createUser(loginId, member))
+        return memberRepository.findOneWithMemberTypeByEmail(email)
+                .map(member -> createUser(email, member))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found in DB."));
     }
 
@@ -45,7 +42,7 @@ public class PrincipalDetailsService implements UserDetailsService {
                 .map(memberType -> (GrantedAuthority) () -> memberType.getRoleName())
                 .toList();
         return new User(
-                member.getLoginId(),
+                member.getEmail(),
                 member.getPw(),
                 grantedAuthorities);
     }

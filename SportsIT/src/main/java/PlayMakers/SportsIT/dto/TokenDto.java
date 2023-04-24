@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.auth.dto;
+package PlayMakers.SportsIT.dto;
 
 import lombok.*;
 

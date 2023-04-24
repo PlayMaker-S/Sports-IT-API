@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.member.domain;
+package PlayMakers.SportsIT.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

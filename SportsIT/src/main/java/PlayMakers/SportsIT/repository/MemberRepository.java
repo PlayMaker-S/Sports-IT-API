@@ -1,6 +1,6 @@
-package PlayMakers.SportsIT.member.repository;
+package PlayMakers.SportsIT.repository;
 
-import PlayMakers.SportsIT.member.domain.Member;
+import PlayMakers.SportsIT.domain.Member;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,9 +10,9 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
         List<Member> findByName(String name);
-        Member findByLoginId(String loginId);
+        Member findByEmail(String email);;
         List<Member> findAll();
 
         @EntityGraph(attributePaths = "memberType") // Eager 조회로 가져옴
-        Optional<Member> findOneWithMemberTypeByLoginId(String loginId);
+        Optional<Member> findOneWithMemberTypeByEmail(String email);
 }
