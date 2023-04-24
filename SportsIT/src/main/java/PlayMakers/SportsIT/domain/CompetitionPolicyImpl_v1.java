@@ -22,7 +22,10 @@ public class CompetitionPolicyImpl_v1 implements CompetitionPolicy{
     @Override
     public CompetitionState getCompetitionState(Competition competition) {
         LocalDateTime now = LocalDateTime.now();
-
-        return CompetitionState.IN_PROGRESS;
+        if (now.isBefore(competition.getRecruitingStart())) return CompetitionState.PLANNING;
+        else if (now.isBefore(competition.getRecruitingEnd())) return CompetitionState.RECRUITING;
+        else if (now.isBefore(competition.getStartDate())) return CompetitionState.RECRUITING_END;
+        else if (now.isAfter(competition.getStartDate()) || now.isEqual(competition.getStartDate())) return CompetitionState.IN_PROGRESS;
+        else throw new IllegalArgumentException("모집 및 대회 일정이 정확한지 확인해주세요.");
     }
 }

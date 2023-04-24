@@ -37,7 +37,7 @@ public class CompetitionService {
 
         // 대회 상태 설정 (PLANNING, RECRUITING, RECRUITING_END, IN_PROGRESS) : competition.state == null 일 경우
         if (newCompetition.getState() == null) {
-            autoSetCompetitionState(newCompetition);
+            newCompetition.setState(competitionPolicy.getCompetitionState(newCompetition));
         }
 
         // 대회 타입 설정 (FREE, PREMIUM, VIP) : competition.type == null 일 경우
@@ -59,26 +59,6 @@ public class CompetitionService {
         log.info("CompetitionService.create() : {}", newCompetition.getState());
 
         return competitionRepository.save(newCompetition);
-    }
-
-    private static void setAutoCompetitionType(Member host, Competition newCompetition) {
-        if (host.getSubscription() == Subscribe.BASIC_HOST) newCompetition.setCompetitionType(CompetitionType.FREE);
-        else if (host.getSubscription() == Subscribe.PREMIUM_HOST) newCompetition.setCompetitionType(CompetitionType.PREMIUM);
-        else if (host.getSubscription() == Subscribe.VIP_HOST) newCompetition.setCompetitionType(CompetitionType.VIP);
-        else throw new IllegalArgumentException("회원의 구독 정보가 올바르지 않습니다. 회원 타입 : " + host.getMemberType());
-    }
-
-    public static void autoSetCompetitionState(Competition newCompetition) {
-        LocalDateTime today = LocalDateTime.now();
-        if (today.isBefore(newCompetition.getRecruitingStart())) {
-            newCompetition.setState(CompetitionState.PLANNING);
-        } else if (today.isBefore(newCompetition.getRecruitingEnd())) {
-            newCompetition.setState(CompetitionState.RECRUITING);
-        } else if (today.isBefore(newCompetition.getStartDate())) {
-            newCompetition.setState(CompetitionState.RECRUITING_END);
-        } else {
-            newCompetition.setState(CompetitionState.IN_PROGRESS);
-        }
     }
 
     private static void checkRequiredInfo(Competition newCompetition) {

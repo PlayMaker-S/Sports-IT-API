@@ -228,9 +228,11 @@ class CompetitionServiceUnitTest {
 
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            Competition mockCompetition = dto.toEntity();
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
-            given(competitionRepository.save(any(Competition.class))).willReturn(dto.toEntity());
+            given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
 
             // then
             Competition created = competitionService.create(dto);
@@ -251,9 +253,11 @@ class CompetitionServiceUnitTest {
 
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            Competition mockCompetition = dto.toEntity();
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
-            given(competitionRepository.save(any(Competition.class))).willReturn(dto.toEntity());
+            given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
 
             // then
             Competition created = competitionService.create(dto);
@@ -273,9 +277,11 @@ class CompetitionServiceUnitTest {
 
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            Competition mockCompetition = dto.toEntity();
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
-            given(competitionRepository.save(any(Competition.class))).willReturn(dto.toEntity());
+            given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
 
             // then
             Competition created = competitionService.create(dto);
@@ -295,8 +301,11 @@ class CompetitionServiceUnitTest {
 
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            Competition mockCompetition = dto.toEntity();
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
+
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
-            given(competitionRepository.save(any(Competition.class))).willReturn(dto.toEntity());
+            given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
 
             // then
             Competition created = competitionService.create(dto);
@@ -323,16 +332,52 @@ class CompetitionServiceUnitTest {
             Member host = Member.builder().uid(1L).memberType(Collections.singleton(userTypeInst)).build();
             CompetitionDto dto = getCompetitionDto(host);
             Competition mockCompetition = dto.toEntity();
-            mockCompetition.setCompetitionType(CompetitionType.FREE);
 
-            // when
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionPolicy.getCompetitionType(host)).willReturn(CompetitionType.FREE);
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
 
+            mockCompetition.setCompetitionType(competitionPolicy.getCompetitionType(host));
+
             // then
             Competition created = competitionService.create(dto);
             assertEquals(CompetitionType.FREE, created.getCompetitionType());
+        }
+        @Test
+        @DisplayName("주최자 타입이 HOST_BASIC이면 대회 타입은 FREE이다.")
+        public void PREMIUM타입_대회생성() {
+            // given and when
+            Member host = Member.builder().uid(1L).memberType(Collections.singleton(userTypeInst)).build();
+            CompetitionDto dto = getCompetitionDto(host);
+            Competition mockCompetition = dto.toEntity();
+
+            given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
+            given(competitionPolicy.getCompetitionType(host)).willReturn(CompetitionType.PREMIUM);
+            given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
+
+            mockCompetition.setCompetitionType(competitionPolicy.getCompetitionType(host));
+
+            // then
+            Competition created = competitionService.create(dto);
+            assertEquals(CompetitionType.PREMIUM, created.getCompetitionType());
+        }
+        @Test
+        @DisplayName("주최자 타입이 HOST_BASIC이면 대회 타입은 FREE이다.")
+        public void VIP타입_대회생성() {
+            // given and when
+            Member host = Member.builder().uid(1L).memberType(Collections.singleton(userTypeInst)).build();
+            CompetitionDto dto = getCompetitionDto(host);
+            Competition mockCompetition = dto.toEntity();
+
+            given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
+            given(competitionPolicy.getCompetitionType(host)).willReturn(CompetitionType.VIP);
+            given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
+
+            mockCompetition.setCompetitionType(competitionPolicy.getCompetitionType(host));
+
+            // then
+            Competition created = competitionService.create(dto);
+            assertEquals(CompetitionType.VIP, created.getCompetitionType());
         }
 
         private CompetitionDto getCompetitionDto(Member host) {
