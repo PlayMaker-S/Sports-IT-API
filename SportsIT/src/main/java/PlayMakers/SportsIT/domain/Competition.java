@@ -67,5 +67,26 @@ public class Competition extends BaseEntity {
     @Enumerated(EnumType.STRING) // enum 타입을 DB에 저장할 때, enum의 이름을 저장하도록 설정
     private SportCategory category;
 
+    @Override
+    public String toString() {
+        return "Competition{" +
+                "competitionId=" + competitionId +
+                ", name='" + name + '\'' +
+                ", host=" + host +
+                ", category=" + category +
+                ", viewCount=" + viewCount +
+                ", scrapCount=" + scrapCount +
+                ", startDate=" + startDate +
+                ", recruitingStart=" + recruitingStart +
+                ", recruitingEnd=" + recruitingEnd +
+                ", totalPrize=" + totalPrize +
+                ", content='" + content + '\'' +
+                ", location='" + location + '\'' +
+                ", locationDetail='" + locationDetail + '\'' +
+                ", state=" + state +
+                ", stateDetail='" + stateDetail + '\'' +
+                ", competitionType=" + competitionType +
+                '}';
+    }
 
 }
