@@ -68,6 +68,7 @@ class CompetitionRepositoryTest {
                 .totalPrize(10000)
                 .content("테스트 대회입니다.")
                 .location("아주대학교")
+                .locationDetail("체육관")
                 .category(category)
                 .host(host)
                 .build();

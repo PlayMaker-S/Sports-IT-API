@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.competition;
 
+import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
@@ -12,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
@@ -29,15 +31,18 @@ class CompetitionServiceIntegrationTest {
     CompetitionRepository competitionRepository;
     @Autowired
     MemberRepository memberRepository;
+    @MockBean  // @DataJpaTest에서는 JPA 관련 빈들만 등록되므로, @MockBean을 사용해야 한다.
+    @MainCompetitionPolicy
+    CompetitionPolicy competitionPolicy;
 
     MemberType userTypePlayer = MemberType.builder()
-            .roleName("ROLE_INSTITUTION")
+            .roleName("ROLE_PLAYER")
             .build();
     MemberType userTypeInst = MemberType.builder()
             .roleName("ROLE_INSTITUTION")
             .build();
     MemberType userTypeAdmin = MemberType.builder()
-            .roleName("ROLE_INSTITUTION")
+            .roleName("ROLE_ADMIN")
             .build();
 
     @BeforeEach
@@ -56,7 +61,7 @@ class CompetitionServiceIntegrationTest {
     }
     @Test
     public void 주최자대회생성() {
-        CompetitionService competitionService = new CompetitionService(competitionRepository, memberRepository);
+        CompetitionService competitionService = new CompetitionService(competitionRepository, memberRepository, competitionPolicy);
 
         for (Member member : memberRepository.findAll()) {
             System.out.println("member email = " + member.getEmail());
@@ -80,6 +85,7 @@ class CompetitionServiceIntegrationTest {
                 .location("대회장소")
                 .locationDetail("대회장소상세")
                 .state(CompetitionState.RECRUITING)
+                .competitionType(CompetitionType.FREE)
                 .build();
 
 
