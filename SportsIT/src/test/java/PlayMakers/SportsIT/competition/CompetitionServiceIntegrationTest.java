@@ -63,13 +63,8 @@ class CompetitionServiceIntegrationTest {
     public void 주최자대회생성() {
         CompetitionService competitionService = new CompetitionService(competitionRepository, memberRepository, competitionPolicy);
 
-        for (Member member : memberRepository.findAll()) {
-            System.out.println("member email = " + member.getEmail());
-        }
-
         // given 호스트가 대회 생성
         Member host = memberRepository.findByEmail("host@gmail.com");
-        // host가 널일 경우
 
         CompetitionDto dto = CompetitionDto.builder()
                 .name("대회이름")
@@ -95,7 +90,10 @@ class CompetitionServiceIntegrationTest {
 
         // then
         assertEquals(created.getCompetitionId(), saved.getCompetitionId());
-
+        log.info("created = {}", created.toString());
 
     }
+    /*
+        host의 구독정보, competition의 모집일/시작일 기준으로 동작하는 테스트 필요
+     */
 }
