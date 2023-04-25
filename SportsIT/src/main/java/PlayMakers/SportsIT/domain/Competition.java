@@ -86,6 +86,10 @@ public class Competition extends BaseEntity {
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Poster> posters = new ArrayList<>(); // 대회 포스터 URL
 
+    @Builder.Default
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CompetitionAgree> agreements = new ArrayList<>(); // 대회 규정
+
     @Override
     public String toString() {
         return "Competition{" +
