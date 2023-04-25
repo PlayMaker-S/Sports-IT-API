@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 // @AllArgsConstructor: 모든 필드값이 들어간 생성자 선언 @NoArgsConstructor : 이하 생략
 @AllArgsConstructor @NoArgsConstructor
@@ -20,11 +22,11 @@ import java.time.LocalDateTime;
 public class Competition extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) // MySQL에서는 AI 해제할 것
     private Long competitionId;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name; // 대회 이름
-    @Builder.Default
+    @Builder.Default // Builder의 default 설정 : viewCount = 0;
     @Column(nullable = false)
-    @ColumnDefault("0")
+    @ColumnDefault("0") // MySQL에서의 default 0으로 설정
     private Integer viewCount = 0; // 조회수
     @Builder.Default
     @Column(nullable = false)
@@ -43,15 +45,15 @@ public class Competition extends BaseEntity {
     private Integer totalPrize = 0; // 총 상금
     @Column(nullable = false, length=2000)
     private String content; // 대회 내용
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String location; // 대회 장소
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String locationDetail; // 대회 장소 상세
     @Builder.Default
     @Enumerated(EnumType.ORDINAL)
     private CompetitionState state = CompetitionState.RECRUITING; // 대회 상태 - enum으로 구현했을 때
 
-    @Column
+    @Column(length = 50)
     private String stateDetail; // 대회 상세 상태
     @Builder.Default
     @Column(nullable = false)
@@ -66,6 +68,23 @@ public class Competition extends BaseEntity {
 
     @Enumerated(EnumType.STRING) // enum 타입을 DB에 저장할 때, enum의 이름을 저장하도록 설정
     private SportCategory category;
+
+    @Column(length = 45)
+    private String templateID; // 대회 신청폼 ID
+
+    @Builder.Default
+    @Column(nullable = false)
+    @ColumnDefault("999")
+    private Integer maxPlayer = 999; // 최대 참가자 수
+
+    @Builder.Default
+    @Column(nullable = false)
+    @ColumnDefault("999")
+    private Integer maxViewer = 999; // 최대 관람자 수
+
+    @Builder.Default
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Poster> posters = new ArrayList<>(); // 대회 포스터 URL
 
     @Override
     public String toString() {
