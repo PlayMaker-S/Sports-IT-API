@@ -229,14 +229,15 @@ class CompetitionServiceUnitTest {
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
             Competition mockCompetition = dto.toEntity();
-            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
+            given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.PLANNING);
+
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             // then
             Competition created = competitionService.create(dto);
-            CompetitionService.autoSetCompetitionState(created);
             assertEquals(CompetitionState.PLANNING, created.getState());
 
         }
@@ -254,14 +255,15 @@ class CompetitionServiceUnitTest {
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
             Competition mockCompetition = dto.toEntity();
-            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
+            given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.RECRUITING);
+
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             // then
             Competition created = competitionService.create(dto);
-            CompetitionService.autoSetCompetitionState(created);
             assertEquals(CompetitionState.RECRUITING, created.getState());
         }
 
@@ -278,14 +280,15 @@ class CompetitionServiceUnitTest {
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
             Competition mockCompetition = dto.toEntity();
-            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
+            given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.RECRUITING_END);
+
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             // then
             Competition created = competitionService.create(dto);
-            CompetitionService.autoSetCompetitionState(created);
             assertEquals(CompetitionState.RECRUITING_END, created.getState());
         }
 
@@ -302,14 +305,16 @@ class CompetitionServiceUnitTest {
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
             Competition mockCompetition = dto.toEntity();
-            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
+            given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.IN_PROGRESS);
+
+            mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             // then
             Competition created = competitionService.create(dto);
-            CompetitionService.autoSetCompetitionState(created);
+            //CompetitionService.autoSetCompetitionState(created);
             assertEquals(CompetitionState.IN_PROGRESS, created.getState());
         }
 
