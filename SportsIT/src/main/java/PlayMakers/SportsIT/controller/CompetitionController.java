@@ -7,10 +7,13 @@ import PlayMakers.SportsIT.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,12 +24,13 @@ public class CompetitionController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<Competition> createCompetition(@RequestBody CompetitionDto dto) {
+    public ResponseEntity<Competition> createCompetition(@RequestBody CompetitionDto dto,
+                                                         @AuthenticationPrincipal User user) throws Exception{
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
-        //String hostLoginId = getLoggedInMemberId(); // 로그인한 회원 ID를 가져오는 메서드
-        //Member host = memberService.getMemberWithMemberTypeByLoginId(hostLoginId);
-        Member host = memberService.findOne("sportsit_test@abc.com"); // 임시
+        String hostEmail = user.getUsername(); // 로그인한 회원 ID를 가져옴
+        Member host = memberService.findOne(hostEmail);
         dto.setHost(host);
+
         // 대회 생성
         Competition competition = competitionService.create(dto);
 
@@ -34,9 +38,11 @@ public class CompetitionController {
                 .body(competition); // 201
     }
 
-    private String getLoggedInMemberId() {
-        // 로그인한 회원 ID를 가져오는 코드
-        return "";
+    @GetMapping
+    public ResponseEntity<Optional<Competition>> getCompetitions() {
+        //List<Competition> competitions = competitionService.getCompetitions();
+        Optional<Competition> competitions = null;
+        return ResponseEntity.ok(competitions); // 200
     }
 
     @GetMapping("/{competitionId}")

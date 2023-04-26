@@ -60,7 +60,7 @@ public class CompetitionService {
     }
 
     public Competition update(Long competitionId, CompetitionDto dto) {
-        log.info("CompetitionService.update() : {}", competitionId);
+        log.info("대회 수정 : {}", competitionId);
 
         // 수정 사항 검증
         Competition updated = dto.toEntity();
