@@ -50,16 +50,16 @@ public class Competition extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String locationDetail; // 대회 장소 상세
     @Builder.Default
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private CompetitionState state = CompetitionState.RECRUITING; // 대회 상태 - enum으로 구현했을 때
 
     @Column(length = 50)
     private String stateDetail; // 대회 상세 상태
     @Builder.Default
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CompetitionType competitionType = CompetitionType.FREE; // 대회 타입 FREE, PREMIUM, VIP
 
-    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "competition_host",
             joinColumns = @JoinColumn(name = "competition_id"),
@@ -73,21 +73,21 @@ public class Competition extends BaseEntity {
     private String templateID; // 대회 신청폼 ID
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(scale = 3)
     @ColumnDefault("999")
     private Integer maxPlayer = 999; // 최대 참가자 수
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(scale = 3)
     @ColumnDefault("999")
     private Integer maxViewer = 999; // 최대 관람자 수
 
     @Builder.Default
-    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true) // orphanRemoval : 대회 삭제 시, 대회 사진도 삭제, cascade : 대회 삭제 시, 대회 사진도 삭제
     private List<Poster> posters = new ArrayList<>(); // 대회 포스터 URL
 
     @Builder.Default
-    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true) // orphanRemoval : 대회 삭제 시, 대회 규정도 삭제, cascade : 대회 삭제 시, 대회 규정도 삭제
     private List<CompetitionAgree> agreements = new ArrayList<>(); // 대회 규정
 
     @Override
@@ -109,6 +109,7 @@ public class Competition extends BaseEntity {
                 ", state=" + state +
                 ", stateDetail='" + stateDetail + '\'' +
                 ", competitionType=" + competitionType +
+                ", templateID='" + templateID + '\'' +
                 '}';
     }
 

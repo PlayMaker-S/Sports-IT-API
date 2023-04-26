@@ -382,6 +382,7 @@ class CompetitionServiceUnitTest {
 
             // then
             Competition created = competitionService.create(dto);
+            log.info("created : {}", created);
             assertEquals(CompetitionType.VIP, created.getCompetitionType());
         }
 
