@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ class MemberRepositoryTest {
             .roleName("ROLE_USER")
             .build();
 
-    @Before
+    @BeforeEach
     public void before() {
         memberRepository.deleteAll();
 
@@ -41,7 +42,7 @@ class MemberRepositoryTest {
                 .name("홍길동")
                 .memberType(Collections.singleton(userType))
                 .email("test@google.com")
-                .phone("010-1234-5678")
+                .phone("010-1234-8765")
                 .build();
         Member member2 = Member.builder()
                 .pw("1234")
@@ -54,7 +55,7 @@ class MemberRepositoryTest {
                 .pw("1234")
                 .name("홍길동")
                 .memberType(Collections.singleton(userType))
-                .email("test@google.com")
+                .email("test222@google.com")
                 .phone("010-3333-3333")
                 .build();
 
@@ -94,22 +95,13 @@ class MemberRepositoryTest {
     @Test
     void 사용자_정보_수정() {
         //given
-        Member member = Member.builder()
-                .pw("1234")
-                .name("홍길동")
-                .memberType(Collections.singleton(userType))
-                .email("test4@gmail.com")
-                .phone("010-1234-5678")
-                .build();
-
-        Member savedMember = memberRepository.save(member);
+        Member savedMember = memberRepository.findByEmail("test2@naver.com");
         Long savedId = savedMember.getUid();
         String oldPw = savedMember.getPw();
 
         //when
-        Member findMember = memberRepository.findById(savedId).get();
         String newPw = "4321";
-        findMember.setPw(newPw);
+        savedMember.setPw(newPw);
         Member refindMember = memberRepository.findById(savedId).get();
 
         //then
