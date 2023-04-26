@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.competition;
 
+import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
@@ -8,18 +9,15 @@ import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.service.CompetitionService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,20 +26,23 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 실제 DB로 테스트
 //@RunWith(SpringJUnit4ClassRunner.class)
 @RunWith(SpringRunner.class)
-class CompetitionServiceTest {
+class CompetitionServiceIntegrationTest {
     @Autowired
     CompetitionRepository competitionRepository;
     @Autowired
     MemberRepository memberRepository;
+    @MockBean  // @DataJpaTest에서는 JPA 관련 빈들만 등록되므로, @MockBean을 사용해야 한다.
+    @MainCompetitionPolicy
+    CompetitionPolicy competitionPolicy;
 
     MemberType userTypePlayer = MemberType.builder()
-            .roleName("ROLE_INSTITUTION")
+            .roleName("ROLE_PLAYER")
             .build();
     MemberType userTypeInst = MemberType.builder()
             .roleName("ROLE_INSTITUTION")
             .build();
     MemberType userTypeAdmin = MemberType.builder()
-            .roleName("ROLE_INSTITUTION")
+            .roleName("ROLE_ADMIN")
             .build();
 
     @BeforeEach
@@ -60,15 +61,10 @@ class CompetitionServiceTest {
     }
     @Test
     public void 주최자대회생성() {
-        CompetitionService competitionService = new CompetitionService(competitionRepository, memberRepository);
-
-        for (Member member : memberRepository.findAll()) {
-            System.out.println("member email = " + member.getEmail());
-        }
+        CompetitionService competitionService = new CompetitionService(competitionRepository, memberRepository, competitionPolicy);
 
         // given 호스트가 대회 생성
         Member host = memberRepository.findByEmail("host@gmail.com");
-        // host가 널일 경우
 
         CompetitionDto dto = CompetitionDto.builder()
                 .name("대회이름")
@@ -82,17 +78,22 @@ class CompetitionServiceTest {
                 .totalPrize(10000)
                 .content("대회내용")
                 .location("대회장소")
+                .locationDetail("대회장소상세")
                 .state(CompetitionState.RECRUITING)
+                .competitionType(CompetitionType.FREE)
                 .build();
 
 
         // when 대회 dto 생성
-        Competition created = competitionService.createCompetition(dto);
+        Competition created = competitionService.create(dto);
         Competition saved = competitionRepository.findById(created.getCompetitionId()).get();
 
         // then
         assertEquals(created.getCompetitionId(), saved.getCompetitionId());
-
+        log.info("created = {}", created.toString());
 
     }
+    /*
+        host의 구독정보, competition의 모집일/시작일 기준으로 동작하는 테스트 필요
+     */
 }

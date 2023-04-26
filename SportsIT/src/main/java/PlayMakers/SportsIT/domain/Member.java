@@ -1,14 +1,8 @@
 package PlayMakers.SportsIT.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @AllArgsConstructor @NoArgsConstructor
@@ -29,6 +23,14 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String phone;
+
+    @Column
+    private String birth;
+
+    @Column(nullable = false)
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private Subscribe subscription = Subscribe.FREE;
 
     @Builder.Default
     @Column(nullable = false)
