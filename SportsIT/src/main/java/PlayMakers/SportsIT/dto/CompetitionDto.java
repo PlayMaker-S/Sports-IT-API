@@ -1,9 +1,6 @@
 package PlayMakers.SportsIT.dto;
 
-import PlayMakers.SportsIT.domain.Competition;
-import PlayMakers.SportsIT.domain.CompetitionState;
-import PlayMakers.SportsIT.domain.Member;
-import PlayMakers.SportsIT.domain.SportCategory;
+import PlayMakers.SportsIT.domain.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,8 +28,10 @@ public class CompetitionDto {
     private Integer totalPrize;
     private String content;
     private String location;
+    private String locationDetail;
     private CompetitionState state;
     private String stateDetail;
+    private CompetitionType competitionType;
     private String createdDate;
     private String updatedDate;
 
@@ -50,8 +49,10 @@ public class CompetitionDto {
                 .totalPrize(totalPrize)
                 .content(content)
                 .location(location)
+                .locationDetail(locationDetail)
                 .state(state)
                 .stateDetail(stateDetail)
+                .competitionType(competitionType)
                 .build();
     }
 }
