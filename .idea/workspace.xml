@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8a984288-8158-48af-9997-ef376f02edc4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SportsIT/src/main/java/PlayMakers/SportsIT/repository/MemberRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/SportsIT/src/main/java/PlayMakers/SportsIT/repository/MemberRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SportsIT/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/SportsIT/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SportsIT/src/test/java/PlayMakers/SportsIT/member/MemberRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/SportsIT/src/test/java/PlayMakers/SportsIT/member/MemberRepositoryTest.java" afterDir="false" />
-    </list>
+    <list default="true" id="8a984288-8158-48af-9997-ef376f02edc4" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -149,7 +144,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="upstream/develop/member" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
