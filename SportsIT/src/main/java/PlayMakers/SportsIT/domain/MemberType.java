@@ -13,4 +13,5 @@ public class MemberType {
     @Id
     @Column(name = "member_type", nullable = false)
     private String roleName;
+    // commit test
 }

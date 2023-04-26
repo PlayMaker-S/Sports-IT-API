@@ -4,9 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="14ab1cb0-6007-4bef-8ef7-32e48a7d7dd0" name="Default Changelist" comment="">
+    <list default="true" id="14ab1cb0-6007-4bef-8ef7-32e48a7d7dd0" name="Default Changelist" comment="[Test] Commit test">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/mysql_connector_j_8_0_32.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Sports-IT-API-level.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Sports-IT-API-level.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SportsIT/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/SportsIT/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SportsIT/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/SportsIT/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SportsIT/src/main/java/PlayMakers/SportsIT/domain/MemberType.java" beforeDir="false" afterPath="$PROJECT_DIR$/SportsIT/src/main/java/PlayMakers/SportsIT/domain/MemberType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SportsIT/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/SportsIT/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,6 +44,11 @@
     </system>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitSEFilterConfiguration">
@@ -58,7 +68,8 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="project.structure.last.edited" value="Global Libraries" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.21111111" />
     <property name="project.structure.side.proportion" value="0.2496474" />
     <property name="settings.editor.selected.configurable" value="coverage" />
@@ -100,11 +111,28 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="develop/member" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="[Test] Commit test" />
+    <option name="LAST_COMMIT_MESSAGE" value="[Test] Commit test" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
