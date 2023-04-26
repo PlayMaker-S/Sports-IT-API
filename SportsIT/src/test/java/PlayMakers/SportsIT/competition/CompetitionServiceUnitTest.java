@@ -402,4 +402,18 @@ class CompetitionServiceUnitTest {
             return dto;
         }
     }
+    /*
+    대회 조회 점검 사항
+    1. 대회 조회 시 대회 상태에 따라 조회되는 대회가 다르다. (PLANNING, RECRUITING, RECRUITING_END, IN_PROGRESS, END, SUSPEND)
+    2. 대회 조회 시 대회 종목으로 조회할 수 있다.
+    3. 대회 조회 시 대회 이름으로 조회할 수 있다.
+    4. 대회 조회 시 대회 주최자로 조회할 수 있다.
+    5. 대회 조회 시 대회
+     */
+
+    /*
+    대회 수정 점검 사항
+    1. 대회 시작일 이후에는 대회 정보를 수정할 수 없다.
+
+     */
 }
