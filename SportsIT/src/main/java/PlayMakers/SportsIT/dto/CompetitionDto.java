@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor @NoArgsConstructor
@@ -20,8 +22,8 @@ public class CompetitionDto {
     private String name;
     private Member host;
     private SportCategory sportCategory;
-    private Integer viewCount;
-    private Integer scrapCount;
+    private Integer viewCount = 0;
+    private Integer scrapCount = 0;
     private LocalDateTime startDate;
     private LocalDateTime recruitingStart;
     private LocalDateTime recruitingEnd;
@@ -32,6 +34,11 @@ public class CompetitionDto {
     private CompetitionState state;
     private String stateDetail;
     private CompetitionType competitionType;
+    private String templateId;
+    private Integer maxPlayer = 999;
+    private Integer maxViewer = 999;
+    private List<Poster> posters = new ArrayList<>();
+    private List<CompetitionAgree> agreements = new ArrayList<>();
     private String createdDate;
     private String updatedDate;
 
@@ -53,6 +60,11 @@ public class CompetitionDto {
                 .state(state)
                 .stateDetail(stateDetail)
                 .competitionType(competitionType)
+                .templateID(templateId)
+                .maxPlayer(maxPlayer)
+                .maxViewer(maxViewer)
+                .posters(posters)
+                .agreements(agreements)
                 .build();
     }
 }
