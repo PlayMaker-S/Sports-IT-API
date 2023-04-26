@@ -5,15 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Slf4j
 public class PrincipalUser extends User {
     private Member member;
 
-    //public PrincipalDetails(Member member) {
-    //    this.member = member;
-    //}
+//    public PrincipalDetails(Member member) {
+//        this.member = member;
+//    }
 
     public PrincipalUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
@@ -24,13 +25,13 @@ public class PrincipalUser extends User {
     }
 
     // 해당 User의 권한을 반환
-//    @Override
-//    public Collection<GrantedAuthority> getAuthorities() {
-//        Collection<GrantedAuthority> collect = new ArrayList<>();
-//        // 권한(MemberType)을 리턴
-//        collect.add((GrantedAuthority) () -> member.getMemberType().toString());
-//        return null;
-//    }
+    @Override
+    public Collection<GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> collect = new ArrayList<>();
+        // 권한(MemberType)을 리턴
+        collect.add((GrantedAuthority) () -> member.getMemberType().toString());
+        return null;
+    }
 
     // User 의 password 리턴
     @Override
