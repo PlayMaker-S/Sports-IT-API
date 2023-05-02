@@ -4,6 +4,7 @@ import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.MemberType;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,9 +17,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Slf4j
 @DataJpaTest  //@Transactional 어노테이션 포함 -> 테스트가 끝나면 자동으로 롤백
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ExtendWith(SpringExtension.class)  // 필요한 의존성 추가 (@Autowired, @MockBean)
@@ -39,21 +42,21 @@ class MemberRepositoryTest {
 
         Member member1 = Member.builder()
                 .pw("1234")
-                .name("홍길동")
+                .name("홍길동1")
                 .memberType(Collections.singleton(userType))
                 .email("test@google.com")
                 .phone("010-1234-8765")
                 .build();
         Member member2 = Member.builder()
                 .pw("1234")
-                .name("홍길동")
+                .name("홍길동2")
                 .memberType(Collections.singleton(userType))
                 .email("test2@naver.com")
                 .phone("010-1111-2222")
                 .build();
         Member member3 = Member.builder()
                 .pw("1234")
-                .name("홍길동")
+                .name("홍길동3")
                 .memberType(Collections.singleton(userType))
                 .email("test222@google.com")
                 .phone("010-3333-3333")
@@ -90,6 +93,31 @@ class MemberRepositoryTest {
         //System.out.println("savedMember = " + savedMember);
         System.out.println("findMember = " + findMember.getUid() + " " + findMember.getEmail());
         assertThat(findMember).isEqualTo(savedMember);
+    }
+
+    @Test
+    void 사용자_이름_검색(){
+        //given
+        Member member = Member.builder()
+                .pw("1234")
+                .name("11홍길동")
+                .memberType(Collections.singleton(userType))
+                .email("test4@gmail.com")
+                .phone("010-1234-5678")
+                .build();
+        memberRepository.save(member);
+
+        //when
+        String containName = "홍길동";
+        List<Member> memberList = memberRepository.findByNameContaining(containName);
+        List<Member> findAllList = memberRepository.findAll();
+        for (Member m : memberList){
+            log.info("Name : {}", m.getName());
+        }
+        assertThat(findAllList).isEqualTo(memberList);
+
+        //then
+
     }
 
     @Test
