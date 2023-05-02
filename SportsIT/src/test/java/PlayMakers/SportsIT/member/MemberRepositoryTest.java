@@ -1,8 +1,10 @@
 package PlayMakers.SportsIT.member;
 
+import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.MemberType;
 import PlayMakers.SportsIT.repository.MemberRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -11,10 +13,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,15 +27,17 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
+@ExtendWith(SpringExtension.class)  // 필요한 의존성 추가 (@Autowired, @MockBean)
 @DataJpaTest  //@Transactional 어노테이션 포함 -> 테스트가 끝나면 자동으로 롤백
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ExtendWith(SpringExtension.class)  // 필요한 의존성 추가 (@Autowired, @MockBean)
+@Import(TestConfig.class)
 class MemberRepositoryTest {
+    @Autowired EntityManager em;
+    JPAQueryFactory queryFactory;
+
     @Autowired
     MemberRepository memberRepository;
 
-    @Autowired
-    EntityManager em;
 
     MemberType userType = MemberType.builder()
             .roleName("ROLE_USER")
@@ -38,6 +45,7 @@ class MemberRepositoryTest {
 
     @BeforeEach
     public void before() {
+        queryFactory = new JPAQueryFactory(em);
         memberRepository.deleteAll();
 
         Member member1 = Member.builder()
