@@ -3,8 +3,10 @@ package PlayMakers.SportsIT.repository;
 import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.QCompetition;
 import PlayMakers.SportsIT.domain.SportCategory;
+import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,13 +34,11 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
     public Slice<Competition> findCompetitionSortedByCreatedDate( String keyword, Pageable pageable) {
         QCompetition competition = QCompetition.competition;
 
-        OrderSpecifier sorting = getOrderSpecifier(pageable.getSort().toString());
-
         List<Competition> competitions = jpaQueryFactory.selectFrom(competition)
                 .where(containsKeyword(keyword))
                 .offset(pageable.getOffset()*pageable.getPageNumber())
                 .limit(pageable.getPageSize()+1)
-                .orderBy(sorting)
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .fetch();
 
         boolean hasNext = removeOneIfHasNext(pageable, competitions);
@@ -44,6 +46,17 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
         pageable = pageable.next();
 
         return new SliceImpl<>(competitions, pageable, hasNext);
+    }
+
+    private List<OrderSpecifier> getOrderSpecifier(Sort sort) {
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+        sort.stream().forEach(order -> {
+            Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+            String prop = order.getProperty();
+            PathBuilder orderByExpression = new PathBuilder(Competition.class, "competition");
+            orderSpecifiers.add(new OrderSpecifier(direction, orderByExpression.get(prop)));
+        });
+        return orderSpecifiers;
     }
 
     private static List<SportCategory> categoriesContainKeyword(String keyword) {
@@ -67,18 +80,6 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
             competitions.remove(competitions.size()-1);
         }
         return hasNext;
-    }
-
-    private static OrderSpecifier getOrderSpecifier(String sort) {
-        OrderSpecifier sorting = competition.createdDate.desc();
-        if (sort.contains("viewCount")) {
-            sorting = competition.viewCount.desc();;
-        } else if (sort.contains("scrapCount")) {
-            sorting = competition.scrapCount.desc();;
-        } else {
-            sorting = competition.createdDate.desc();
-        }
-        return sorting;
     }
 
 
