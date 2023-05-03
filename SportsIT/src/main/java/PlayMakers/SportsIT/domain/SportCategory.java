@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.Arrays;
 import java.util.Optional;
 
+@Getter
 public enum SportCategory {
     SOCCER("축구"),
     TENNIS("테니스"),

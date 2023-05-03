@@ -18,8 +18,8 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	// QueryDSL
-	querydsl.extendsFrom compileClasspath
+//	// QueryDSL
+//	querydsl.extendsFrom compileClasspath
 }
 
 repositories {
@@ -64,10 +64,10 @@ dependencies {
 	testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
 
 	// QueryDSL
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
-	implementation "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
-	annotationProcessor("jakarta.persistence:jakarta.persistence-api")
-	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 
  test {
@@ -75,12 +75,13 @@ dependencies {
 }
 
 // QueryDSL 빌드 옵션
-def querydslDir = "$buildDir/generated/querydsl"
+//def querydslDir = "$buildDir/generated/querydsl"
+def querydslDir = "src/main/generated"
 sourceSets {
-	main.java.srcDir querydslDir
+	main.java.srcDirs += [ querydslDir ]
 }
 tasks.withType(JavaCompile) {
-	options.generatedSourceOutputDirectory = file(querydslDir)
+	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
 }
 clean.doLast {
 	file(querydslDir).deleteDir()
