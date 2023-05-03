@@ -1,9 +1,12 @@
 package PlayMakers.SportsIT.competition;
 
+import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
@@ -22,9 +30,11 @@ import java.util.Collections;
 import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.*;
 
+@Slf4j
+@ExtendWith(SpringExtension.class)  // 필요한 의존성 추가 (@Autowired, @MockBean)
 @DataJpaTest  //@Transactional 어노테이션 포함 -> 테스트가 끝나면 자동으로 롤백
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ExtendWith(SpringExtension.class)  // 필요한 의존성 추가 (@Autowired, @MockBean)
+@Import(TestConfig.class)
 class CompetitionRepositoryTest {
     @Autowired
     CompetitionRepository competitionRepository;
@@ -35,12 +45,17 @@ class CompetitionRepositoryTest {
     @Autowired
     TestEntityManager em;
 
+    JPAQueryFactory jpaQueryFactory;
+
     MemberType hostType = MemberType.builder()
             .roleName("ROLE_INSTITUTION")
             .build();
 
     @BeforeEach
     public void before() {
+        jpaQueryFactory = new JPAQueryFactory(em.getEntityManager());
+
+        competitionRepository.deleteAll();
         // 호스트 생성
         Member member = createHost("test99@gmail.com", "010-1234-5678");
         em.persistAndFlush(member);
@@ -167,8 +182,29 @@ class CompetitionRepositoryTest {
         assertThat(findCompetition.getName()).isNotEqualTo(oldName);  // 대회 명이 수정되어야 한다.
         System.out.println("oldCreatedDate = " + oldCreatedDate + ", oldModifiedDate = " + oldModifiedDate);
         System.out.println("newCreatedDate = " + findCompetition.getCreatedDate() + ", newModifiedDate = " + findCompetition.getUpdatedDate());
-        //assertThat(findCompetition.getUpdatedDate()).isNotEqualTo(oldModifiedDate);
-        //assertThat(findCompetition.getCreatedDate()).isNotEqualTo(oldCreatedDate);
+    }
+
+    @Nested
+    @DisplayName("대회 Slice 테스트")
+    class 대회_Slice_조회_테스트 {
+        @Test
+        @DisplayName("대회를 슬라이싱하여 조회할 수 있다.")
+        void 대회_슬라이싱_조회() {
+            //given
+            int page = 0;
+            int size = 10;
+            Pageable pageable = PageRequest.of(page, size);
+            String keyword = "";
+
+            //when
+            Slice<Competition> competitions = competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable);
+            log.info("대회 개수 : " + competitions.getNumberOfElements());
+            log.info("응답 : {}", competitions.getContent());
+
+            //then
+            assertThat(competitions.getNumberOfElements()).isEqualTo(1);
+            assertThat(competitions.getContent().get(0).getName()).isEqualTo("테스트대회_0");
+        }
     }
 
 

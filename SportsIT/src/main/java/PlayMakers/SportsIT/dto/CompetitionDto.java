@@ -22,7 +22,9 @@ public class CompetitionDto {
     private String name;
     private Member host;
     private SportCategory sportCategory;
+    @Builder.Default
     private Integer viewCount = 0;
+    @Builder.Default
     private Integer scrapCount = 0;
     private LocalDateTime startDate;
     private LocalDateTime recruitingStart;
@@ -35,9 +37,13 @@ public class CompetitionDto {
     private String stateDetail;
     private CompetitionType competitionType;
     private String templateId;
+    @Builder.Default
     private Integer maxPlayer = 999;
+    @Builder.Default
     private Integer maxViewer = 999;
+    @Builder.Default
     private List<Poster> posters = new ArrayList<>();
+    @Builder.Default
     private List<CompetitionAgree> agreements = new ArrayList<>();
     private String createdDate;
     private String updatedDate;

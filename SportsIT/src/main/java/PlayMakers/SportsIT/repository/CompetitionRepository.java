@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 @Repository
-public interface CompetitionRepository extends JpaRepository<Competition, Long> {
+public interface CompetitionRepository extends JpaRepository<Competition, Long>, CompetitionCustomRepository {
     // 대회 아이디로 찾기
     Competition findByCompetitionId(Long competitionId);
     // 대회 이름으로 찾기
