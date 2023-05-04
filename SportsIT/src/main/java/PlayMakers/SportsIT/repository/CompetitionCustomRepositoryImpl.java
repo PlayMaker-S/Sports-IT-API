@@ -1,13 +1,14 @@
 package PlayMakers.SportsIT.repository;
 
 import PlayMakers.SportsIT.domain.Competition;
+import PlayMakers.SportsIT.domain.CompetitionType;
 import PlayMakers.SportsIT.domain.QCompetition;
 import PlayMakers.SportsIT.domain.SportCategory;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static PlayMakers.SportsIT.domain.QCompetition.competition;
@@ -31,11 +30,14 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
 
 
     @Override
-    public Slice<Competition> findCompetitionSortedByCreatedDate( String keyword, Pageable pageable) {
+    public Slice<Competition> findCompetitionBySlice(String keyword, String filterType, Pageable pageable) {
         QCompetition competition = QCompetition.competition;
 
         List<Competition> competitions = jpaQueryFactory.selectFrom(competition)
-                .where(containsKeyword(keyword))
+                .where(
+                        containsKeyword(keyword),
+                        filteredBy(filterType)
+                )
                 .offset(pageable.getOffset()*pageable.getPageNumber())
                 .limit(pageable.getPageSize()+1)
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
@@ -116,5 +118,12 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
                 .or(competition.host.name.contains(keyword))
                 .or(competition.category.in(foundCategories))
                 : null;
+    }
+    private BooleanExpression filteredBy(String filterType) {
+        if(filterType == null) return null;
+        else if(filterType == "recruitingEnd") return competition.recruitingEnd.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7));
+        else if(filterType == "totalPrize") return competition.totalPrize.goe(100000);
+        else if(filterType == "recommend") return competition.competitionType.in(CompetitionType.PREMIUM, CompetitionType.VIP);
+        else throw new IllegalArgumentException("filterType이 유효하지 않습니다.");
     }
 }

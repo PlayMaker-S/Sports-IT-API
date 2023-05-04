@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -88,9 +85,9 @@ public class CompetitionService {
         competitionRepository.deleteById(competitionId);
     }
 
-    public Slice<Competition> getCompetitionSlice(String keyword, String sortType, Pageable pageable) {
+    public Slice<Competition> getCompetitionSlice(String keyword, String filterBy, Pageable pageable) {
         log.info("대회 목록 조회 요청: {}", keyword);
-        Slice<Competition> competitions = competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable);
+        Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filterBy, pageable);
 
         if (competitions.isEmpty()) {
             throw new EntityNotFoundException("대회가 존재하지 않습니다.");
