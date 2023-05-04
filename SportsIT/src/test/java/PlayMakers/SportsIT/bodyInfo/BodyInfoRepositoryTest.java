@@ -7,6 +7,7 @@ import PlayMakers.SportsIT.domain.MemberType;
 import PlayMakers.SportsIT.repository.BodyInfoRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -47,7 +49,6 @@ public class BodyInfoRepositoryTest {
         bodyInfoRepository.deleteAll();
 
         Member member = Member.builder()
-                .uid(1L)
                 .pw("1234")
                 .name("홍길동1")
                 .memberType(Collections.singleton(userType))
@@ -69,6 +70,7 @@ public class BodyInfoRepositoryTest {
                 .fatMass(12.3f)
                 .smMass(33.2f)
                 .build();
+        log.info("BodyInfo's memberId : {}", bodyInfo.getMember().getUid());
 
         //when
         BodyInfo savedBodyInfo = bodyInfoRepository.save(bodyInfo);
