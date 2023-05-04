@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
@@ -453,13 +454,13 @@ class CompetitionServiceUnitTest {
             Slice<Competition> expectedSliceSortedByScrapCount = new SliceImpl<>(competitions.stream().sorted(Comparator.comparing(Competition::getScrapCount).reversed()).sorted(Comparator.comparing(Competition::getCompetitionId)).collect(Collectors.toList()).subList(0, 10), pageableScrapCntDesc, true);
 
             // when
-            Mockito.when(competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageableCreatedDesc)).thenReturn(expectedSliceSortedByCreatedAt);
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, null, pageableCreatedDesc)).thenReturn(expectedSliceSortedByCreatedAt);
             Slice<Competition> actualSliceSortedByCreatedAt = competitionService.getCompetitionSlice(keyword, null, pageableCreatedDesc);
 
-            Mockito.when(competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageableViewCntDesc)).thenReturn(expectedSliceSortedByViewCount);
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, null, pageableViewCntDesc)).thenReturn(expectedSliceSortedByViewCount);
             Slice<Competition> actualSliceSortedByViewCount = competitionService.getCompetitionSlice(keyword, null, pageableViewCntDesc);
 
-            Mockito.when(competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageableScrapCntDesc)).thenReturn(expectedSliceSortedByScrapCount);
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, null, pageableScrapCntDesc)).thenReturn(expectedSliceSortedByScrapCount);
             Slice<Competition> actualSliceSortedByScrapCount = competitionService.getCompetitionSlice(keyword, null, pageableScrapCntDesc);
 
             // then
@@ -477,10 +478,10 @@ class CompetitionServiceUnitTest {
             Slice<Competition> expectedSlice = new SliceImpl<>(new ArrayList<>(), pageable, false);
 
             // when
-            Mockito.when(competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable)).thenReturn(expectedSlice);
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, null, pageable)).thenReturn(expectedSlice);
 
             // then
-            assertThrows(EntityNotFoundException.class, () -> competitionService.getCompetitionSlice(keyword, null, pageable));
+            assertThrows(EntityNotFoundException.class, () -> competitionService.getCompetitionSlice(keyword,null, pageable));
         }
 
         @Test
@@ -493,12 +494,70 @@ class CompetitionServiceUnitTest {
             Slice<Competition> expectedSlice = new SliceImpl<>(competitions.stream().filter(competition -> competition.getName().contains(keyword)||competition.getHost().getName().contains(keyword)||competition.getCategory().getCategoryName().contains(keyword)).collect(Collectors.toList()), pageable, false);
 
             // when
-            Mockito.when(competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable)).thenReturn(expectedSlice);
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, null, pageable)).thenReturn(expectedSlice);
             Slice<Competition> actualSlice = competitionService.getCompetitionSlice(keyword, null, pageable);
 
             // then
             assertEquals(expectedSlice, actualSlice);
             log.info("actualSlice = {}", actualSlice.getNumberOfElements());
+        }
+        @Test
+        @DisplayName("대회 목록 조회시 큰 상금 기준으로 필터링을 적용할 수 있다.")
+        public void 대회_상금_필터링() {
+            // given
+            String keyword = null;
+            String filterTypePrize = "totalPrize";
+            Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate", "competitionId"));
+            Slice<Competition> expectedSlice = new SliceImpl<>(competitions.stream().filter(competition -> competition.getTotalPrize() >= 100000).collect(Collectors.toList()), pageable, false);
+
+            // when
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, filterTypePrize, pageable)).thenReturn(expectedSlice);
+            Slice<Competition> actualSlice = competitionService.getCompetitionSlice(keyword, filterTypePrize, pageable);
+
+            // then
+            assertEquals(expectedSlice, actualSlice);
+            log.info("expectedSlice = {}", expectedSlice);
+            log.info("actualSlice = {}", actualSlice);
+
+        }
+        @Test
+        @DisplayName("대회 목록 조회시 모집 마감일 기준으로 필터링을 적용할 수 있다.")
+        public void 대회_마감일_필터링() {
+            // given
+            String keyword = null;
+            String filterTypeRecuitingEnd = "recruitingEnd";
+            LocalDateTime now = LocalDateTime.now();
+            Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate", "competitionId"));
+            Slice<Competition> expectedSlice = new SliceImpl<>(competitions.stream().filter(competition -> competition.getRecruitingEnd().isAfter(now) && competition.getRecruitingEnd().isBefore(now.plusDays(7))).collect(Collectors.toList()), pageable, false);
+
+            // when
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, filterTypeRecuitingEnd, pageable)).thenReturn(expectedSlice);
+            Slice<Competition> actualSlice = competitionService.getCompetitionSlice(keyword, filterTypeRecuitingEnd, pageable);
+
+            // then
+            assertEquals(expectedSlice, actualSlice);
+            log.info("expectedSlice = {}", expectedSlice);
+            log.info("actualSlice = {}", actualSlice);
+
+        }
+        @Test
+        @DisplayName("대회 목록 조회시 추천 기준으로 필터링을 적용할 수 있다.")
+        public void 대회_추천_필터링() {
+            // given
+            String keyword = null;
+            String filterTypeRecommend = "recommend";
+            Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate", "competitionId"));
+            Slice<Competition> expectedSlice = new SliceImpl<>(competitions.stream().filter(competition -> competition.getCompetitionType().equals(CompetitionType.PREMIUM)||competition.getCompetitionType().equals(CompetitionType.VIP)).collect(Collectors.toList()), pageable, false);
+
+            // when
+            Mockito.when(competitionRepository.findCompetitionBySlice(keyword, filterTypeRecommend, pageable)).thenReturn(expectedSlice);
+            Slice<Competition> actualSlice = competitionService.getCompetitionSlice(keyword, filterTypeRecommend, pageable);
+
+            // then
+            assertEquals(expectedSlice, actualSlice);
+            log.info("expectedSlice = {}", expectedSlice);
+            log.info("actualSlice = {}", actualSlice);
+
         }
 
         private CompetitionDto getCompetitionDto(Member host, LocalDateTime recruitingStart, LocalDateTime recruitingEnd, LocalDateTime startDate) {
@@ -512,9 +571,9 @@ class CompetitionServiceUnitTest {
     /*
     대회 조회 점검 사항
     1. 대회 조회 시 대회 상태에 따라 조회되는 대회가 다르다. (PLANNING, RECRUITING, RECRUITING_END, IN_PROGRESS, END, SUSPEND)
-    2. 대회 조회 시 대회 종목으로 조회할 수 있다.
-    3. 대회 조회 시 대회 이름으로 조회할 수 있다.
-    4. 대회 조회 시 대회 주최자로 조회할 수 있다.
+    2. 대회 조회 시 대회 종목으로 조회할 수 있다. O
+    3. 대회 조회 시 대회 이름으로 조회할 수 있다. O
+    4. 대회 조회 시 대회 주최자로 조회할 수 있다. O
     5. 대회 조회 시 대회
      */
 
