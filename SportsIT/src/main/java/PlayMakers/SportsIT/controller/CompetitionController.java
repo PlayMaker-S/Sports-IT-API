@@ -6,6 +6,8 @@ import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -38,10 +41,20 @@ public class CompetitionController {
                 .body(competition); // 201
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<Optional<Competition>> getCompetitions() {
         //List<Competition> competitions = competitionService.getCompetitions();
         Optional<Competition> competitions = null;
+        return ResponseEntity.ok(competitions); // 200
+    }
+    @GetMapping("/slice")
+    public ResponseEntity<Slice<Competition>> getCompetitionSlice(@RequestParam String keyword,
+                                                                  @RequestParam String filterBy,
+                                                                  @RequestParam String page,
+                                                                  @RequestParam String size) {
+        log.info("출력 확인: {} {} {} {}", filterBy, keyword, page, size);
+        Pageable pageable = Pageable.ofSize(Integer.parseInt(size)).withPage(Integer.parseInt(page));
+        Slice<Competition> competitions = competitionService.getCompetitionSlice(keyword, filterBy, pageable);
         return ResponseEntity.ok(competitions); // 200
     }
 

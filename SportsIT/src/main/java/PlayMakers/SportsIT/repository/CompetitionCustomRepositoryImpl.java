@@ -121,9 +121,9 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
     }
     private BooleanExpression filteredBy(String filterType) {
         if(filterType == null) return null;
-        else if(filterType == "recruitingEnd") return competition.recruitingEnd.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7));
-        else if(filterType == "totalPrize") return competition.totalPrize.goe(100000);
-        else if(filterType == "recommend") return competition.competitionType.in(CompetitionType.PREMIUM, CompetitionType.VIP);
+        else if(filterType.equals("recruitingEnd")) return competition.recruitingEnd.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7));
+        else if(filterType.equals("totalPrize")) return competition.totalPrize.goe(100000);
+        else if(filterType.equals("recommend")) return competition.competitionType.in(CompetitionType.PREMIUM, CompetitionType.VIP);
         else throw new IllegalArgumentException("filterType이 유효하지 않습니다.");
     }
 }

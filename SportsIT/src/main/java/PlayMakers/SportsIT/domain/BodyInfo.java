@@ -11,6 +11,7 @@ import lombok.*;
 @Entity(name="bodyInfo")
 public class BodyInfo {
     @Id
+    private Long id;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uid")
     private Member member;
