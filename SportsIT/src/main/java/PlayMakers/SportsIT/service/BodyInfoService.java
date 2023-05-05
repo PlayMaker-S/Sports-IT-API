@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @Transactional
@@ -21,9 +23,12 @@ public class BodyInfoService {
 
     public BodyInfo create(BodyInfoDto dto) {
         log.info("신체정보 생성 요청: {}", dto);
-        Member host = memberRepository.findById(dto.getMember().getUid()).orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
-        BodyInfo newBodyInfo = dto.toEntity();
-
-        return null;
+        Member member = memberRepository.findById(dto.getMember().getUid()).orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
+        BodyInfo newBodyInfo = bodyInfoRepository.save(dto.toEntity());
+        return newBodyInfo;
+    }
+    public Optional<BodyInfo> getBodyInfo(Member member){
+        Optional<BodyInfo> findBodyInfo = bodyInfoRepository.findByMemberUid(member.getUid());
+        return findBodyInfo;
     }
 }

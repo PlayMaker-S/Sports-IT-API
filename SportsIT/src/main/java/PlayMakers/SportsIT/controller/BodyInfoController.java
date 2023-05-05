@@ -10,12 +10,12 @@ import PlayMakers.SportsIT.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -26,11 +26,21 @@ public class BodyInfoController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<BodyInfo> createBodyInfo(@RequestBody BodyInfoDto dto){
-        Member member = memberService.findOne("sportsit_test@abc.com");
+    public ResponseEntity<BodyInfo> createBodyInfo(@RequestBody BodyInfoDto dto,
+                                                   @AuthenticationPrincipal User user){
+        String memberEmail = user.getUsername(); // 로그인한 회원 ID를 가져옴
+        Member member = memberService.findOne(memberEmail);
         dto.setMember(member);
 
         BodyInfo bodyInfo = bodyInfoService.create(dto);
         return ResponseEntity.ok(bodyInfo);
+    }
+
+    @GetMapping
+    public ResponseEntity<Optional<BodyInfo>> getBodyInfo(@AuthenticationPrincipal User user) {
+        String memberEmail = user.getUsername();
+        Member member = memberService.findOne(memberEmail);
+        Optional<BodyInfo> bodyInfo = bodyInfoService.getBodyInfo(member);
+        return ResponseEntity.ok(bodyInfo); // 200
     }
 }

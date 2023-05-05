@@ -11,9 +11,10 @@ import lombok.*;
 @Entity(name="bodyInfo")
 public class BodyInfo {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "uid")
+    @OneToOne
+    @JoinColumn(name = "memberId")
     private Member member;
     @Column
     private float height;
