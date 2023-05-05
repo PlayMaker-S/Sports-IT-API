@@ -10,9 +10,15 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -85,14 +91,25 @@ public class CompetitionService {
         competitionRepository.deleteById(competitionId);
     }
 
-    public Slice<Competition> getCompetitionSlice(String keyword, String filterBy, Pageable pageable) {
+    public Slice<Competition> getCompetitionSlice(String keyword, String filterBy, String orderBy, int page, int size) {
         log.info("대회 목록 조회 요청: {}", keyword);
+
+        Pageable pageable;
+        List<String> sortByProperties = new ArrayList<>();
+        if(orderBy!=null && !orderBy.isEmpty()) pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy));
+        else pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
         Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filterBy, pageable);
 
         if (competitions.isEmpty()) {
             throw new EntityNotFoundException("대회가 존재하지 않습니다.");
         }
         return competitions;
+    }
+
+    @NotNull
+    private static Sort.Order getSortByProperty(String orderBy) {
+        return Sort.Order.desc(orderBy);
     }
 
     private static void updateCompetition(Competition competition, CompetitionDto dto) {

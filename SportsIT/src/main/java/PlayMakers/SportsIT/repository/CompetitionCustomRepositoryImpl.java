@@ -6,12 +6,12 @@ import PlayMakers.SportsIT.domain.QCompetition;
 import PlayMakers.SportsIT.domain.SportCategory;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -28,10 +28,10 @@ import static PlayMakers.SportsIT.domain.QCompetition.competition;
 public class CompetitionCustomRepositoryImpl implements CompetitionCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-
-    @Override
     public Slice<Competition> findCompetitionBySlice(String keyword, String filterType, Pageable pageable) {
         QCompetition competition = QCompetition.competition;
+
+        OrderSpecifier orderSpecifier = getOrderSpecifier(pageable, competition);
 
         List<Competition> competitions = jpaQueryFactory.selectFrom(competition)
                 .where(
@@ -40,25 +40,30 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
                 )
                 .offset(pageable.getOffset()*pageable.getPageNumber())
                 .limit(pageable.getPageSize()+1)
-                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .orderBy(
+                        orderSpecifier,
+                        competition.createdDate.desc()
+                )
                 .fetch();
 
         boolean hasNext = removeOneIfHasNext(pageable, competitions);
 
-        pageable = pageable.next();
-
         return new SliceImpl<>(competitions, pageable, hasNext);
     }
 
-    private List<OrderSpecifier> getOrderSpecifier(Sort sort) {
-        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
-        sort.stream().forEach(order -> {
+    @NotNull
+    private static OrderSpecifier getOrderSpecifier(Pageable pageable, QCompetition competition) {
+        OrderSpecifier orderSpecifier = new OrderSpecifier<>(Order.DESC, competition.createdDate);
+        for(Sort.Order order : pageable.getSort()){
+            log.info("order: {}", order);
+            NumberPath<Integer> orderPath;
+            if(order.getProperty().equals("viewCount")) orderPath = competition.viewCount;
+            else if(order.getProperty().equals("scrapCount")) orderPath = competition.scrapCount;
+            else continue;
             Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-            String prop = order.getProperty();
-            PathBuilder orderByExpression = new PathBuilder(Competition.class, "competition");
-            orderSpecifiers.add(new OrderSpecifier(direction, orderByExpression.get(prop)));
-        });
-        return orderSpecifiers;
+            orderSpecifier = new OrderSpecifier<>(direction, orderPath);
+        }
+        return orderSpecifier;
     }
 
     private static List<SportCategory> categoriesContainKeyword(String keyword) {
@@ -82,32 +87,6 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
             competitions.remove(competitions.size()-1);
         }
         return hasNext;
-    }
-
-
-    @Override
-    public Slice<Competition> findCompetitionSortedByViewCount(String keyword) {
-        return null;
-    }
-
-    @Override
-    public Slice<Competition> findCompetitionSortedByScrapCount(String keyword) {
-        return null;
-    }
-
-    @Override
-    public Slice<Competition> findCompetitionWithConditionsSortedByCreatedDate(String keyword, String condition) {
-        return null;
-    }
-
-    @Override
-    public Slice<Competition> findCompetitionWithConditionsSortedByViewCount(String keyword, String condition) {
-        return null;
-    }
-
-    @Override
-    public Slice<Competition> findCompetitionWithConditionsSortedByScrapCount(String keyword, String condition) {
-        return null;
     }
 
     private BooleanExpression containsKeyword(String keyword) {

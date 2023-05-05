@@ -6,8 +6,10 @@ import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -15,8 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static java.lang.Integer.parseInt;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,11 +55,12 @@ public class CompetitionController {
     @GetMapping("/slice")
     public ResponseEntity<Slice<Competition>> getCompetitionSlice(@RequestParam String keyword,
                                                                   @RequestParam String filterBy,
+                                                                  @RequestParam String orderBy,
                                                                   @RequestParam String page,
                                                                   @RequestParam String size) {
         log.info("출력 확인: {} {} {} {}", filterBy, keyword, page, size);
-        Pageable pageable = Pageable.ofSize(Integer.parseInt(size)).withPage(Integer.parseInt(page));
-        Slice<Competition> competitions = competitionService.getCompetitionSlice(keyword, filterBy, pageable);
+        //Pageable pageable = Pageable.ofSize(Integer.parseInt(size)).withPage(Integer.parseInt(page));
+        Slice<Competition> competitions = competitionService.getCompetitionSlice(keyword, filterBy, orderBy, parseInt(page), parseInt(size));
         return ResponseEntity.ok(competitions); // 200
     }
 
