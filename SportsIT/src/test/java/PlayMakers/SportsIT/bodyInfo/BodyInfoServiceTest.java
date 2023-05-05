@@ -10,6 +10,7 @@ import PlayMakers.SportsIT.repository.BodyInfoRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.service.BodyInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,7 +65,6 @@ class BodyInfoServiceTest {
                 .fatMass(12.3f)
                 .smMass(33.2f)
                 .build();
-
         BodyInfo mockBodyInfo = dto.toEntity();
 
         memberRepository.save(member);
@@ -73,16 +73,46 @@ class BodyInfoServiceTest {
         given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
         given(bodyInfoRepository.save(any(BodyInfo.class))).willReturn(mockBodyInfo);
 
-
         //when
         BodyInfo createdBodyInfo = bodyInfoService.create(dto);
-
 
         //then
         assertNotNull(createdBodyInfo);
     }
 
     @Test
-    void getBodyInfo() {
+    void 신체정보조회() {
+        //given
+        Long memberId = 1L;
+        Member member = Member.builder()
+                .uid(memberId)
+                .pw("1234")
+                .name("홍길동1")
+                .memberType(Collections.singleton(userTypePlayer))
+                .email("test@google.com")
+                .phone("010-1234-8765")
+                .build();
+
+        BodyInfoDto dto = BodyInfoDto.builder()
+                .member(member)
+                .height(170.0f)
+                .weight(65.0f)
+                .fatMass(12.3f)
+                .smMass(33.2f)
+                .build();
+        BodyInfo mockBodyInfo = dto.toEntity();
+
+        memberRepository.save(member);
+        bodyInfoRepository.save(mockBodyInfo);
+
+        //mocking
+        given(bodyInfoRepository.findByMemberUid(memberId)).willReturn(Optional.ofNullable(mockBodyInfo));
+
+        //when
+        Optional<BodyInfo> getBodyInfo = bodyInfoService.getBodyInfo(member);
+
+        //then
+        log.info(getBodyInfo.get().getMember().getName());
+        assertThat(mockBodyInfo).isEqualTo(getBodyInfo.get());
     }
 }
