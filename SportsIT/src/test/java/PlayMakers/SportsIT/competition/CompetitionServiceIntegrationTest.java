@@ -78,6 +78,7 @@ class CompetitionServiceIntegrationTest {
                 .viewCount(0)
                 .scrapCount(0)
                 .startDate(LocalDateTime.now().plusDays(3))
+                .endDate(LocalDateTime.now().plusDays(7))
                 .recruitingStart(LocalDateTime.now().plusDays(1))
                 .recruitingEnd(LocalDateTime.now().plusDays(2))
                 .totalPrize(10000)

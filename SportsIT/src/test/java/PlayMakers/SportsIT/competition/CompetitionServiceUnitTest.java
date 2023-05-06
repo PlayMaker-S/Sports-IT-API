@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
@@ -70,6 +71,7 @@ class CompetitionServiceUnitTest {
                     .locationDetail("대회장소상세")
                     .state(CompetitionState.RECRUITING)
                     .startDate(LocalDateTime.parse("2021-03-01T00:00:00"))
+                    .endDate(LocalDateTime.parse("2021-03-05T00:00:00"))
                     .recruitingStart(LocalDateTime.parse("2021-01-31T00:00:00"))
                     .recruitingEnd(LocalDateTime.parse("2021-02-28T00:00:00"))
                     .competitionType(CompetitionType.FREE)
@@ -136,6 +138,7 @@ class CompetitionServiceUnitTest {
                 .locationDetail("대회장소상세")
                 .state(CompetitionState.RECRUITING)
                 .startDate(LocalDateTime.parse("2021-03-01T00:00:00"))
+                .endDate(LocalDateTime.parse("2021-03-05T00:00:00"))
                 .recruitingStart(LocalDateTime.parse("2021-01-31T00:00:00"))
                 .recruitingEnd(LocalDateTime.parse("2021-02-28T00:00:00"))
                 .competitionType(CompetitionType.FREE)
@@ -173,6 +176,7 @@ class CompetitionServiceUnitTest {
                     .locationDetail("대회장소상세")
                     .state(CompetitionState.RECRUITING)
                     .startDate(LocalDateTime.parse("2021-03-01T00:00:00"))
+                    .endDate(LocalDateTime.parse("2021-03-05T00:00:00"))
                     .recruitingStart(LocalDateTime.parse("2021-02-28T00:00:00"))
                     .recruitingEnd(LocalDateTime.parse("2021-01-31T00:00:00"))
                     .competitionType(CompetitionType.FREE)
@@ -203,6 +207,7 @@ class CompetitionServiceUnitTest {
                     .locationDetail("대회장소상세")
                     .state(CompetitionState.RECRUITING)
                     .startDate(LocalDateTime.parse("2021-01-31T00:00:00"))
+                    .endDate(LocalDateTime.parse("2021-03-05T00:00:00"))
                     .recruitingStart(LocalDateTime.parse("2021-01-31T00:00:00"))
                     .recruitingEnd(LocalDateTime.parse("2021-02-28T00:00:00"))
                     .competitionType(CompetitionType.FREE)
@@ -229,9 +234,10 @@ class CompetitionServiceUnitTest {
             LocalDateTime recruitingStart = today.plusDays(1);
             LocalDateTime recruitingEnd = today.plusDays(2);
             LocalDateTime startDate = today.plusDays(3);
+            LocalDateTime endDate = today.plusDays(4);
 
             // when
-            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate, endDate);
             Competition mockCompetition = dto.toEntity();
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
@@ -255,9 +261,10 @@ class CompetitionServiceUnitTest {
             LocalDateTime recruitingStart = today.plusDays(-1);
             LocalDateTime recruitingEnd = today.plusDays(2);
             LocalDateTime startDate = today.plusDays(3);
+            LocalDateTime endDate = today.plusDays(4);
 
             // when
-            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate, endDate);
             Competition mockCompetition = dto.toEntity();
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
@@ -280,9 +287,10 @@ class CompetitionServiceUnitTest {
             LocalDateTime recruitingStart = today.plusDays(-2);
             LocalDateTime recruitingEnd = today.plusDays(-1);
             LocalDateTime startDate = today.plusDays(3);
+            LocalDateTime endDate = today.plusDays(4);
 
             // when
-            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate, endDate);
             Competition mockCompetition = dto.toEntity();
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
@@ -305,9 +313,10 @@ class CompetitionServiceUnitTest {
             LocalDateTime recruitingStart = today.plusDays(-3);
             LocalDateTime recruitingEnd = today.plusDays(-2);
             LocalDateTime startDate = today.plusDays(-1);
+            LocalDateTime endDate = today.plusDays(4);
 
             // when
-            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate);
+            CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate, endDate);
             Competition mockCompetition = dto.toEntity();
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
@@ -322,9 +331,9 @@ class CompetitionServiceUnitTest {
             assertEquals(CompetitionState.IN_PROGRESS, created.getState());
         }
 
-        private CompetitionDto getCompetitionDto(Member host, LocalDateTime recruitingStart, LocalDateTime recruitingEnd, LocalDateTime startDate) {
+        private CompetitionDto getCompetitionDto(Member host, LocalDateTime recruitingStart, LocalDateTime recruitingEnd, LocalDateTime startDate, LocalDateTime endDate) {
             CompetitionDto dto = CompetitionDto.builder().name("대회이름").host(host).sportCategory(SportCategory.ARM_WRESTLING).totalPrize(10000)
-                    .content("대회내용").location("대회장소").locationDetail("대회장소상세").startDate(startDate) // dto.state 없이 빌드
+                    .content("대회내용").location("대회장소").locationDetail("대회장소상세").startDate(startDate).endDate(endDate) // dto.state 없이 빌드
                     .recruitingStart(recruitingStart).recruitingEnd(recruitingEnd).competitionType(CompetitionType.FREE).build();
             return dto;
         }
@@ -400,6 +409,7 @@ class CompetitionServiceUnitTest {
                     .location("대회장소")
                     .locationDetail("대회장소상세")
                     .startDate(LocalDateTime.parse("2023-03-15T00:00:00"))
+                    .endDate(LocalDateTime.parse("2023-03-20T00:00:00"))
                     .recruitingStart(LocalDateTime.parse("2023-01-31T00:00:00"))
                     .recruitingEnd(LocalDateTime.parse("2023-02-28T00:00:00"))
                     .build();
