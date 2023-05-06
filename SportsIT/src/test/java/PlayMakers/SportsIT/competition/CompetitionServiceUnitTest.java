@@ -521,7 +521,8 @@ class CompetitionServiceUnitTest {
         public void 대회_상금_필터링() {
             // given
             String keyword = null;
-            String filterTypePrize = "totalPrize";
+            List<String> filterTypePrize = new ArrayList<>();
+            filterTypePrize.add("totalPrize");
             Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
             Slice<Competition> expectedSlice = new SliceImpl<>(competitions.stream().filter(competition -> competition.getTotalPrize() >= 100000).collect(Collectors.toList()), pageable, false);
 
@@ -540,7 +541,8 @@ class CompetitionServiceUnitTest {
         public void 대회_마감일_필터링() {
             // given
             String keyword = null;
-            String filterTypeRecuitingEnd = "recruitingEnd";
+            List<String> filterTypeRecuitingEnd = new ArrayList<>();
+            filterTypeRecuitingEnd.add("recruitingEnd");
             LocalDateTime now = LocalDateTime.parse("2023-03-20T00:00:00");
             Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
             Slice<Competition> expectedSlice = new SliceImpl<>(competitions.stream().filter(competition -> competition.getRecruitingEnd().isAfter(now) && competition.getRecruitingEnd().isBefore(now.plusDays(7))).collect(Collectors.toList()), pageable, false);
@@ -561,7 +563,8 @@ class CompetitionServiceUnitTest {
         public void 대회_추천_필터링() {
             // given
             String keyword = null;
-            String filterTypeRecommend = "recommend";
+            List<String> filterTypeRecommend = new ArrayList<>();
+            filterTypeRecommend.add("recommend");
             Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
             Slice<Competition> expectedSlice = new SliceImpl<>(competitions.stream().filter(competition -> competition.getCompetitionType().equals(CompetitionType.PREMIUM)||competition.getCompetitionType().equals(CompetitionType.VIP)).collect(Collectors.toList()), pageable, false);
 
