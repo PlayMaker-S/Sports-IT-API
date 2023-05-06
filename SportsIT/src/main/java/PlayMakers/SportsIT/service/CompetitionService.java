@@ -11,14 +11,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,6 +61,12 @@ public class CompetitionService {
 
         return competitionRepository.save(newCompetition);
     }
+    public Competition findById(Long competitionId) {
+        log.info("대회 조회 요청: {}", competitionId);
+        Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new EntityNotFoundException("해당 대회가 존재하지 않습니다."));
+        competition.setViewCount(competition.getViewCount() + 1);
+        return competition;
+    }
 
     public Competition update(Long competitionId, CompetitionDto dto) {
         log.info("대회 수정 : {}", competitionId);
@@ -89,12 +92,15 @@ public class CompetitionService {
         competitionRepository.deleteById(competitionId);
     }
 
-    public Slice<Competition> getCompetitionSlice(String keyword, String filterBy, String orderBy, int page, int size) {
+    public Slice<Competition> getCompetitionSlice(String keyword,
+                                                  List<String> filteringConditions,
+                                                  String orderBy,
+                                                  int page, int size) {
         log.info("대회 목록 조회 요청: {}", keyword);
 
         Pageable pageable = getPageableProperties(orderBy, page, size);
 
-        Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filterBy, pageable);
+        Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filteringConditions, pageable);
 
         if (competitions.isEmpty()) {
             throw new EntityNotFoundException("대회가 존재하지 않습니다.");
@@ -105,7 +111,7 @@ public class CompetitionService {
     @NotNull
     private static Pageable getPageableProperties(String orderBy, int page, int size) {
         Pageable pageable;
-        if(orderBy !=null && !orderBy.isEmpty()) pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy));
+        if(orderBy != null && !orderBy.isEmpty()) pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy));
         else pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
         return pageable;
     }
