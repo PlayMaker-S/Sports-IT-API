@@ -1,9 +1,7 @@
 package PlayMakers.SportsIT.repository;
 
-import PlayMakers.SportsIT.domain.Competition;
-import PlayMakers.SportsIT.domain.CompetitionType;
-import PlayMakers.SportsIT.domain.QCompetition;
-import PlayMakers.SportsIT.domain.SportCategory;
+import PlayMakers.SportsIT.domain.*;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -28,7 +26,7 @@ import static PlayMakers.SportsIT.domain.QCompetition.competition;
 public class CompetitionCustomRepositoryImpl implements CompetitionCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Slice<Competition> findCompetitionBySlice(String keyword, String filterType, Pageable pageable) {
+    public Slice<Competition> findCompetitionBySlice(String keyword, List<String> filterType, Pageable pageable) {
         QCompetition competition = QCompetition.competition;
 
         OrderSpecifier orderSpecifier = getOrderSpecifier(pageable, competition);
@@ -98,11 +96,25 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
                 .or(competition.category.in(foundCategories))
                 : null;
     }
-    private BooleanExpression filteredBy(String filterType) {
+    private BooleanBuilder filteredBy(List<String> filterType) {
+        // CompetitionState : PLANNING, RECRUITING, RECRUITING_END, IN_PROGRESS, END
+        // recruitingEnd : 7일 이내
+        // totalPrize : 100,000원 이상
+        // recommend : FREE, PREMIUM, VIP
+
         if(filterType == null) return null;
-        else if(filterType.equals("recruitingEnd")) return competition.recruitingEnd.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7));
-        else if(filterType.equals("totalPrize")) return competition.totalPrize.goe(100000);
-        else if(filterType.equals("recommend")) return competition.competitionType.in(CompetitionType.PREMIUM, CompetitionType.VIP);
-        else throw new IllegalArgumentException("filterType이 유효하지 않습니다.");
+        // 대회 상태 옵션이 있을 경우
+        BooleanExpression expression = null;
+        BooleanBuilder builder = new BooleanBuilder();
+        if(filterType.contains("PLANNING")) builder.or(competition.state.eq(CompetitionState.PLANNING));
+        if(filterType.contains("RECRUITING")) builder.or(competition.state.eq(CompetitionState.RECRUITING));
+        if(filterType.contains("RECRUITING_END")) builder.or(competition.state.eq(CompetitionState.RECRUITING_END));
+        if(filterType.contains("IN_PROGRESS")) builder.or(competition.state.eq(CompetitionState.IN_PROGRESS));
+        if(filterType.contains("END")) builder.or(competition.state.eq(CompetitionState.END));
+
+        if(filterType.contains("recruitingEnd")) builder.and(competition.recruitingEnd.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7)));
+        else if(filterType.contains("totalPrize")) builder.and(competition.totalPrize.goe(100000));
+        else if(filterType.contains("recommend")) builder.and(competition.competitionType.in(CompetitionType.PREMIUM, CompetitionType.VIP));
+        return builder;
     }
 }
