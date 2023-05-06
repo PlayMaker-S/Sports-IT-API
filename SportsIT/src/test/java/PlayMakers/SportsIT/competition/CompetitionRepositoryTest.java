@@ -7,17 +7,13 @@ import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -197,7 +193,7 @@ class CompetitionRepositoryTest {
             String keyword = "";
 
             //when
-            Slice<Competition> competitions = competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable);
+            Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, null, pageable);
             log.info("대회 개수 : " + competitions.getNumberOfElements());
             log.info("응답 : {}", competitions.getContent());
 
