@@ -34,6 +34,8 @@ public class Competition extends BaseEntity {
     private Integer scrapCount = 0; // 스크랩 수
     @Column(nullable = false)
     private LocalDateTime startDate; // 대회 시작일 - HH:MM:SS'T'YYYYMMDD -> 시간 기준이 뭔지 확인해 볼 필요
+    @Column(nullable = false)
+    private LocalDateTime endDate; // 대회 시작일 - HH:MM:SS'T'YYYYMMDD -> 시간 기준이 뭔지 확인해 볼 필요
     @Builder.Default
     @Column(nullable = false)
     private LocalDateTime recruitingStart = LocalDateTime.now(); // 모집 시작일
@@ -100,6 +102,7 @@ public class Competition extends BaseEntity {
                 ", viewCount=" + viewCount +
                 ", scrapCount=" + scrapCount +
                 ", startDate=" + startDate +
+                ", endDate=" + endDate +
                 ", recruitingStart=" + recruitingStart +
                 ", recruitingEnd=" + recruitingEnd +
                 ", totalPrize=" + totalPrize +

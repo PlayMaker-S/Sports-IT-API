@@ -86,18 +86,13 @@ public class CompetitionService {
         log.info("CompetitionService.delete() : {}", competitionId);
         // 관계를 맺은 table 삭제
 
-
-
         competitionRepository.deleteById(competitionId);
     }
 
     public Slice<Competition> getCompetitionSlice(String keyword, String filterBy, String orderBy, int page, int size) {
         log.info("대회 목록 조회 요청: {}", keyword);
 
-        Pageable pageable;
-        List<String> sortByProperties = new ArrayList<>();
-        if(orderBy!=null && !orderBy.isEmpty()) pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy));
-        else pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Pageable pageable = getPageableProperties(orderBy, page, size);
 
         Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filterBy, pageable);
 
@@ -108,8 +103,11 @@ public class CompetitionService {
     }
 
     @NotNull
-    private static Sort.Order getSortByProperty(String orderBy) {
-        return Sort.Order.desc(orderBy);
+    private static Pageable getPageableProperties(String orderBy, int page, int size) {
+        Pageable pageable;
+        if(orderBy !=null && !orderBy.isEmpty()) pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy));
+        else pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        return pageable;
     }
 
     private static void updateCompetition(Competition competition, CompetitionDto dto) {
@@ -118,6 +116,7 @@ public class CompetitionService {
         competition.setRecruitingStart(dto.getRecruitingStart());
         competition.setRecruitingEnd(dto.getRecruitingEnd());
         competition.setStartDate(dto.getStartDate());
+        competition.setEndDate(dto.getEndDate());
         competition.setTotalPrize(dto.getTotalPrize());
         competition.setContent(dto.getContent());
         competition.setLocation(dto.getLocation());
@@ -141,6 +140,7 @@ public class CompetitionService {
         if (newCompetition.getLocation() == null) errorMessage += "\n대회 장소";
         if (newCompetition.getLocationDetail() == null) errorMessage += "\n대회 장소 상세";
         if (newCompetition.getStartDate() == null) errorMessage += "\n대회 시작일";
+        if (newCompetition.getEndDate() == null) errorMessage += "\n대회 종료일";
         if (newCompetition.getRecruitingStart() == null) errorMessage += "\n대회 모집 시작일";
         if (newCompetition.getRecruitingEnd() == null) errorMessage += "\n대회 모집 종료일";
         if (newCompetition.getCompetitionType() == null) errorMessage += "\n대회 프리미엄";
@@ -149,13 +149,18 @@ public class CompetitionService {
             throw new IllegalArgumentException(errorMessage);
         }
     }
-    private static void checkTimeValidity(Competition newCompetition) {
-        if (newCompetition.getStartDate().isBefore(newCompetition.getRecruitingEnd())) {
-            throw new IllegalArgumentException("대회 시작일이 모집 종료일보다 빠릅니다.");
+    private static void checkTimeValidity(Competition competition) {
+        String errorMessage = "";
+        if (competition.getEndDate().isBefore(competition.getStartDate())) {
+            errorMessage += "대회 종료일이 대회 시작일보다 빠릅니다.";
         }
-        if (newCompetition.getRecruitingStart().isAfter(newCompetition.getRecruitingEnd())) {
-            throw new IllegalArgumentException("모집 종료일이 모집 시작일보다 빠릅니다.");
+        else if (competition.getStartDate().isBefore(competition.getRecruitingEnd())) {
+            errorMessage += "대회 시작일이 모집 종료일보다 빠릅니다.";
         }
+        else if (competition.getRecruitingEnd().isBefore(competition.getRecruitingStart())) {
+            errorMessage += "모집 종료일이 모집 시작일보다 빠릅니다.";
+        }
+        if(!errorMessage.equals("")) throw new IllegalArgumentException(errorMessage);
     }
 
 }
