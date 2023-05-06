@@ -135,8 +135,8 @@ public class CompetitionService {
         competition.setLocationDetail(dto.getLocationDetail());
         competition.setMaxPlayer(dto.getMaxPlayer());
         competition.setMaxViewer(dto.getMaxViewer());
-        competition.setPosters(dto.getPosters());
-        competition.setAgreements(dto.getAgreements());
+        //competition.setPosters(dto.getPosters());  // 변경하면 참조가 깨져버림
+        //competition.setAgreements(dto.getAgreements());  // 변경하면 참조가 깨져버림
     }
 
     /*
