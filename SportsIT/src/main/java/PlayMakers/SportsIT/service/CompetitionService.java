@@ -11,11 +11,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.batch.item.Chunk;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -66,6 +68,10 @@ public class CompetitionService {
         Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new EntityNotFoundException("해당 대회가 존재하지 않습니다."));
         competition.setViewCount(competition.getViewCount() + 1);
         return competition;
+    }
+    public List<Competition> findAll(){
+        log.info("대회 전체 조회 요청");
+        return competitionRepository.findAll();
     }
 
     public Competition update(Long competitionId, CompetitionDto dto) {
@@ -168,5 +174,4 @@ public class CompetitionService {
         }
         if(!errorMessage.equals("")) throw new IllegalArgumentException(errorMessage);
     }
-
 }

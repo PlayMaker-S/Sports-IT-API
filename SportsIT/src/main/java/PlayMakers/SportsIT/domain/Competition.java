@@ -3,11 +3,13 @@ package PlayMakers.SportsIT.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.Store;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -91,6 +93,29 @@ public class Competition extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true) // orphanRemoval : 대회 삭제 시, 대회 규정도 삭제, cascade : 대회 삭제 시, 대회 규정도 삭제
     private List<CompetitionAgree> agreements = new ArrayList<>(); // 대회 규정
+
+    @Scheduled(fixedDelay = 1000*60) // 1분마다 실행
+    public void updateState() {
+        LocalDateTime now = LocalDateTime.now();
+        boolean isChanged = false;
+        if (this.state == CompetitionState.PLANNING && this.recruitingStart.isBefore(now)) {
+            this.state = CompetitionState.RECRUITING;
+            isChanged = true;
+        }
+        if (this.state == CompetitionState.RECRUITING && this.recruitingEnd.isBefore(now)) {
+            this.state = CompetitionState.RECRUITING_END;
+            isChanged = true;
+        }
+        if (this.state == CompetitionState.RECRUITING_END && this.startDate.isBefore(now)) {
+            this.state = CompetitionState.IN_PROGRESS;
+            isChanged = true;
+        }
+        if (this.state == CompetitionState.IN_PROGRESS && this.endDate.isBefore(now)) {
+            this.state = CompetitionState.END;
+            isChanged = true;
+        }
+        //if (isChanged) competitionRepository.save(this);
+    }
 
     @Override
     public String toString() {
