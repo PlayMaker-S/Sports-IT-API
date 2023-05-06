@@ -1,5 +1,7 @@
 package PlayMakers.SportsIT.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,7 @@ public class Competition extends BaseEntity {
             name = "competition_host",
             joinColumns = @JoinColumn(name = "competition_id"),
             inverseJoinColumns = @JoinColumn(name = "host_id"))
+    @JsonIgnoreProperties({"pw", "email", "phone", "birth", "subscription", "activated", "authorities", "createdDate", "updatedDate", "memberType"})
     private Member host; // 주최자 uid
 
     @Enumerated(EnumType.STRING) // enum 타입을 DB에 저장할 때, enum의 이름을 저장하도록 설정
