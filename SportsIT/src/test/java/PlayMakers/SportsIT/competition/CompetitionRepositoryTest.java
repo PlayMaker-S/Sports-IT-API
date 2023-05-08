@@ -73,7 +73,8 @@ class CompetitionRepositoryTest {
     public Competition createCompetition(Member host, SportCategory category) {
         Competition competition = Competition.builder()
                 .name("테스트대회_0")
-                .startDate(LocalDateTime.now())
+                .startDate(LocalDateTime.of(2023, 4, 30, 0, 0))
+                .endDate(LocalDateTime.of(2023, 5, 4, 0, 0))
                 .recruitingStart(LocalDateTime.of(2023, 4, 20, 0, 0))
                 .recruitingEnd(LocalDateTime.of(2023, 4, 25, 0, 0))
                 .totalPrize(10000)

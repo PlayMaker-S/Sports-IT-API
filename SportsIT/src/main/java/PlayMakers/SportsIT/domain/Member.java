@@ -1,5 +1,8 @@
 package PlayMakers.SportsIT.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,9 +12,11 @@ import java.util.Set;
 @Builder
 @Getter @Setter
 @Entity (name="member")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "pw"})
 public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
     @Column(nullable = false)
     private String pw;
 
