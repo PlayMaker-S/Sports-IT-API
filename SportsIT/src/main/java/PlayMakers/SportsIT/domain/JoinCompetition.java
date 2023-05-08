@@ -37,7 +37,7 @@ public class JoinCompetition extends BaseEntity{
 
     @Embeddable
     @AllArgsConstructor @NoArgsConstructor
-    @Setter
+    @Getter @Setter
     public static class JoinCompetitionId implements Serializable {
         private Long uid;
         private Long competitionId;
