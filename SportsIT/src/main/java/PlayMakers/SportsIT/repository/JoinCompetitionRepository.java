@@ -14,7 +14,7 @@ public interface JoinCompetitionRepository extends JpaRepository<JoinCompetition
     Optional<JoinCompetition> findByIdUidAndIdCompetitionId(Long uid, Long competitionId);
     //Page<JoinCompetition> findByUid(Long uid, Pageable pageable);
     //Page<JoinCompetition> findByCompetitionId(Long competitionId, Pageable pageable);
-    //void deleteByUidAndCompetitionId(Long uid, Long competitionId);
+    void deleteByIdUidAndIdCompetitionId(Long uid, Long competitionId);
     //void deleteAllByCompetitionId(Long competitionId);
 
 }
