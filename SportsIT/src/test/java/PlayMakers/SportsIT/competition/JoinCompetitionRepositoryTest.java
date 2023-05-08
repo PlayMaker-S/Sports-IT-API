@@ -148,7 +148,7 @@ public class JoinCompetitionRepositoryTest {
     }
 
     @Test
-    @DisplayName("단일 대회 신청 취소")
+    @DisplayName("Uid, CompetitionId로 단일 대회 신청 취소")
     public void 단일대회신청취소() {
         // given
         Member host = createHost(1);
@@ -189,6 +189,74 @@ public class JoinCompetitionRepositoryTest {
         // when
         joinCompetitionRepository.deleteByIdUidAndIdCompetitionId(player.getUid(), competition.getCompetitionId());
 
+        // then
+        Assert.assertEquals(1, joinCompetitionRepository.findAll().size());
+    }
+
+    @Test
+    @DisplayName("모든 대회 신청 삭제")
+    public void 모든_대회_삭제() {
+        // given
+        Member host = createHost(1);
+        memberRepository.save(host);
+        Competition competition = createCompetition(host);
+        competitionRepository.save(competition);
+
+        for(int i=0; i<10; i++) {
+            Member player = createPlayer(i);
+            memberRepository.save(player);
+
+            JoinCompetition joinAsPlayer = JoinCompetition.builder()
+                    .competition(competition)
+                    .member(player)
+                    .id(new JoinCompetition.JoinCompetitionId(player.getUid(), competition.getCompetitionId()))
+                    .formId("1")
+                    .isAgree(true)
+                    .isPaid(true)
+                    .joinType(JoinCompetition.joinType.PLAYER)
+                    .build();
+
+            joinCompetitionRepository.save(joinAsPlayer);
+        }
+
+        // when
+        joinCompetitionRepository.deleteAll();
+
+        // then
+        Assert.assertEquals(0, joinCompetitionRepository.findAll().size());
+    }
+
+    @Test
+    @DisplayName("특정 대회에 대한 모든 신청 삭제")
+    public void 특정_대회_모든_신청_삭제() {
+        // given
+        Member host = createHost(1);
+        memberRepository.save(host);
+        Competition competition = createCompetition(host);
+        competitionRepository.save(competition);
+
+        for(int i=0; i<10; i++) {
+            Member player = createPlayer(i);
+            memberRepository.save(player);
+
+            JoinCompetition joinAsPlayer = JoinCompetition.builder()
+                    .competition(competition)
+                    .member(player)
+                    .id(new JoinCompetition.JoinCompetitionId(player.getUid(), competition.getCompetitionId()))
+                    .formId("1")
+                    .isAgree(true)
+                    .isPaid(true)
+                    .joinType(JoinCompetition.joinType.PLAYER)
+                    .build();
+
+            joinCompetitionRepository.save(joinAsPlayer);
+        }
+
+        // when
+        joinCompetitionRepository.deleteByIdCompetitionId(competition.getCompetitionId());
+
+        // then
+        Assert.assertEquals(0, joinCompetitionRepository.findAll().size());
     }
 
 }
