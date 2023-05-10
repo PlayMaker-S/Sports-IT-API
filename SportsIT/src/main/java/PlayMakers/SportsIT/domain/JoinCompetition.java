@@ -29,12 +29,6 @@ public class JoinCompetition extends BaseEntity{
     @Column
     private String formId;
 
-    @Column(nullable = false)
-    private boolean isAgree;
-
-    @Column(nullable = false)
-    private boolean isPaid;
-
     @Embeddable
     @AllArgsConstructor @NoArgsConstructor
     @Getter @Setter

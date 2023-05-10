@@ -113,8 +113,6 @@ public class JoinCompetitionRepositoryTest {
                 .member(player)
                 .id(new JoinCompetition.JoinCompetitionId(player.getUid(), competition.getCompetitionId()))
                 .formId("1")
-                .isAgree(true)
-                .isPaid(true)
                 .joinType(JoinCompetition.joinType.PLAYER)
                 .build();
 
@@ -125,8 +123,6 @@ public class JoinCompetitionRepositoryTest {
                 .member(viewer)
                 .id(new JoinCompetition.JoinCompetitionId(viewer.getUid(), competition.getCompetitionId()))
                 .formId("2")
-                .isAgree(true)
-                .isPaid(true)
                 .joinType(JoinCompetition.joinType.VIEWER)
                 .build();
 
@@ -168,8 +164,6 @@ public class JoinCompetitionRepositoryTest {
                 .member(player)
                 .id(new JoinCompetition.JoinCompetitionId(player.getUid(), competition.getCompetitionId()))
                 .formId("1")
-                .isAgree(true)
-                .isPaid(true)
                 .joinType(JoinCompetition.joinType.PLAYER)
                 .build();
 
@@ -178,8 +172,6 @@ public class JoinCompetitionRepositoryTest {
                 .member(viewer)
                 .id(new JoinCompetition.JoinCompetitionId(viewer.getUid(), competition.getCompetitionId()))
                 .formId("2")
-                .isAgree(true)
-                .isPaid(true)
                 .joinType(JoinCompetition.joinType.VIEWER)
                 .build();
 
@@ -211,8 +203,6 @@ public class JoinCompetitionRepositoryTest {
                     .member(player)
                     .id(new JoinCompetition.JoinCompetitionId(player.getUid(), competition.getCompetitionId()))
                     .formId("1")
-                    .isAgree(true)
-                    .isPaid(true)
                     .joinType(JoinCompetition.joinType.PLAYER)
                     .build();
 
@@ -244,8 +234,6 @@ public class JoinCompetitionRepositoryTest {
                     .member(player)
                     .id(new JoinCompetition.JoinCompetitionId(player.getUid(), competition.getCompetitionId()))
                     .formId("1")
-                    .isAgree(true)
-                    .isPaid(true)
                     .joinType(JoinCompetition.joinType.PLAYER)
                     .build();
 

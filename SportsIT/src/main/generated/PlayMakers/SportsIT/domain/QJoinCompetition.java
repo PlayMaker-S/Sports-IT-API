@@ -33,10 +33,6 @@ public class QJoinCompetition extends EntityPathBase<JoinCompetition> {
 
     public final QJoinCompetition_JoinCompetitionId id;
 
-    public final BooleanPath isAgree = createBoolean("isAgree");
-
-    public final BooleanPath isPaid = createBoolean("isPaid");
-
     public final EnumPath<JoinCompetition.joinType> joinType = createEnum("joinType", JoinCompetition.joinType.class);
 
     public final QMember member;
