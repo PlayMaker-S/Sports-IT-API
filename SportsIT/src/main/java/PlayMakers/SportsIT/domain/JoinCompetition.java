@@ -41,4 +41,9 @@ public class JoinCompetition extends BaseEntity{
         PLAYER,
         VIEWER
     }
+
+    public void update(joinType type, String formId) {
+        this.joinType = type;
+        this.formId = formId;
+    }
 }

@@ -15,5 +15,6 @@ public interface JoinCompetitionRepository extends JpaRepository<JoinCompetition
     void deleteByIdUidAndIdCompetitionId(Long uid, Long competitionId);
     void deleteByIdCompetitionId(Long competitionId);
     void deleteByIdUid(Long uid);
-
+    int countByIdCompetitionId(Long competitionId);
+    int countByIdCompetitionIdAndJoinType(Long competitionId, JoinCompetition.joinType type);
 }
