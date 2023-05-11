@@ -19,9 +19,9 @@ public class JoinCompetitionDto {
 
     public JoinCompetition toEntity() {
         return JoinCompetition.builder()
-                .id(new JoinCompetitionId(this.uid, this.competitionId))
-                .joinType(this.type)
-                .formId(this.formId)
+                .id(new JoinCompetitionId(uid, competitionId))
+                .joinType(type)
+                .formId(formId)
                 .build();
     }
 }

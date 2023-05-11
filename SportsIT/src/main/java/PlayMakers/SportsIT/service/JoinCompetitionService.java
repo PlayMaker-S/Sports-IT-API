@@ -1,6 +1,7 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.domain.Competition;
+import PlayMakers.SportsIT.domain.CompetitionState;
 import PlayMakers.SportsIT.domain.JoinCompetition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
@@ -26,12 +27,15 @@ public class JoinCompetitionService {
     public JoinCompetition join(JoinCompetitionDto dto) {
         log.info("대회 참가 요청: {}", dto);
 
+        Long uid = dto.getUid();
+        Long competitionId = dto.getCompetitionId();
+
         // 대회 참가 요청을 보낸 회원이 해당 대회에 이미 참가한 회원인지 확인
-        checkAlreadyJoined(dto);
+        checkAlreadyJoined(uid, competitionId);
         // 대회 참가 요청을 보낸 회원이 해당 대회에 참가할 수 있는 회원인지 확인
-        checkPlayer(dto);
+        checkPlayer(uid);
         // 대회 참가 요청을 받은 대회가 신청 가능한지 확인
-        checkJoinable(dto);
+        checkJoinable(competitionId, dto.getType());
 
         JoinCompetition join = dto.toEntity();
         join.setMember(memberRepository.findById(dto.getUid()).get());
@@ -44,7 +48,7 @@ public class JoinCompetitionService {
         log.info("대회 참가 정보 수정 요청: {}", dto);
 
         // 대회 참가서 수정 요청을 받은 대회가 신청 가능지 확인
-        checkJoinable(dto);
+        checkJoinable(dto.getCompetitionId(), dto.getType());
 
         JoinCompetition target = joinCompetitionRepository.findByIdUidAndIdCompetitionId(dto.getUid(), dto.getCompetitionId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 대회에 참가한 회원이 존재하지 않습니다."));
@@ -71,25 +75,33 @@ public class JoinCompetitionService {
         joinCompetitionRepository.delete(target);
     }
 
-    public void checkJoinable(JoinCompetitionDto dto) {
-        competitionRepository.findById(dto.getCompetitionId())
+    public void checkJoinable(Long competitionId, JoinCompetition.joinType type) {
+        competitionRepository.findById(competitionId)
                 .ifPresent(competition -> {
-                    if (isJoinableToday(competition)) {
-                        throw new IllegalArgumentException("대회 참가/관람 신청 기간이 아닙니다.");
+                    if (!isJoinableToday(competition)) {
+                        throw new IllegalArgumentException("대회 참가/관람 신청 기간이 아닙니다.\n" +
+                                "대회 신청 기간: " + competition.getRecruitingStart().toLocalDate() + " " + competition.getRecruitingStart().toLocalTime() +
+                                " ~ " + competition.getRecruitingEnd().toLocalDate() + " " + competition.getRecruitingEnd().toLocalTime());
                     }
-                    if (isAlreadyFull(dto, competition)) {
-                        if(dto.getType().equals(JoinCompetition.joinType.PLAYER)) throw new IllegalArgumentException("대회 참가 인원이 마감되었습니다.");
+                    if (isAlreadyFull(competition, type)) {
+                        if(type.equals(JoinCompetition.joinType.PLAYER)) throw new IllegalArgumentException("대회 참가 인원이 마감되었습니다.");
                         else throw new IllegalArgumentException("대회 관람 인원이 마감되었습니다.");
                     }
                 });
+    }
+    public int countCurrentPlayer(Long competitionId){
+        return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competitionId, JoinCompetition.joinType.PLAYER);
+    }
+    public int countCurrentViewer(Long competitionId){
+        return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competitionId, JoinCompetition.joinType.VIEWER);
     }
 
     private static boolean isAlreadyStarted(Competition competition) {
         return competition.getStartDate().isBefore(LocalDateTime.now());
     }
 
-    private void checkPlayer(JoinCompetitionDto dto) {
-        memberRepository.findById(dto.getUid())
+    private void checkPlayer(Long uid) {
+        memberRepository.findById(uid)
                 .ifPresent(member -> {
                     // 회원이 대회에 참가할 수 있는 회원인지 확인
                     if (isPlayer(member)) {
@@ -98,8 +110,8 @@ public class JoinCompetitionService {
                 });
     }
 
-    private void checkAlreadyJoined(JoinCompetitionDto dto) {
-        joinCompetitionRepository.findByIdUidAndIdCompetitionId(dto.getUid(), dto.getCompetitionId())
+    public void checkAlreadyJoined(Long uid, Long competitionId) {
+        joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId)
                 .ifPresent(joinCompetition -> {
                     throw new IllegalArgumentException("이미 해당 대회에 신청한 회원입니다.");
                 });
@@ -111,12 +123,11 @@ public class JoinCompetitionService {
                         memberType.getRoleName().equals("ROLE_INSTITUTION"));
     }
 
-    private static boolean isJoinableToday(Competition competition) {
-        return LocalDateTime.now().isBefore(competition.getRecruitingStart().minusSeconds(1)) &&
-                LocalDateTime.now().isAfter(competition.getRecruitingEnd().plusSeconds(1));
+    public static boolean isJoinableToday(Competition competition) {
+        return competition.getState().equals(CompetitionState.RECRUITING);
     }
 
-    private boolean isAlreadyFull(JoinCompetitionDto dto, Competition competition) {
-        return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competition.getCompetitionId(), dto.getType()) >= competition.getMaxViewer();
+    public boolean isAlreadyFull(Competition competition, JoinCompetition.joinType type) {
+        return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competition.getCompetitionId(), type) >= competition.getMaxViewer();
     }
 }

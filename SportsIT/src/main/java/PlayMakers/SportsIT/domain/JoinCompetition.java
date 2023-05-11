@@ -23,7 +23,7 @@ public class JoinCompetition extends BaseEntity{
     @MapsId("competitionId")
     private Competition competition;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private joinType joinType;
 
     @Column

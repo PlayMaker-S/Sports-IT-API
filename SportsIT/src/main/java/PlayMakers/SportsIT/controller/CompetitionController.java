@@ -1,8 +1,11 @@
 package PlayMakers.SportsIT.controller;
 
+import PlayMakers.SportsIT.domain.JoinCompetition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.CompetitionDto;
+import PlayMakers.SportsIT.dto.JoinCompetitionDto;
 import PlayMakers.SportsIT.service.CompetitionService;
+import PlayMakers.SportsIT.service.JoinCompetitionService;
 import PlayMakers.SportsIT.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ import static java.lang.Integer.parseInt;
 public class CompetitionController {
     private final CompetitionService competitionService;
     private final MemberService memberService;
+    private final JoinCompetitionService joinCompetitionService;
 
     @PostMapping
     public ResponseEntity<Competition> createCompetition(@RequestBody CompetitionDto dto,
@@ -84,9 +88,65 @@ public class CompetitionController {
         competitionService.delete(competitionId);
         return ResponseEntity.noContent().build(); // 204
     }
+    @GetMapping("/{competitionId}/join/player/checkJoinable")
+    public ResponseEntity<String> isJoinable(@PathVariable Long competitionId,
+                                             @AuthenticationPrincipal User user) throws Exception{
+        Member member = memberService.findOne(user.getUsername());
+
+        joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId);
+        joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.PLAYER);
+
+        return ResponseEntity.ok("success"); // 200
+    }
+
+    @GetMapping("/join/{competitionId}/player/count")
+    public ResponseEntity<Integer> getJoinCount(@PathVariable Long competitionId) {
+        int joinCount = joinCompetitionService.countCurrentPlayer(competitionId);
+
+        return ResponseEntity.ok(joinCount); // 200
+    }
+
+    @GetMapping("/join/{competitionId}/viewer/checkJoinable")
+    public ResponseEntity<String> isJoinableViewer(@PathVariable Long competitionId,
+                                             @AuthenticationPrincipal User user) throws Exception{
+        Member member = memberService.findOne(user.getUsername());
+
+        joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId);
+        joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.VIEWER);
+
+        return ResponseEntity.ok("success"); // 200
+    }
+
+    @GetMapping("/join/{competitionId}/viewer/count")
+    public ResponseEntity<Integer> getJoinViewerCount(@PathVariable Long competitionId) {
+        int joinCount = joinCompetitionService.countCurrentViewer(competitionId);
+
+        return ResponseEntity.ok(joinCount); // 200
+    }
+
+    @PostMapping("/join")
+    public ResponseEntity<String> joinCompetition(@RequestBody JoinCompetitionDto competitionDto) throws Exception{
+
+        log.info("대회 참가 요청 Controller: {}", competitionDto);
+        JoinCompetition joinCompetition = joinCompetitionService.join(competitionDto);
+
+        // 생성된 리소스의 uri와 함께 201코드, "success" 응답
+        return ResponseEntity.created(URI.create("/" + joinCompetition.getId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
+                .body("success"); // 201
+    }
+    @DeleteMapping("/join")
+    public ResponseEntity<String> cancelJoinCompetition(@RequestBody JoinCompetitionDto joincompetitionDto) throws Exception{
+        joinCompetitionService.deleteJoinCompetition(joincompetitionDto);
+
+        return ResponseEntity.accepted().body("대회가 취소되었습니다."); // 202
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<String> handleNoSuchElementFoundException(EntityNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage()); // 404
+    }
+    @ExceptionHandler
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage()); // 400
     }
 }
