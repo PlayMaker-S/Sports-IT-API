@@ -7,17 +7,13 @@ import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -77,7 +73,8 @@ class CompetitionRepositoryTest {
     public Competition createCompetition(Member host, SportCategory category) {
         Competition competition = Competition.builder()
                 .name("테스트대회_0")
-                .startDate(LocalDateTime.now())
+                .startDate(LocalDateTime.of(2023, 4, 30, 0, 0))
+                .endDate(LocalDateTime.of(2023, 5, 4, 0, 0))
                 .recruitingStart(LocalDateTime.of(2023, 4, 20, 0, 0))
                 .recruitingEnd(LocalDateTime.of(2023, 4, 25, 0, 0))
                 .totalPrize(10000)
@@ -197,7 +194,7 @@ class CompetitionRepositoryTest {
             String keyword = "";
 
             //when
-            Slice<Competition> competitions = competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable);
+            Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, null, pageable);
             log.info("대회 개수 : " + competitions.getNumberOfElements());
             log.info("응답 : {}", competitions.getContent());
 

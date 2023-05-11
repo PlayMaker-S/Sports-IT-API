@@ -4,8 +4,14 @@ import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.MemberService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -13,7 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static java.lang.Integer.parseInt;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,17 +49,27 @@ public class CompetitionController {
                 .body(competition); // 201
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<Optional<Competition>> getCompetitions() {
         //List<Competition> competitions = competitionService.getCompetitions();
         Optional<Competition> competitions = null;
         return ResponseEntity.ok(competitions); // 200
     }
+    @GetMapping("/slice")
+    public ResponseEntity<Slice<Competition>> getCompetitionSlice(@RequestParam(required = false) String keyword,
+                                                                  @RequestParam(value = "filterBy", required = false) List<String> filteringConditions,
+                                                                  @RequestParam String orderBy,
+                                                                  @RequestParam String page,
+                                                                  @RequestParam String size) {
+        log.info("대회 slice 요청: {} {} {} {} {}", keyword, filteringConditions, orderBy, page, size);
+
+        Slice<Competition> competitions = competitionService.getCompetitionSlice(keyword, filteringConditions, orderBy, parseInt(page), parseInt(size));
+        return ResponseEntity.ok(competitions); // 200
+    }
 
     @GetMapping("/{competitionId}")
     public ResponseEntity<Competition> getCompetition(@PathVariable Long competitionId) {
-        //Competition competition = competitionService.getCompetition(competitionId);
-        Competition competition = null;
+        Competition competition = competitionService.findById(competitionId);
         return ResponseEntity.ok(competition); // 200
     }
 
@@ -62,5 +83,10 @@ public class CompetitionController {
     public ResponseEntity<Void> deleteCompetition(@PathVariable Long competitionId) {
         competitionService.delete(competitionId);
         return ResponseEntity.noContent().build(); // 204
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleNoSuchElementFoundException(EntityNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage()); // 404
     }
 }

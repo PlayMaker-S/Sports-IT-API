@@ -1,9 +1,11 @@
 package PlayMakers.SportsIT.repository;
 
 import PlayMakers.SportsIT.domain.Competition;
+import PlayMakers.SportsIT.domain.CompetitionState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 @Repository
 public interface CompetitionRepository extends JpaRepository<Competition, Long>, CompetitionCustomRepository {
@@ -13,6 +15,8 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long>,
     Optional<Competition> findByName(String name);
     // 대회 상태로 찾기
     Optional<Competition> findByState(String state);
+
+    List<Competition> findAllByStateIn(List<CompetitionState> state);
 
     // 대회 저장
 
