@@ -6,7 +6,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Getter
+@Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
 public class JoinCompetition extends BaseEntity{
@@ -23,17 +23,11 @@ public class JoinCompetition extends BaseEntity{
     @MapsId("competitionId")
     private Competition competition;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private joinType joinType;
 
     @Column
     private String formId;
-
-    @Column(nullable = false)
-    private boolean isAgree;
-
-    @Column(nullable = false)
-    private boolean isPaid;
 
     @Embeddable
     @AllArgsConstructor @NoArgsConstructor
@@ -46,5 +40,20 @@ public class JoinCompetition extends BaseEntity{
     public enum joinType {
         PLAYER,
         VIEWER
+    }
+
+    public void update(joinType type, String formId) {
+        this.joinType = type;
+        this.formId = formId;
+    }
+    @Override
+    public String toString(){
+        return "JoinCompetition{" +
+                "id=" + id +
+                ", member=" + member +
+                ", competition=" + competition +
+                ", joinType=" + joinType +
+                ", formId='" + formId + '\'' +
+                '}';
     }
 }
