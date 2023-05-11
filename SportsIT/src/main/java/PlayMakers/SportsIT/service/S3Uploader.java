@@ -1,10 +1,14 @@
-package PlayMakers.SportsIT;
+package PlayMakers.SportsIT.service;
 
+import PlayMakers.SportsIT.domain.BodyInfo;
+import PlayMakers.SportsIT.domain.Image;
+import PlayMakers.SportsIT.repository.ImageRepository;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -24,6 +28,9 @@ public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
 
+    @Autowired
+    private final ImageRepository imageRepository;
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
@@ -40,7 +47,12 @@ public class S3Uploader {
 
         removeNewFile(uploadFile);  // 로컬에 생성된 File 삭제 (MultipartFile -> File 전환 하며 로컬에 파일 생성됨)
 
-        return uploadImageUrl;      // 업로드된 파일의 S3 URL 주소 반환
+        Image image = Image.builder()
+                .url(uploadImageUrl)
+                .build();
+        Image newImage = imageRepository.save(image);
+
+        return newImage.getUrl();      // 업로드된 파일의 S3 URL 주소 반환
     }
 
     private String putS3(File uploadFile, String fileName) {
