@@ -37,6 +37,8 @@ public class QCompetition extends EntityPathBase<Competition> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
+    public final DateTimePath<java.time.LocalDateTime> endDate = createDateTime("endDate", java.time.LocalDateTime.class);
+
     public final QMember host;
 
     public final StringPath location = createString("location");
