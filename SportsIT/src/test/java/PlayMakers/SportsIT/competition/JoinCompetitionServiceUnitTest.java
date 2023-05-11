@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.given;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-class JoinCompetitionServiceTest {
+class JoinCompetitionServiceUnitTest {
     @Mock
     private CompetitionRepository competitionRepository;
     @Mock
