@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT;
+package PlayMakers.SportsIT.config;
 
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
