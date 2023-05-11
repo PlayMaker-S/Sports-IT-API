@@ -27,6 +27,7 @@ public class CompetitionDto {
     @Builder.Default
     private Integer scrapCount = 0;
     private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private LocalDateTime recruitingStart;
     private LocalDateTime recruitingEnd;
     private Integer totalPrize;
@@ -57,6 +58,7 @@ public class CompetitionDto {
                 .viewCount(viewCount)
                 .scrapCount(scrapCount)
                 .startDate(startDate)
+                .endDate(endDate)
                 .recruitingStart(recruitingStart)
                 .recruitingEnd(recruitingEnd)
                 .totalPrize(totalPrize)

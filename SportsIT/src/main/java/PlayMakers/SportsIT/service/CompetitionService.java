@@ -10,11 +10,14 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.batch.item.Chunk;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -60,6 +63,16 @@ public class CompetitionService {
 
         return competitionRepository.save(newCompetition);
     }
+    public Competition findById(Long competitionId) {
+        log.info("대회 조회 요청: {}", competitionId);
+        Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new EntityNotFoundException("해당 대회가 존재하지 않습니다."));
+        competition.setViewCount(competition.getViewCount() + 1);
+        return competition;
+    }
+    public List<Competition> findAll(){
+        log.info("대회 전체 조회 요청");
+        return competitionRepository.findAll();
+    }
 
     public Competition update(Long competitionId, CompetitionDto dto) {
         log.info("대회 수정 : {}", competitionId);
@@ -82,18 +95,31 @@ public class CompetitionService {
         log.info("CompetitionService.delete() : {}", competitionId);
         // 관계를 맺은 table 삭제
 
-
-
         competitionRepository.deleteById(competitionId);
     }
 
-    public Slice<Competition> getCompetitionSlice(String keyword, Pageable pageable) {
+    public Slice<Competition> getCompetitionSlice(String keyword,
+                                                  List<String> filteringConditions,
+                                                  String orderBy,
+                                                  int page, int size) {
         log.info("대회 목록 조회 요청: {}", keyword);
-        Slice<Competition> competitions = competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable);
+
+        Pageable pageable = getPageableProperties(orderBy, page, size);
+
+        Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filteringConditions, pageable);
+
         if (competitions.isEmpty()) {
             throw new EntityNotFoundException("대회가 존재하지 않습니다.");
         }
-        return competitionRepository.findCompetitionSortedByCreatedDate(keyword, pageable);
+        return competitions;
+    }
+
+    @NotNull
+    private static Pageable getPageableProperties(String orderBy, int page, int size) {
+        Pageable pageable;
+        if(orderBy != null && !orderBy.isEmpty()) pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy));
+        else pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        return pageable;
     }
 
     private static void updateCompetition(Competition competition, CompetitionDto dto) {
@@ -102,14 +128,15 @@ public class CompetitionService {
         competition.setRecruitingStart(dto.getRecruitingStart());
         competition.setRecruitingEnd(dto.getRecruitingEnd());
         competition.setStartDate(dto.getStartDate());
+        competition.setEndDate(dto.getEndDate());
         competition.setTotalPrize(dto.getTotalPrize());
         competition.setContent(dto.getContent());
         competition.setLocation(dto.getLocation());
         competition.setLocationDetail(dto.getLocationDetail());
         competition.setMaxPlayer(dto.getMaxPlayer());
         competition.setMaxViewer(dto.getMaxViewer());
-        competition.setPosters(dto.getPosters());
-        competition.setAgreements(dto.getAgreements());
+        //competition.setPosters(dto.getPosters());  // 변경하면 참조가 깨져버림
+        //competition.setAgreements(dto.getAgreements());  // 변경하면 참조가 깨져버림
     }
 
     /*
@@ -125,6 +152,7 @@ public class CompetitionService {
         if (newCompetition.getLocation() == null) errorMessage += "\n대회 장소";
         if (newCompetition.getLocationDetail() == null) errorMessage += "\n대회 장소 상세";
         if (newCompetition.getStartDate() == null) errorMessage += "\n대회 시작일";
+        if (newCompetition.getEndDate() == null) errorMessage += "\n대회 종료일";
         if (newCompetition.getRecruitingStart() == null) errorMessage += "\n대회 모집 시작일";
         if (newCompetition.getRecruitingEnd() == null) errorMessage += "\n대회 모집 종료일";
         if (newCompetition.getCompetitionType() == null) errorMessage += "\n대회 프리미엄";
@@ -133,13 +161,17 @@ public class CompetitionService {
             throw new IllegalArgumentException(errorMessage);
         }
     }
-    private static void checkTimeValidity(Competition newCompetition) {
-        if (newCompetition.getStartDate().isBefore(newCompetition.getRecruitingEnd())) {
-            throw new IllegalArgumentException("대회 시작일이 모집 종료일보다 빠릅니다.");
+    private static void checkTimeValidity(Competition competition) {
+        String errorMessage = "";
+        if (competition.getEndDate().isBefore(competition.getStartDate())) {
+            errorMessage += "대회 종료일이 대회 시작일보다 빠릅니다.";
         }
-        if (newCompetition.getRecruitingStart().isAfter(newCompetition.getRecruitingEnd())) {
-            throw new IllegalArgumentException("모집 종료일이 모집 시작일보다 빠릅니다.");
+        else if (competition.getStartDate().isBefore(competition.getRecruitingEnd())) {
+            errorMessage += "대회 시작일이 모집 종료일보다 빠릅니다.";
         }
+        else if (competition.getRecruitingEnd().isBefore(competition.getRecruitingStart())) {
+            errorMessage += "모집 종료일이 모집 시작일보다 빠릅니다.";
+        }
+        if(!errorMessage.equals("")) throw new IllegalArgumentException(errorMessage);
     }
-
 }
