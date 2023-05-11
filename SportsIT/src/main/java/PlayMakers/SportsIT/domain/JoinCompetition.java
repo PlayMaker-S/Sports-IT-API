@@ -6,7 +6,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Getter
+@Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
 public class JoinCompetition extends BaseEntity{
@@ -45,5 +45,15 @@ public class JoinCompetition extends BaseEntity{
     public void update(joinType type, String formId) {
         this.joinType = type;
         this.formId = formId;
+    }
+    @Override
+    public String toString(){
+        return "JoinCompetition{" +
+                "id=" + id +
+                ", member=" + member +
+                ", competition=" + competition +
+                ", joinType=" + joinType +
+                ", formId='" + formId + '\'' +
+                '}';
     }
 }

@@ -34,6 +34,9 @@ public class JoinCompetitionService {
         checkJoinable(dto);
 
         JoinCompetition join = dto.toEntity();
+        join.setMember(memberRepository.findById(dto.getUid()).get());
+        join.setCompetition(competitionRepository.findById(dto.getCompetitionId()).get());
+        log.info("대회 참가 정보: {}", join);
 
         return joinCompetitionRepository.save(join);
     }
