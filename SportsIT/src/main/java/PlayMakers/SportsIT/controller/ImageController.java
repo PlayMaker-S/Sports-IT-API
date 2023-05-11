@@ -21,7 +21,7 @@ public class ImageController {
     private final S3Uploader s3Uploader;
 
     @PostMapping
-    public String upload(@RequestParam(value="image") MultipartFile image) throws IOException{
+    public String upload(@RequestBody MultipartFile image) throws IOException{
         String url = s3Uploader.upload(image, "test");
         return url;
     }
