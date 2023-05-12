@@ -4,6 +4,7 @@ import PlayMakers.SportsIT.domain.JoinCompetition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
+import PlayMakers.SportsIT.dto.JoinCountDto;
 import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.JoinCompetitionService;
 import PlayMakers.SportsIT.service.MemberService;
@@ -99,13 +100,6 @@ public class CompetitionController {
         return ResponseEntity.ok("success"); // 200
     }
 
-    @GetMapping("/join/{competitionId}/player/count")
-    public ResponseEntity<Integer> getJoinCount(@PathVariable Long competitionId) {
-        int joinCount = joinCompetitionService.countCurrentPlayer(competitionId);
-
-        return ResponseEntity.ok(joinCount); // 200
-    }
-
     @GetMapping("/join/{competitionId}/viewer/checkJoinable")
     public ResponseEntity<String> isJoinableViewer(@PathVariable Long competitionId,
                                              @AuthenticationPrincipal User user) throws Exception{
@@ -115,13 +109,6 @@ public class CompetitionController {
         joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.VIEWER);
 
         return ResponseEntity.ok("success"); // 200
-    }
-
-    @GetMapping("/join/{competitionId}/viewer/count")
-    public ResponseEntity<Integer> getJoinViewerCount(@PathVariable Long competitionId) {
-        int joinCount = joinCompetitionService.countCurrentViewer(competitionId);
-
-        return ResponseEntity.ok(joinCount); // 200
     }
 
     @PostMapping("/join")
@@ -139,6 +126,12 @@ public class CompetitionController {
         joinCompetitionService.deleteJoinCompetition(joincompetitionDto);
 
         return ResponseEntity.accepted().body("대회가 취소되었습니다."); // 202
+    }
+
+    @GetMapping("/count-join/{competitionId}")
+    public ResponseEntity<JoinCountDto> getJoinCompetitionCounts(@PathVariable Long competitionId) throws Exception {
+        JoinCountDto result =  joinCompetitionService.countJoinCompetition(competitionId);
+        return ResponseEntity.ok(result); // 200
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
