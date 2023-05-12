@@ -43,4 +43,10 @@ public class BodyInfoController {
         Optional<BodyInfo> bodyInfo = bodyInfoService.getBodyInfo(member);
         return ResponseEntity.ok(bodyInfo); // 200
     }
+
+    @PutMapping("{bodyInfoId}")
+    public ResponseEntity<BodyInfo> updateBodyInfo(@PathVariable Long bodyInfoId, @RequestBody BodyInfoDto dto){
+        BodyInfo updatedBodyInfo = bodyInfoService.update(bodyInfoId, dto);
+        return ResponseEntity.ok(updatedBodyInfo);
+    }
 }
