@@ -92,8 +92,12 @@ class JoinCompetitionServiceUnitTest {
 
         //when
         JoinCompetition mockJoin = joinCompetitionDto.toEntity();
+        mockJoin.setMember(player);
+        mockJoin.setCompetition(newCompetition);
         log.info("mockJoin: {}", mockJoin);
 
+        given(memberRepository.findById(any(Long.class))).willReturn(Optional.of(player));
+        given(competitionRepository.findById(any(Long.class))).willReturn(Optional.of(newCompetition));
         given(joinCompetitionRepository.save(any(JoinCompetition.class))).willReturn(mockJoin);
 
         JoinCompetition newJoin = joinCompetitionService.join(joinCompetitionDto);
@@ -122,8 +126,12 @@ class JoinCompetitionServiceUnitTest {
                 .build();
 
         JoinCompetition mockJoin = joinCompetitionDto.toEntity();
+        mockJoin.setMember(player);
+        mockJoin.setCompetition(newCompetition);
         log.info("mockJoin: {}", mockJoin);
 
+        given(memberRepository.findById(any(Long.class))).willReturn(Optional.of(player));
+        given(competitionRepository.findById(any(Long.class))).willReturn(Optional.of(newCompetition));
         given(joinCompetitionRepository.save(any(JoinCompetition.class))).willReturn(mockJoin);
 
         JoinCompetition newJoin = joinCompetitionService.join(joinCompetitionDto);
