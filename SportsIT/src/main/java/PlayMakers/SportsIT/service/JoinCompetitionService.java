@@ -116,7 +116,7 @@ public class JoinCompetitionService {
         memberRepository.findById(uid)
                 .ifPresent(member -> {
                     // 회원이 대회에 참가할 수 있는 회원인지 확인
-                    if (isPlayer(member)) {
+                    if (isNotPlayer(member)) {
                         throw new IllegalArgumentException("대회 참가 권한이 없는 회원입니다.");
                     }
                 });
@@ -129,9 +129,9 @@ public class JoinCompetitionService {
                 });
     }
 
-    private static boolean isPlayer(Member member) {
+    private static boolean isNotPlayer(Member member) {
         return member.getMemberType().stream().anyMatch(memberType ->
-                memberType.getRoleName().equals("ROLE_PLAYER") ||
+                memberType.getRoleName().equals("ROLE_ADMIN") ||
                         memberType.getRoleName().equals("ROLE_INSTITUTION"));
     }
 
