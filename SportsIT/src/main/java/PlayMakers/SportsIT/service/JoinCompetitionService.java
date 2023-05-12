@@ -5,6 +5,7 @@ import PlayMakers.SportsIT.domain.CompetitionState;
 import PlayMakers.SportsIT.domain.JoinCompetition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
+import PlayMakers.SportsIT.dto.JoinCountDto;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.JoinCompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
@@ -89,10 +90,21 @@ public class JoinCompetitionService {
                     }
                 });
     }
-    public int countCurrentPlayer(Long competitionId){
+
+    public JoinCountDto countJoinCompetition(Long competitionId){
+        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        JoinCountDto countResult = JoinCountDto.builder()
+                .maxPlayerCount(competition.getMaxPlayer())
+                .playerCount(countCurrentPlayer(competitionId))
+                .maxViewerCount(competition.getMaxViewer())
+                .viewerCount(countCurrentViewer(competitionId))
+                .build();
+        return countResult;
+    }
+    private int countCurrentPlayer(Long competitionId){
         return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competitionId, JoinCompetition.joinType.PLAYER);
     }
-    public int countCurrentViewer(Long competitionId){
+    private int countCurrentViewer(Long competitionId){
         return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competitionId, JoinCompetition.joinType.VIEWER);
     }
 
