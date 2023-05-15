@@ -74,4 +74,8 @@ public class MemberService {
     public Member findOne(String memberId) {
         return memberRepository.findByEmail(memberId);
     }
+
+    public Boolean isDuplicateEmail(String email) {
+        return memberRepository.existsByEmail(email);
+    }
 }
