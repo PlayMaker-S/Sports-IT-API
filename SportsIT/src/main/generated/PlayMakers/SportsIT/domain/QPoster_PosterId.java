@@ -21,7 +21,7 @@ public class QPoster_PosterId extends BeanPath<Poster.PosterId> {
 
     public final NumberPath<Long> competitionId = createNumber("competitionId", Long.class);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final StringPath posterUrl = createString("posterUrl");
 
     public QPoster_PosterId(String variable) {
         super(Poster.PosterId.class, forVariable(variable));

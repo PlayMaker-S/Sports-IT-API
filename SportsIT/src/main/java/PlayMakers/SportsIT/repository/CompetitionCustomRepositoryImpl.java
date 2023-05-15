@@ -113,8 +113,8 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
         if(filterType.contains("END")) builder.or(competition.state.eq(CompetitionState.END));
 
         if(filterType.contains("recruitingEnd")) builder.and(competition.recruitingEnd.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7)));
-        else if(filterType.contains("totalPrize")) builder.and(competition.totalPrize.goe(100000));
-        else if(filterType.contains("recommend")) builder.and(competition.competitionType.in(CompetitionType.PREMIUM, CompetitionType.VIP));
+        if(filterType.contains("totalPrize")) builder.and(competition.totalPrize.goe(100000));
+        if(filterType.contains("recommend")) builder.and(competition.competitionType.in(CompetitionType.PREMIUM, CompetitionType.VIP));
         return builder;
     }
 }
