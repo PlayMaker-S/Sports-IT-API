@@ -24,8 +24,6 @@ public class QPoster extends EntityPathBase<Poster> {
 
     public final QCompetition competition;
 
-    public final QPoster_PosterId id;
-
     public final StringPath posterUrl = createString("posterUrl");
 
     public QPoster(String variable) {
@@ -47,7 +45,6 @@ public class QPoster extends EntityPathBase<Poster> {
     public QPoster(Class<? extends Poster> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.competition = inits.isInitialized("competition") ? new QCompetition(forProperty("competition"), inits.get("competition")) : null;
-        this.id = inits.isInitialized("id") ? new QPoster_PosterId(forProperty("id")) : null;
     }
 
 }

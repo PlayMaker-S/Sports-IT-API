@@ -134,6 +134,7 @@ public class CompetitionController {
         return ResponseEntity.ok(result); // 200
     }
 
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<String> handleNoSuchElementFoundException(EntityNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage()); // 404
