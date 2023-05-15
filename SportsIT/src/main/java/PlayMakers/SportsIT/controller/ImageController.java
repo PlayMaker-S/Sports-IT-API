@@ -41,7 +41,7 @@ public class ImageController {
         List<Poster> savedPosters = posterService.savePosters(savedUrls, competition);
 
         return ResponseEntity.created(URI.create("/" + savedPosters.get(0).getPosterUrl()))
-                .body(savedPosters);
+                .body(savedPosters); // 201
     }
 
     // 핸들러
