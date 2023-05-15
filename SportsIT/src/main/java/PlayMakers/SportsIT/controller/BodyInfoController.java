@@ -25,6 +25,9 @@ public class BodyInfoController {
     private final BodyInfoService bodyInfoService;
     private final MemberService memberService;
 
+
+
+
     @PostMapping
     public ResponseEntity<BodyInfo> createBodyInfo(@RequestBody BodyInfoDto dto,
                                                    @AuthenticationPrincipal User user){
@@ -42,5 +45,12 @@ public class BodyInfoController {
         Member member = memberService.findOne(memberEmail);
         Optional<BodyInfo> bodyInfo = bodyInfoService.getBodyInfo(member);
         return ResponseEntity.ok(bodyInfo); // 200
+    }
+
+    @PutMapping("/{bodyInfoId}")
+    public ResponseEntity<BodyInfo> updateBodyInfo(@PathVariable("bodyInfoId") Long bodyInfoId, @RequestBody BodyInfoDto dto){
+
+        BodyInfo updatedBodyInfo = bodyInfoService.update(bodyInfoId, dto);
+        return ResponseEntity.ok(updatedBodyInfo);
     }
 }
