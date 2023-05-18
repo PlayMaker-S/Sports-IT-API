@@ -37,7 +37,7 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final EnumPath<PlayMakers.SportsIT.enums.PaymentType> paymentType = createEnum("paymentType", PlayMakers.SportsIT.enums.PaymentType.class);
 
-    public final NumberPath<Integer> price = createNumber("price", Integer.class);
+    public final NumberPath<Long> price = createNumber("price", Long.class);
 
     public final StringPath refundReason = createString("refundReason");
 

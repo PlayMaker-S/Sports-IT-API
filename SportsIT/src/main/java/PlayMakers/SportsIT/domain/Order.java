@@ -28,7 +28,7 @@ public class Order extends BaseEntity{
     @Column(nullable = false)
     String content; // 주문 내역에 대한 설명
     @Column(nullable = false)
-    int price;
+    Long price;
     @Column(nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
     PaymentType paymentType;
