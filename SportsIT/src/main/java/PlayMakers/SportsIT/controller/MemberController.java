@@ -53,4 +53,15 @@ public class MemberController {
     public String home() {
         return "home";
     }
+
+    @GetMapping("/member/checkEmail")
+    public String checkEmail(@RequestBody Map<String, Object> data) {
+        String email = String.valueOf(data.get("email"));
+        Boolean isDuplicate = memberService.isDuplicateEmail(email);
+        if (isDuplicate) {
+            return "중복된 이메일로 가입된 계정이 있습니다.";
+        } else {
+            return "중복된 계정이 없습니다.";
+        }
+    }
 }
