@@ -26,7 +26,7 @@ public class MemberService {
     /**
      * 회원 가입
      */
-    public Member join(MemberDto dto) {
+    public Member join(MemberDto dto){
         // 같은 이름을 갖는 중복 회원은 X
         validateDuplicateMember(dto);  // 중복 회원 검증
 
