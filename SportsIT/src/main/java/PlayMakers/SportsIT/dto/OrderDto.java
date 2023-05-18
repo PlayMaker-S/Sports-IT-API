@@ -12,18 +12,25 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor @NoArgsConstructor
 public class OrderDto {
-    private String merchantUid;
-    private String impUid;
+    private String merchant_uid;
+    private String imp_uid;
     private String content;
-    private int price;
+    private Long price;
     private PaymentType paymentType;
     private OrderStatus status;
     private String refundReason;
 
+    public PaymentRequestDto getPaymentRequestDto(OrderDto orderDto){
+        return PaymentRequestDto.builder()
+                .merchant_uid(merchant_uid)
+                .amount(price)
+                .build();
+    }
+
     public Order toEntity(){
         return Order.builder()
-                .merchantUid(merchantUid)
-                .impUid(impUid)
+                .merchantUid(merchant_uid)
+                .impUid(imp_uid)
                 .content(content)
                 .price(price)
                 .paymentType(paymentType)
