@@ -7,15 +7,13 @@ import PlayMakers.SportsIT.dto.PaymentRequestDto;
 import PlayMakers.SportsIT.dto.PaymentResponseDto;
 import PlayMakers.SportsIT.service.MemberService;
 import PlayMakers.SportsIT.service.OrderService;
+import com.nimbusds.jose.shaded.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -55,6 +53,15 @@ public class OrderController {
 
         if(order != null) return ResponseEntity.ok("결제 내역 생성 완료");
         else return ResponseEntity.internalServerError().body("결제 내역 생성 실패");
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<String> handleIOException(IOException e) {
+        log.error("IOException 발생", e);
+        JsonObject response = new JsonObject();
+        response.addProperty("code", "401");
+        response.addProperty("message", "이미 등록된 결제 정보입니다.");
+        return ResponseEntity.badRequest().body(response.toString());
     }
 
 }

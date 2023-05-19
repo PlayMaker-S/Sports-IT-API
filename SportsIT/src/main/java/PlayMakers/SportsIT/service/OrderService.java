@@ -57,7 +57,7 @@ public class OrderService {
 
         // 응답 확인
         int code = Objects.requireNonNull(paymentResponseBody).getCode();
-        if (code == -1) {
+        if (code == 1) {
             log.info("이미 등록된 결제 내역");
             throw new IOException("결제 내역 사전 등록 실패");
         }
