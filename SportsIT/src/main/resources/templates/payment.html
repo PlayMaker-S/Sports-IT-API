@@ -66,9 +66,7 @@
                     return response.json();
                 }
             }).then(rsp => {
-                if (rsp.success) {
-                    const IMP = window.IMP; // 생략 가능
-                    IMP.init("imp22742363"); // 예: imp00000000a
+                if (rsp.success == 0) {
 
                     IMP.request_pay({
                         pg: "html5_inicis.INIBillTst",

@@ -11,10 +11,7 @@ import PlayMakers.SportsIT.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -50,7 +44,7 @@ public class CompetitionController {
         // 대회 생성
         Competition competition = competitionService.create(dto);
 
-        return ResponseEntity.created(URI.create("/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
+        return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(competition); // 201
     }
 
@@ -112,10 +106,13 @@ public class CompetitionController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> joinCompetition(@RequestBody JoinCompetitionDto competitionDto) throws Exception{
+    public ResponseEntity<String> joinCompetition(@RequestBody JoinCompetitionDto joinCompetitionDto,
+                                                  @AuthenticationPrincipal User user) throws Exception{
 
-        log.info("대회 참가 요청 Controller: {}", competitionDto);
-        JoinCompetition joinCompetition = joinCompetitionService.join(competitionDto);
+        log.info("대회 참가 요청 Controller: {}", joinCompetitionDto);
+        Member member = memberService.findOne(user.getUsername());
+        joinCompetitionDto.setUid(member.getUid());
+        JoinCompetition joinCompetition = joinCompetitionService.join(joinCompetitionDto);
 
         // 생성된 리소스의 uri와 함께 201코드, "success" 응답
         return ResponseEntity.created(URI.create("/" + joinCompetition.getId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
@@ -136,8 +133,15 @@ public class CompetitionController {
 
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleNoSuchElementFoundException(EntityNotFoundException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage()); // 404
+    public ResponseEntity<HashMap<String, Object>> handleNoSuchElementFoundException(EntityNotFoundException exception) {
+        // {"code": 1, "message": exception.getMessage()}
+        ResponseEntity<HashMap<String, Object>> responseEntity = ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new HashMap<String, Object>() {{
+                    put("code", 1);
+                    put("message", exception.getMessage());
+                }});
+        return responseEntity;
+
     }
     @ExceptionHandler
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
