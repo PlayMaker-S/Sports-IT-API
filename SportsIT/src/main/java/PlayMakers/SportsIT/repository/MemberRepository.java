@@ -13,8 +13,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
         List<Member> findByName(String name);
         List<Member> findByNameContaining(String name);
-        Member findByEmail(String email);;
+        Member findByEmail(String email);
         List<Member> findAll();
+        Boolean existsByEmail(String email);
 
         @EntityGraph(attributePaths = "memberType") // Eager 조회로 가져옴
         Optional<Member> findOneWithMemberTypeByEmail(String email);

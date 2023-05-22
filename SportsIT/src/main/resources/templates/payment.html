@@ -11,43 +11,109 @@
     <script defer>
         const IMP = window.IMP; // 생략 가능
         IMP.init("imp22742363"); // 예: imp00000000a
+        // function requestPay() {
+        //     IMP.request_pay({
+        //         pg: "html5_inicis.INIBillTst",
+        //         pay_method: "card",
+        //         merchant_uid: "ORD20180131-0000011",   // 주문번호
+        //         name: "노르웨이 회전 의자",
+        //         amount: 64900,                         // 숫자 타입
+        //         buyer_email: "gildong@gmail.com",
+        //         buyer_name: "홍길동",
+        //         buyer_tel: "010-9923-9440",
+        //         buyer_addr: "서울특별시 강남구 신사동",
+        //         buyer_postcode: "01147"
+        //     }, function (rsp) { // callback
+        //         //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
+        //         if(rsp.success){
+        //             // 결제 성공 시: 결제 승인 또는 가상계좌 발급에 성공한 경우
+        //             // jQuery로 HTTP 요청
+        //             jQuery.ajax({
+        //                 url: "http://localhost:8080/test",
+        //                 method: "POST",
+        //                 headers: { "Content-Type": "application/json" },
+        //                 data: {
+        //                     imp_uid: rsp.imp_uid,            // 결제 고유번호
+        //                     merchant_uid: rsp.merchant_uid   // 주문번호
+        //                 }
+        //             }).done(function (data) {
+        //                 // 가맹점 서버 결제 API 성공시 로직
+        //             })
+        //         } else {
+        //             let msg = '결제에 실패하였습니다.\n';
+        //             msg += '에러내용 : ' + rsp.error_msg;
+        //             console.log(msg)
+        //             window.location.href = 'http://localhost:8080/';
+        //         }
+        //     });
+        // }
+        const requestPay = () => {
+            const requestData = {
+                merchant_uid: "TESTUID",
+                amount: 1000
+            };
 
-        function requestPay() {
-            IMP.request_pay({
-                pg: "html5_inicis.INIBillTst",
-                pay_method: "card",
-                merchant_uid: "ORD20180131-0000011",   // 주문번호
-                name: "노르웨이 회전 의자",
-                amount: 64900,                         // 숫자 타입
-                buyer_email: "gildong@gmail.com",
-                buyer_name: "홍길동",
-                buyer_tel: "010-9923-9440",
-                buyer_addr: "서울특별시 강남구 신사동",
-                buyer_postcode: "01147"
-            }, function (rsp) { // callback
-                //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
-                if(rsp.success){
-                    // 결제 성공 시: 결제 승인 또는 가상계좌 발급에 성공한 경우
-                    // jQuery로 HTTP 요청
-                    jQuery.ajax({
-                        url: "http://localhost:8080/test",
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        data: {
-                            imp_uid: rsp.imp_uid,            // 결제 고유번호
-                            merchant_uid: rsp.merchant_uid   // 주문번호
-                        }
-                    }).done(function (data) {
-                        // 가맹점 서버 결제 API 성공시 로직
-                    })
+            fetch('/api/payment/record', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            }).then(response => {
+                if (response.status !== 200) {
+                    alert('Error occurred in the request');
                 } else {
-                    let msg = '결제에 실패하였습니다.\n';
-                    msg += '에러내용 : ' + rsp.error_msg;
-                    console.log(msg)
-                    window.location.href = 'http://localhost:8080/';
+                    return response.json();
                 }
-            });
-        }
+            }).then(rsp => {
+                if (rsp.success == 0) {
+
+                    IMP.request_pay({
+                        pg: "html5_inicis.INIBillTst",
+                        pay_method: "card",
+                        merchant_uid: rsp.merchant_uid,
+                        amount: rsp.amount,
+                        name: "탁구대회",
+                        buyer_email: "gildong@gmail.com",
+                        buyer_name: "홍길동",
+                        buyer_tel: "010-9923-9440",
+                        buyer_addr: "서울특별시 강남구 신사동",
+                        buyer_postcode: "01147"
+                    }, function (rsp) {
+                        if (rsp.success) {
+                            const completeData = {
+                                merchant_uid: rsp.merchant_uid,
+                                imp_uid: rsp.imp_uid,
+                                amount: rsp.amount,
+                                name: "탁구대회"
+                            };
+
+                            fetch('/api/payment/complete', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(completeData)
+                            })
+                                .then(response => {
+                                    if (response.status === 200) {
+                                        // 가맹점 서버 결제 API 성공시 로직
+                                    } else {
+                                        alert('Error occurred in completing the payment');
+                                    }
+                                });
+                        } else {
+                            const errorMsg = '결제에 실패하였습니다.\n에러내용 : ' + rsp.error_msg;
+                            console.log(errorMsg);
+                            window.location.href = 'http://localhost:8080/';
+                        }
+                    });
+                    } else {
+                        alert('Error occurred in the request');
+                    }
+                });
+        };
+
     </script>
     <title>Bill</title>
 </head>
