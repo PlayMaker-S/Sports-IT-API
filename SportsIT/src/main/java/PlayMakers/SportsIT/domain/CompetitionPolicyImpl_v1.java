@@ -13,7 +13,7 @@ public class CompetitionPolicyImpl_v1 implements CompetitionPolicy{
 
     @Override
     public CompetitionType getCompetitionType(Member host) {
-        if (host.getSubscription() == Subscribe.BASIC_HOST) return CompetitionType.FREE;
+        if (host.getSubscription() == Subscribe.BASIC_HOST || host.getSubscription() == Subscribe.FREE) return CompetitionType.FREE;
         else if (host.getSubscription() == Subscribe.PREMIUM_HOST) return CompetitionType.PREMIUM;
         else if (host.getSubscription() == Subscribe.VIP_HOST) return CompetitionType.VIP;
         else throw new IllegalArgumentException("회원의 구독 정보가 올바르지 않습니다. 회원 타입 : " + host.getMemberType());
