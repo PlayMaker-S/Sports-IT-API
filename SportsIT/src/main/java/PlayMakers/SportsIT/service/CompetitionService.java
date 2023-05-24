@@ -108,9 +108,9 @@ public class CompetitionService {
 
         Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filteringConditions, pageable);
 
-        if (competitions.isEmpty()) {
-            throw new EntityNotFoundException("대회가 존재하지 않습니다.");
-        }
+        // if (competitions.isEmpty()) {
+        //     throw new EntityNotFoundException("대회가 존재하지 않습니다.");
+        // }
         return competitions;
     }
 
