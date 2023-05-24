@@ -39,7 +39,7 @@ dependencies {
 	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 
-	//implementation 'com.google.firebase:firebase-admin:9.1.1'
+	implementation 'com.google.firebase:firebase-admin:9.1.1'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

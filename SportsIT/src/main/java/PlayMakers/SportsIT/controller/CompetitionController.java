@@ -1,12 +1,14 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.JoinCompetition;
+import PlayMakers.SportsIT.domain.JoinCompetitionTemplate;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
 import PlayMakers.SportsIT.dto.JoinCountDto;
 import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.JoinCompetitionService;
+import PlayMakers.SportsIT.service.JoinCompetitionTemplateService;
 import PlayMakers.SportsIT.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class CompetitionController {
     private final CompetitionService competitionService;
     private final MemberService memberService;
     private final JoinCompetitionService joinCompetitionService;
+    private final JoinCompetitionTemplateService joinCompetitionTemplateService;
 
     @PostMapping
     public ResponseEntity<Competition> createCompetition(@RequestBody CompetitionDto dto,
@@ -129,6 +132,13 @@ public class CompetitionController {
     public ResponseEntity<JoinCountDto> getJoinCompetitionCounts(@PathVariable Long competitionId) throws Exception {
         JoinCountDto result =  joinCompetitionService.countJoinCompetition(competitionId);
         return ResponseEntity.ok(result); // 200
+    }
+
+    @PostMapping("/firebase-test")
+    public ResponseEntity<String> testFirebase(@RequestBody JoinCompetitionTemplate template) throws Exception {
+        log.info("템플릿 생성 요청 Controller: {}", template);
+        String docId = joinCompetitionTemplateService.saveTemplate(template);
+        return ResponseEntity.ok(docId); // 200
     }
 
 
