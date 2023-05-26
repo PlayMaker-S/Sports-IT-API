@@ -16,7 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,15 +51,13 @@ public class ImageController {
     // @GetMapping("/poster/{competitionId}")
 
     @PostMapping("/agreements")
-    public ResponseEntity<List<Agreement>> uploadAgreement (@RequestBody List<MultipartFile> agreements, Long competitionId) throws IOException {
+    public ResponseEntity<List<String>> uploadAgreements (@RequestBody List<MultipartFile> agreements, Long competitionId) throws IOException {
         Competition competition = competitionService.findById(competitionId);
 
         List<String> savedUrls = s3Uploader.uploadImages(agreements, "agreement/"+competitionId);
 
-        List<Agreement> savedAgreements = agreementService.saveAgreements(savedUrls, competition);
-
-        return ResponseEntity.created(URI.create("/" + savedAgreements.get(0).getAgreementUrl()))
-                .body(savedAgreements); // 201
+        return ResponseEntity.created(URI.create("/" + savedUrls.get(0)))
+                .body(savedUrls); // 201
     }
 
     // 핸들러

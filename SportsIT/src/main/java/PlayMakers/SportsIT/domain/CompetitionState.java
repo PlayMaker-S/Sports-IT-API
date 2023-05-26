@@ -7,5 +7,4 @@ public enum CompetitionState {
     IN_PROGRESS, // 진행중
     END, // 종료 - 주최자가 대회 결과를 입력한 후
     CANCEL, // 중단
-    EARLY_END // 조기 종료
 }

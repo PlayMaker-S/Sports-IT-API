@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import java.io.FileInputStream;
 
 @Configuration
-public class FirebaseInitialize {
+public class FirebaseConfig {
     @PostConstruct //has to be Run during the Start of
     public void initialize() {
         try {

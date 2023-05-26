@@ -141,6 +141,35 @@ public class CompetitionController {
         return ResponseEntity.ok(docId); // 200
     }
 
+    @PostMapping("/template")
+    public ResponseEntity<Object> createTemplate(@RequestBody JoinCompetitionTemplate template) throws Exception {
+        log.info("템플릿 생성 요청 Controller: {}", template);
+        String docId = joinCompetitionTemplateService.saveTemplate(template);
+        Object result = new HashMap<String, Object>() {{
+            put("template-id", docId);
+        }};
+        return ResponseEntity.created(URI.create("/api/competitions/template/" + docId)) // Location Header에 생성된 리소스의 URI를 담아서 보냄
+                .body(result); // 201
+    }
+    @PutMapping("/template/{templateId}")
+    public ResponseEntity<Void> updateTemplate(@PathVariable String templateId, @RequestBody JoinCompetitionTemplate template) throws Exception {
+        log.info("템플릿 수정 요청 Controller: {}", template);
+        joinCompetitionTemplateService.updateTemplate(templateId, template);
+        return ResponseEntity.noContent().build(); // 204
+    }
+//    @GetMapping("/template/{templateId}")
+//    public ResponseEntity<JoinCompetitionTemplate> getTemplate(@PathVariable String templateId) throws Exception {
+//        log.info("템플릿 조회 요청 Controller: {}", templateId);
+//        JoinCompetitionTemplate template = joinCompetitionTemplateService.findTemplate(templateId);
+//        return ResponseEntity.ok(template); // 200
+//    }
+//    @DeleteMapping("/template/{templateId}")
+//    public ResponseEntity<Void> deleteTemplate(@PathVariable String templateId) throws Exception {
+//        log.info("템플릿 삭제 요청 Controller: {}", templateId);
+//        joinCompetitionTemplateService.deleteTemplate(templateId);
+//        return ResponseEntity.noContent().build(); // 204
+//    }
+
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<HashMap<String, Object>> handleNoSuchElementFoundException(EntityNotFoundException exception) {

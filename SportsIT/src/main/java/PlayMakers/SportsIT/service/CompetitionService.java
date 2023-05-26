@@ -6,18 +6,17 @@ import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.batch.item.Chunk;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,6 +25,9 @@ import java.util.Optional;
 public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final MemberRepository memberRepository;
+    private final FirebaseDatabase firebaseDB = FirebaseDatabase.getInstance();
+    private DatabaseReference ref = firebaseDB.getReference("server/sportsit-test/join-competition");
+    private static final String COL_NAME = "template";
     private final @MainCompetitionPolicy CompetitionPolicy competitionPolicy;
 
     public Competition create(CompetitionDto dto) {
@@ -108,10 +110,14 @@ public class CompetitionService {
 
         Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filteringConditions, pageable);
 
-        // if (competitions.isEmpty()) {
-        //     throw new EntityNotFoundException("대회가 존재하지 않습니다.");
-        // }
         return competitions;
+    }
+    public String createTemplate(JoinCompetitionTemplate template) {
+        DatabaseReference templateRef = ref.child(COL_NAME);
+        DatabaseReference newTemplateRef = templateRef.push();
+        newTemplateRef.setValueAsync(template);
+
+        return newTemplateRef.getKey();
     }
 
     @NotNull

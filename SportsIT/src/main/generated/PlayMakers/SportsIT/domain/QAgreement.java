@@ -26,6 +26,8 @@ public class QAgreement extends EntityPathBase<Agreement> {
 
     public final QCompetition competition;
 
+    public final StringPath name = createString("name");
+
     public QAgreement(String variable) {
         this(Agreement.class, forVariable(variable), INITS);
     }

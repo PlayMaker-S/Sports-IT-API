@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -20,17 +21,17 @@ import java.util.List;
 public class AgreementService {
     private final AgreementRepository agreementRepository;
 
-    public List<Agreement> saveAgreements(List<String> agreementUrls, Competition competition) {
+    public List<Agreement> saveAgreements(Map<String,String> agreementMap, Competition competition) {
         List<Agreement> savedAgreements = new ArrayList<>();
 
-        for (String url : agreementUrls) {
-            log.info("url : {}", url);
-            Agreement poster = new Agreement(url, competition);
-            log.info("poster : {}", poster);
-            savedAgreements.add(agreementRepository.save(poster));
+        for (String name : agreementMap.keySet()) {
+            log.info("name : {}", name);
+            Agreement agreement = new Agreement(agreementMap.get(name), name, competition);
+            savedAgreements.add(agreement);
         }
+        agreementRepository.saveAll(savedAgreements);
 
-        log.info("posters: {}", savedAgreements);
+        log.info("savedAgreements: {}", savedAgreements);
         return savedAgreements;
     }
 

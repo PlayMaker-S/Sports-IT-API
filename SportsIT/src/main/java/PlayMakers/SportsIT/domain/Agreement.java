@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class Agreement {
     @Id
     private String agreementUrl;
+    @Column(nullable = false)
+    private String name;
 
     @JsonIgnore
     @JoinColumn(name = "competition_id")
