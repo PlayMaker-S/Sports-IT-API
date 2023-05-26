@@ -15,7 +15,8 @@ public enum SportCategory {
     BADMINTON("배드민턴"),
     GOLF("골프"),
     TABLE_TENNIS("탁구"),
-    ARM_WRESTLING("팔씨름");
+    ARM_WRESTLING("팔씨름"),
+    VALLEYBALL("배구");
 
     private String categoryName;
 

@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -40,18 +37,28 @@ public class CompetitionController {
     private final JoinCompetitionService joinCompetitionService;
 
     @PostMapping
-    public ResponseEntity<Competition> createCompetition(@RequestBody CompetitionDto dto,
+    public ResponseEntity<?> createCompetition(@RequestBody CompetitionDto dto,
                                                          @AuthenticationPrincipal User user) throws Exception{
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
-        String hostEmail = user.getUsername(); // 로그인한 회원 ID를 가져옴
+        String hostEmail = null;
+        try{
+            hostEmail = user.getUsername(); // 로그인한 회원 ID를 가져옴
+        } catch (Exception e) {
+            throw new EntityNotFoundException("로그인이 필요합니다.");
+        }
+
         Member host = memberService.findOne(hostEmail);
         dto.setHost(host);
 
         // 대회 생성
         Competition competition = competitionService.create(dto);
 
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", true);
+        res.put("result", competition);
+
         return ResponseEntity.created(URI.create("/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
-                .body(competition); // 201
+                .body(res); // 201
     }
 
     @GetMapping("/all")
@@ -136,8 +143,11 @@ public class CompetitionController {
 
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleNoSuchElementFoundException(EntityNotFoundException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage()); // 404
+    public ResponseEntity<?> handleNoSuchElementFoundException(EntityNotFoundException exception) {
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", false);
+        res.put("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res); // 404
     }
     @ExceptionHandler
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
