@@ -25,9 +25,6 @@ import java.util.List;
 public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final MemberRepository memberRepository;
-    private final FirebaseDatabase firebaseDB = FirebaseDatabase.getInstance();
-    private DatabaseReference ref = firebaseDB.getReference("server/sportsit-test/join-competition");
-    private static final String COL_NAME = "template";
     private final @MainCompetitionPolicy CompetitionPolicy competitionPolicy;
 
     public Competition create(CompetitionDto dto) {
@@ -111,13 +108,6 @@ public class CompetitionService {
         Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filteringConditions, pageable);
 
         return competitions;
-    }
-    public String createTemplate(JoinCompetitionTemplate template) {
-        DatabaseReference templateRef = ref.child(COL_NAME);
-        DatabaseReference newTemplateRef = templateRef.push();
-        newTemplateRef.setValueAsync(template);
-
-        return newTemplateRef.getKey();
     }
 
     @NotNull

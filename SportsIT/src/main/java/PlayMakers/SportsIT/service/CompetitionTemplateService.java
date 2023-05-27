@@ -15,6 +15,7 @@ public class CompetitionTemplateService {
     private final FirebaseDatabase db = FirebaseDatabase.getInstance();
     DatabaseReference ref = db.getReference("server/sportsit-test/transactions");
 
+
     public String saveTemplate(JoinCompetitionTemplate template){
         DatabaseReference templateRef = ref.child(COL_NAME);
         DatabaseReference newTemplateRef = templateRef.push();
