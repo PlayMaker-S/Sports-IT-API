@@ -11,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface AgreementRepository extends JpaRepository<Agreement, Long> {
     Optional<Agreement> findByAgreementUrl(String url);
-    List<Agreement> findByCompetitionCompetitionId(Long id);
+    //List<Agreement> findAllByCompetitionId(Long id);
+    Void deleteByAgreementUrl(String url);
 }

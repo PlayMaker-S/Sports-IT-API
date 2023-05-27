@@ -1,7 +1,8 @@
 package PlayMakers.SportsIT.domain;
 
+import PlayMakers.SportsIT.enums.CompetitionType;
+import PlayMakers.SportsIT.enums.Subscribe;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

@@ -37,23 +37,27 @@ public class ImageController {
         return url;
     }
 
-    @PostMapping("/poster")
-    public ResponseEntity<List<Poster>> uploadPoster(@RequestBody List<MultipartFile> posters, Long competitionId) throws IOException{
+    @PostMapping("/poster/{competitionId}")
+    public ResponseEntity<Object> uploadPoster(@RequestBody List<MultipartFile> posters,
+                                                     @PathVariable Long competitionId) throws IOException{
         Competition competition = competitionService.findById(competitionId);
 
         List<String> savedUrls = s3Uploader.uploadImages(posters, "poster/"+competitionId);
 
         List<Poster> savedPosters = posterService.savePosters(savedUrls, competition);
 
+        Object res = new HashMap<String, Object>() {{
+            put("success", true);
+        }};
+
         return ResponseEntity.created(URI.create("/" + savedPosters.get(0).getPosterUrl()))
-                .body(savedPosters); // 201
+                .body(res); // 201
     }
     // @GetMapping("/poster/{competitionId}")
 
-    @PostMapping("/agreements")
-    public ResponseEntity<List<String>> uploadAgreements (@RequestBody List<MultipartFile> agreements, Long competitionId) throws IOException {
-        Competition competition = competitionService.findById(competitionId);
-
+    @PostMapping("/agreements/{competitionId}")
+    public ResponseEntity<List<String>> uploadAgreements (@RequestBody List<MultipartFile> agreements,
+                                                          @PathVariable Long competitionId) throws IOException {
         List<String> savedUrls = s3Uploader.uploadImages(agreements, "agreement/"+competitionId);
 
         return ResponseEntity.created(URI.create("/" + savedUrls.get(0)))

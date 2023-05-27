@@ -3,6 +3,7 @@ package PlayMakers.SportsIT.service;
 import PlayMakers.SportsIT.domain.Agreement;
 import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Poster;
+import PlayMakers.SportsIT.dto.AgreementDto;
 import PlayMakers.SportsIT.repository.AgreementRepository;
 import PlayMakers.SportsIT.repository.PosterRepository;
 import jakarta.transaction.Transactional;
@@ -21,18 +22,28 @@ import java.util.Map;
 public class AgreementService {
     private final AgreementRepository agreementRepository;
 
-    public List<Agreement> saveAgreements(Map<String,String> agreementMap, Competition competition) {
+    public List<Agreement> saveAgreements(List<AgreementDto> agreements, Competition competition) {
         List<Agreement> savedAgreements = new ArrayList<>();
+        for(AgreementDto agreement : agreements) {
+            log.info("agreement: {}", agreement.getAgreementUrl());
+            Agreement newAgreement = Agreement.builder()
+                                    .agreementUrl(agreement.getAgreementUrl())
+                                    .name(agreement.getAgreementName())
+                                    .competition(competition)
+                                    .build();
 
-        for (String name : agreementMap.keySet()) {
-            log.info("name : {}", name);
-            Agreement agreement = new Agreement(agreementMap.get(name), name, competition);
-            savedAgreements.add(agreement);
+            agreementRepository.save(newAgreement);
         }
-        agreementRepository.saveAll(savedAgreements);
 
         log.info("savedAgreements: {}", savedAgreements);
         return savedAgreements;
+    }
+//    public List<Agreement> findAgreementsByCompetitionId(Long competitionId) {
+//        return agreementRepository.findAllByCompetitionId(competitionId);
+//    }
+
+    public void deleteAgreement(String agreementUrl) {
+        agreementRepository.deleteByAgreementUrl(agreementUrl);
     }
 
 }

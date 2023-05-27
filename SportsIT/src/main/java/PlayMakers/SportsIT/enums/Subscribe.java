@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.domain;
+package PlayMakers.SportsIT.enums;
 
 public enum Subscribe {
     FREE, // 무료

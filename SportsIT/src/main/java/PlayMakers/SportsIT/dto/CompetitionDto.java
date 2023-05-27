@@ -1,13 +1,8 @@
 package PlayMakers.SportsIT.dto;
 
 import PlayMakers.SportsIT.domain.*;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import PlayMakers.SportsIT.enums.CompetitionType;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,7 +40,7 @@ public class CompetitionDto {
     @Builder.Default
     private List<Poster> posters = new ArrayList<>();
     @Builder.Default
-    private List<CompetitionAgree> agreements = new ArrayList<>();
+    private List<Agreement> agreements = new ArrayList<>();
     private String createdDate;
     private String updatedDate;
 

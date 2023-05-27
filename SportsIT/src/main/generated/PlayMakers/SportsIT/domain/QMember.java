@@ -39,7 +39,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath pw = createString("pw");
 
-    public final EnumPath<Subscribe> subscription = createEnum("subscription", Subscribe.class);
+    public final EnumPath<PlayMakers.SportsIT.enums.Subscribe> subscription = createEnum("subscription", PlayMakers.SportsIT.enums.Subscribe.class);
 
     public final NumberPath<Long> uid = createNumber("uid", Long.class);
 

@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.domain;
+package PlayMakers.SportsIT.enums;
 
 public enum CompetitionType {
     FREE, // 기본

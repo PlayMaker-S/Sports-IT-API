@@ -3,6 +3,7 @@ package PlayMakers.SportsIT.controller;
 import PlayMakers.SportsIT.domain.Agreement;
 import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Poster;
+import PlayMakers.SportsIT.dto.AgreementDto;
 import PlayMakers.SportsIT.service.AgreementService;
 import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.PosterService;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,41 +30,48 @@ public class AgreementController {
     private final AgreementService agreementService;
     private final CompetitionService competitionService;
 
-    @PostMapping("/upload") // 대회 규정 S3 저장 후 저장된 URL 리스트 반환
-    public ResponseEntity<List<String>> uploadAgreements (@RequestBody List<MultipartFile> agreements, Long competitionId) throws IOException {
+    @PostMapping("/upload/{competitionId}") // 대회 규정 S3 저장 후 저장된 URL 리스트 반환
+    public ResponseEntity<Object> uploadAgreements (@RequestBody List<MultipartFile> agreements,
+                                                    @PathVariable Long competitionId) throws IOException {
         Competition competition = competitionService.findById(competitionId);
 
         List<String> savedUrls = s3Uploader.uploadImages(agreements, "agreement/"+competitionId);
 
+        Object res = new HashMap<String, Object>() {{
+            put("success", true);
+            put("result", savedUrls);
+        }};
+
         return ResponseEntity.created(URI.create("/" + savedUrls.get(0)))
-                .body(savedUrls); // 201
+                .body(res); // 201
     }
     @PostMapping("/save/{competitionId}")
-    public ResponseEntity<?> saveAgreements (@RequestParam Long competitionId,
-                                             @RequestBody List<String> agreementUrls,
-                                             @RequestBody List<String> agreementNames) {
-        Map<String, Object> res = new HashMap<>();
+    public ResponseEntity<Object> saveAgreements (@PathVariable Long competitionId,
+                                             @RequestBody List<AgreementDto> agreements) {
 
-        Map<String, String> agreementMap = new HashMap<>();
-
-        if (agreementUrls.size() != agreementNames.size()) {
-            String errMsg = "규정 명칭과 규정 파일의 개수가 일치하지 않습니다.";
-            throw new IllegalArgumentException(errMsg); //
-        }
-        for (int i = 0; i < agreementUrls.size(); i++) {
-            agreementMap.put(agreementNames.get(i), agreementUrls.get(i));
-        }
 
         Competition competition = competitionService.findById(competitionId);
 
-        List<Agreement> saved = agreementService.saveAgreements(agreementMap, competition);
+        List<Agreement> saved = agreementService.saveAgreements(agreements, competition);
 
-        res.put("success", true);
-        res.put("result", saved);
+        Object res = new HashMap<String, Object>() {{
+            put("success", true);
+        }};
 
-        return ResponseEntity.created(URI.create("/" + saved.get(0).getAgreementUrl()))
+        return ResponseEntity.created(URI.create("/api/competitions/" + competitionId))
                 .body(res); // 201
     }
+//    @GetMapping("/{competitionId}")
+//    public ResponseEntity<Object> getAllAgreements(@PathVariable Long competitionId) {
+//        List<Agreement> agreements = agreementService.findAgreementsByCompetitionId(competitionId);
+//
+//        Object res = new HashMap<String, Object>() {{
+//            put("success", true);
+//            put("result", agreements);
+//        }};
+//
+//        return ResponseEntity.ok(res);
+//    }
 
     // 핸들러
     @ExceptionHandler(IOException.class)

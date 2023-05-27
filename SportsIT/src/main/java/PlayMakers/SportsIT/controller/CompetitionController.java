@@ -163,7 +163,7 @@ public class CompetitionController {
         String docId = competitionTemplateService.saveTemplate(template);
         Object result = new HashMap<String, Object>() {{
             put("success", true);
-            put("template-id", docId);
+            put("templateId", docId);
         }};
         return ResponseEntity.created(URI.create("/api/competitions/template/" + docId)) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(result); // 201
@@ -201,7 +201,7 @@ public class CompetitionController {
         res.put("message", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res); // 404
     }
-    // ExecutionException, InterruptedException 핸들러
+
     @ExceptionHandler({ExecutionException.class, InterruptedException.class})
     public ResponseEntity<?> handleFirestoreException(Exception exception) {
         Map<String, Object> res = new HashMap<>();

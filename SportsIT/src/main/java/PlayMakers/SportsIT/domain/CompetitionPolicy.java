@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.domain;
 
-import java.time.LocalDateTime;
+import PlayMakers.SportsIT.enums.CompetitionType;
 
 public interface CompetitionPolicy {
     /*

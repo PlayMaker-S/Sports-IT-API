@@ -3,6 +3,8 @@ package PlayMakers.SportsIT.competition;
 import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
+import PlayMakers.SportsIT.enums.CompetitionType;
+import PlayMakers.SportsIT.enums.Subscribe;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.JoinCompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;

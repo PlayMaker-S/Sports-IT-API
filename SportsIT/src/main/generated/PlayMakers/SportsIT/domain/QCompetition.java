@@ -24,13 +24,13 @@ public class QCompetition extends EntityPathBase<Competition> {
 
     public final QBaseEntity _super = new QBaseEntity(this);
 
-    public final ListPath<CompetitionAgree, QCompetitionAgree> agreements = this.<CompetitionAgree, QCompetitionAgree>createList("agreements", CompetitionAgree.class, QCompetitionAgree.class, PathInits.DIRECT2);
+    public final ListPath<Agreement, QAgreement> agreements = this.<Agreement, QAgreement>createList("agreements", Agreement.class, QAgreement.class, PathInits.DIRECT2);
 
     public final EnumPath<SportCategory> category = createEnum("category", SportCategory.class);
 
     public final NumberPath<Long> competitionId = createNumber("competitionId", Long.class);
 
-    public final EnumPath<CompetitionType> competitionType = createEnum("competitionType", CompetitionType.class);
+    public final EnumPath<PlayMakers.SportsIT.enums.CompetitionType> competitionType = createEnum("competitionType", PlayMakers.SportsIT.enums.CompetitionType.class);
 
     public final StringPath content = createString("content");
 

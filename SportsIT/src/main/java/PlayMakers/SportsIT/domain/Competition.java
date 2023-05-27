@@ -1,16 +1,11 @@
 package PlayMakers.SportsIT.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import PlayMakers.SportsIT.enums.CompetitionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Store;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
@@ -95,7 +90,7 @@ public class Competition extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true) // orphanRemoval : 대회 삭제 시, 대회 규정도 삭제, cascade : 대회 삭제 시, 대회 규정도 삭제
-    private List<CompetitionAgree> agreements = new ArrayList<>(); // 대회 규정
+    private List<Agreement> agreements = new ArrayList<>(); // 대회 규정
 
     @Scheduled(fixedDelay = 1000*60) // 1분마다 실행
     public void updateState() {
