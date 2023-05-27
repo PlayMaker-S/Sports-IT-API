@@ -66,7 +66,6 @@ class BodyInfoServiceTest {
                 .smMass(33.2f)
                 .build();
         BodyInfo mockBodyInfo = dto.toEntity();
-
         memberRepository.save(member);
 
         //mocking
@@ -114,5 +113,56 @@ class BodyInfoServiceTest {
         //then
         log.info(getBodyInfo.get().getMember().getName());
         assertThat(mockBodyInfo).isEqualTo(getBodyInfo.get());
+    }
+
+    @Test
+    void 신체정보수정(){
+        // given
+        Long bodyInfoId = 1L;
+        Member member = Member.builder()
+                .pw("1234")
+                .name("홍길동1")
+                .memberType(Collections.singleton(userTypePlayer))
+                .email("test@google.com")
+                .phone("010-1234-8765")
+                .build();
+
+        BodyInfo bodyInfo = BodyInfo.builder()
+                .id(bodyInfoId)
+                .member(member)
+                .height(170.0f)
+                .weight(65.0f)
+                .fatMass(12.3f)
+                .smMass(33.2f)
+                .build();
+
+        BodyInfoDto modifyDto = BodyInfoDto.builder()
+                .height(175.0f)
+                .weight(62.3f)
+                .fatMass(11.3f)
+                .smMass(33.5f)
+                .build();
+
+        memberRepository.save(member);
+        bodyInfoRepository.save(bodyInfo);
+
+        // mocking
+        given(bodyInfoRepository.findById(bodyInfoId)).willReturn(Optional.of(bodyInfo));
+
+        // when
+        BodyInfo updateBodyInfo = bodyInfoService.update(bodyInfoId, modifyDto);
+        log.info("수정된 신체정보 : {}", updateBodyInfo);
+
+        // then
+        assertThat(updateBodyInfo.getHeight()).isEqualTo(modifyDto.getHeight());
+        assertThat(updateBodyInfo.getWeight()).isEqualTo(modifyDto.getWeight());
+        assertThat(updateBodyInfo.getFatMass()).isEqualTo(modifyDto.getFatMass());
+        assertThat(updateBodyInfo.getSmMass()).isEqualTo(modifyDto.getSmMass());
+        assertThat(updateBodyInfo.getId()).isEqualTo(bodyInfo.getId());
+
+        // assertThat(updateBodyInfo.getHeight()).isNotEqualTo(bodyInfo.getHeight());
+        // assertThat(updateBodyInfo.getWeight()).isNotEqualTo(bodyInfo.getWeight());
+        // assertThat(updateBodyInfo.getFatMass()).isNotEqualTo(bodyInfo.getFatMass());
+        // assertThat(updateBodyInfo.getSmMass()).isNotEqualTo(bodyInfo.getSmMass());
     }
 }

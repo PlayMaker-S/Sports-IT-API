@@ -1,7 +1,9 @@
 package PlayMakers.SportsIT.controller;
 
+import PlayMakers.SportsIT.domain.Agreement;
 import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Poster;
+import PlayMakers.SportsIT.service.AgreementService;
 import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.PosterService;
 import PlayMakers.SportsIT.service.S3Uploader;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ImageController {
     private final S3Uploader s3Uploader;
     private final PosterService posterService;
+    private final AgreementService agreementService;
     private final CompetitionService competitionService;
 
     @PostMapping
@@ -41,7 +44,20 @@ public class ImageController {
         List<Poster> savedPosters = posterService.savePosters(savedUrls, competition);
 
         return ResponseEntity.created(URI.create("/" + savedPosters.get(0).getPosterUrl()))
-                .body(savedPosters);
+                .body(savedPosters); // 201
+    }
+    // @GetMapping("/poster/{competitionId}")
+
+    @PostMapping("/agreements")
+    public ResponseEntity<List<Agreement>> uploadAgreement (@RequestBody List<MultipartFile> agreements, Long competitionId) throws IOException {
+        Competition competition = competitionService.findById(competitionId);
+
+        List<String> savedUrls = s3Uploader.uploadImages(agreements, "agreement/"+competitionId);
+
+        List<Agreement> savedAgreements = agreementService.saveAgreements(savedUrls, competition);
+
+        return ResponseEntity.created(URI.create("/" + savedAgreements.get(0).getAgreementUrl()))
+                .body(savedAgreements); // 201
     }
 
     // 핸들러

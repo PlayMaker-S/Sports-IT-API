@@ -11,10 +11,7 @@ import PlayMakers.SportsIT.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,10 +35,10 @@ public class CompetitionController {
 
     @PostMapping
     public ResponseEntity<?> createCompetition(@RequestBody CompetitionDto dto,
-                                                         @AuthenticationPrincipal User user) throws Exception{
+                                                         @AuthenticationPrincipal User user) throws Exception {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
-        try{
+        try {
             hostEmail = user.getUsername(); // 로그인한 회원 ID를 가져옴
         } catch (Exception e) {
             throw new EntityNotFoundException("로그인이 필요합니다.");
@@ -57,9 +54,10 @@ public class CompetitionController {
         res.put("success", true);
         res.put("result", competition);
 
-        return ResponseEntity.created(URI.create("/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
+        return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(res); // 201
     }
+
 
     @GetMapping("/all")
     public ResponseEntity<Optional<Competition>> getCompetitions() {
@@ -119,10 +117,13 @@ public class CompetitionController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> joinCompetition(@RequestBody JoinCompetitionDto competitionDto) throws Exception{
+    public ResponseEntity<String> joinCompetition(@RequestBody JoinCompetitionDto joinCompetitionDto,
+                                                  @AuthenticationPrincipal User user) throws Exception{
 
-        log.info("대회 참가 요청 Controller: {}", competitionDto);
-        JoinCompetition joinCompetition = joinCompetitionService.join(competitionDto);
+        log.info("대회 참가 요청 Controller: {}", joinCompetitionDto);
+        Member member = memberService.findOne(user.getUsername());
+        joinCompetitionDto.setUid(member.getUid());
+        JoinCompetition joinCompetition = joinCompetitionService.join(joinCompetitionDto);
 
         // 생성된 리소스의 uri와 함께 201코드, "success" 응답
         return ResponseEntity.created(URI.create("/" + joinCompetition.getId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
