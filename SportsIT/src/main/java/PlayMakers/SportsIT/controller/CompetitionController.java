@@ -8,7 +8,7 @@ import PlayMakers.SportsIT.dto.JoinCompetitionDto;
 import PlayMakers.SportsIT.dto.JoinCountDto;
 import PlayMakers.SportsIT.service.CompetitionService;
 import PlayMakers.SportsIT.service.JoinCompetitionService;
-import PlayMakers.SportsIT.service.JoinCompetitionTemplateService;
+import PlayMakers.SportsIT.service.CompetitionTemplateService;
 import PlayMakers.SportsIT.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class CompetitionController {
     private final CompetitionService competitionService;
     private final MemberService memberService;
     private final JoinCompetitionService joinCompetitionService;
-    private final JoinCompetitionTemplateService joinCompetitionTemplateService;
+    private final CompetitionTemplateService competitionTemplateService;
 
     @PostMapping
     public ResponseEntity<?> createCompetition(@RequestBody CompetitionDto dto,
@@ -148,14 +148,14 @@ public class CompetitionController {
     @PostMapping("/firebase-test")
     public ResponseEntity<String> testFirebase(@RequestBody JoinCompetitionTemplate template) throws Exception {
         log.info("템플릿 생성 요청 Controller: {}", template);
-        String docId = joinCompetitionTemplateService.saveTemplate(template);
+        String docId = competitionTemplateService.saveTemplate(template);
         return ResponseEntity.ok(docId); // 200
     }
 
     @PostMapping("/template")
     public ResponseEntity<Object> createTemplate(@RequestBody JoinCompetitionTemplate template) throws Exception {
         log.info("템플릿 생성 요청 Controller: {}", template);
-        String docId = joinCompetitionTemplateService.saveTemplate(template);
+        String docId = competitionTemplateService.saveTemplate(template);
         Object result = new HashMap<String, Object>() {{
             put("template-id", docId);
         }};
@@ -165,15 +165,18 @@ public class CompetitionController {
     @PutMapping("/template/{templateId}")
     public ResponseEntity<Void> updateTemplate(@PathVariable String templateId, @RequestBody JoinCompetitionTemplate template) throws Exception {
         log.info("템플릿 수정 요청 Controller: {}", template);
-        joinCompetitionTemplateService.updateTemplate(templateId, template);
+        competitionTemplateService.updateTemplate(templateId, template);
         return ResponseEntity.noContent().build(); // 204
     }
-//    @GetMapping("/template/{templateId}")
-//    public ResponseEntity<JoinCompetitionTemplate> getTemplate(@PathVariable String templateId) throws Exception {
-//        log.info("템플릿 조회 요청 Controller: {}", templateId);
-//        JoinCompetitionTemplate template = joinCompetitionTemplateService.findTemplate(templateId);
-//        return ResponseEntity.ok(template); // 200
-//    }
+    @GetMapping("/template/{templateId}")
+    public ResponseEntity<?> getTemplate(@PathVariable String templateId) throws Exception {
+        log.info("템플릿 조회 요청 Controller: {}", templateId);
+        JoinCompetitionTemplate template = competitionTemplateService.getTemplate(templateId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("result", template);
+        return ResponseEntity.ok(result); // 200
+    }
 //    @DeleteMapping("/template/{templateId}")
 //    public ResponseEntity<Void> deleteTemplate(@PathVariable String templateId) throws Exception {
 //        log.info("템플릿 삭제 요청 Controller: {}", templateId);
