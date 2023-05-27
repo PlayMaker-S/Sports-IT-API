@@ -1,7 +1,7 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.JoinCompetition;
-import PlayMakers.SportsIT.domain.JoinCompetitionTemplate;
+import PlayMakers.SportsIT.domain.CompetitionTemplate;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
@@ -23,6 +23,7 @@ import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import static java.lang.Integer.parseInt;
 
@@ -146,43 +147,51 @@ public class CompetitionController {
     }
 
     @PostMapping("/firebase-test")
-    public ResponseEntity<String> testFirebase(@RequestBody JoinCompetitionTemplate template) throws Exception {
+    public ResponseEntity<String> testFirebase(@RequestBody CompetitionTemplate template) throws Exception {
         log.info("템플릿 생성 요청 Controller: {}", template);
         String docId = competitionTemplateService.saveTemplate(template);
         return ResponseEntity.ok(docId); // 200
     }
 
+    /*
+        템플릿 관련 API
+     */
+
     @PostMapping("/template")
-    public ResponseEntity<Object> createTemplate(@RequestBody JoinCompetitionTemplate template) throws Exception {
+    public ResponseEntity<Object> createTemplate(@RequestBody CompetitionTemplate template) throws Exception {
         log.info("템플릿 생성 요청 Controller: {}", template);
         String docId = competitionTemplateService.saveTemplate(template);
         Object result = new HashMap<String, Object>() {{
+            put("success", true);
             put("template-id", docId);
         }};
         return ResponseEntity.created(URI.create("/api/competitions/template/" + docId)) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(result); // 201
     }
     @PutMapping("/template/{templateId}")
-    public ResponseEntity<Void> updateTemplate(@PathVariable String templateId, @RequestBody JoinCompetitionTemplate template) throws Exception {
+    public ResponseEntity<?> updateTemplate(@PathVariable String templateId, @RequestBody CompetitionTemplate template) throws Exception {
         log.info("템플릿 수정 요청 Controller: {}", template);
         competitionTemplateService.updateTemplate(templateId, template);
-        return ResponseEntity.noContent().build(); // 204
+        Object result = new HashMap<String, Object>() {{
+            put("success", true);
+        }};
+        return ResponseEntity.ok(result); // 200
     }
     @GetMapping("/template/{templateId}")
     public ResponseEntity<?> getTemplate(@PathVariable String templateId) throws Exception {
         log.info("템플릿 조회 요청 Controller: {}", templateId);
-        JoinCompetitionTemplate template = competitionTemplateService.getTemplate(templateId);
+        CompetitionTemplate template = competitionTemplateService.getTemplate(templateId);
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
         result.put("result", template);
         return ResponseEntity.ok(result); // 200
     }
-//    @DeleteMapping("/template/{templateId}")
-//    public ResponseEntity<Void> deleteTemplate(@PathVariable String templateId) throws Exception {
-//        log.info("템플릿 삭제 요청 Controller: {}", templateId);
-//        joinCompetitionTemplateService.deleteTemplate(templateId);
-//        return ResponseEntity.noContent().build(); // 204
-//    }
+    @DeleteMapping("/template/{templateId}")
+    public ResponseEntity<Void> deleteTemplate(@PathVariable String templateId) throws Exception {
+        log.info("템플릿 삭제 요청 Controller: {}", templateId);
+        competitionTemplateService.deleteTemplate(templateId);
+        return ResponseEntity.noContent().build(); // 204
+    }
 
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -191,6 +200,14 @@ public class CompetitionController {
         res.put("success", false);
         res.put("message", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res); // 404
+    }
+    // ExecutionException, InterruptedException 핸들러
+    @ExceptionHandler({ExecutionException.class, InterruptedException.class})
+    public ResponseEntity<?> handleFirestoreException(Exception exception) {
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", false);
+        res.put("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res); // 500
     }
     @ExceptionHandler
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {

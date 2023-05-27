@@ -19,7 +19,7 @@ public class FirebaseConfig {
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl("https://sportsit-test-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                    //.setDatabaseUrl("https://sportsit-test-default-rtdb.asia-southeast1.firebasedatabase.app/")
                     .build();
 
             FirebaseApp.initializeApp(options);
@@ -27,19 +27,19 @@ public class FirebaseConfig {
             e.printStackTrace();
         }
 
-        DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("restricted_access/secret_document");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Object document = dataSnapshot.getValue();
-                System.out.println(document);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-            }
-        });
+//        DatabaseReference ref = FirebaseDatabase.getInstance()
+//                .getReference("restricted_access/secret_document");
+//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Object document = dataSnapshot.getValue();
+//                System.out.println(document);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError error) {
+//            }
+//        });
     }
 
 }
