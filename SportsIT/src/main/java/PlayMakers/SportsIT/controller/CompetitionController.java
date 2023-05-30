@@ -33,9 +33,17 @@ public class CompetitionController {
     private final MemberService memberService;
     private final JoinCompetitionService joinCompetitionService;
 
+    /**
+     *
+     * @param dto
+     * @param user
+     * @return ResponseEntity<?> - 201 : success: true, result: Competition
+     * @throws Exception : 주최자가 아닌 경우
+     * 주최자 계정으로 대회 생성
+     */
     @PostMapping
     public ResponseEntity<?> createCompetition(@RequestBody CompetitionDto dto,
-                                                         @AuthenticationPrincipal User user) throws Exception {
+                                               @AuthenticationPrincipal User user) throws Exception {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
         try {
@@ -58,13 +66,26 @@ public class CompetitionController {
                 .body(res); // 201
     }
 
-
+    /**
+     *
+     * @return 모든 대회 정보
+     */
     @GetMapping("/all")
     public ResponseEntity<Optional<Competition>> getCompetitions() {
         //List<Competition> competitions = competitionService.getCompetitions();
         Optional<Competition> competitions = null;
         return ResponseEntity.ok(competitions); // 200
     }
+
+    /**
+     *
+     * @param keyword
+     * @param filteringConditions
+     * @param orderBy
+     * @param page
+     * @param size
+     * @return ResponseEntity<?> - 200 : success: true, result: Slice<Competition>
+     */
     @GetMapping("/slice")
     public ResponseEntity<Slice<Competition>> getCompetitionSlice(@RequestParam(required = false) String keyword,
                                                                   @RequestParam(value = "filterBy", required = false) List<String> filteringConditions,
