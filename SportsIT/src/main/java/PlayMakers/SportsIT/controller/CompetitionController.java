@@ -98,6 +98,34 @@ public class CompetitionController {
         competitionService.delete(competitionId);
         return ResponseEntity.noContent().build(); // 204
     }
+
+    /**
+     * 대회 참가시 참가 가능한 인원 수를 반환, 대회 참가가 불가능할 경우 예외 발생
+     * @param competitionId
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/{competitionId}/join/init")
+    public ResponseEntity<Object> initJoin(@PathVariable Long competitionId,
+                                           @AuthenticationPrincipal User user) throws Exception{
+        Member member = memberService.findOne(user.getUsername());
+
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Map<String, String> result = joinCompetitionService.getJoinCounts(competitionId, member);
+            res.put("success", true);
+            res.put("result", result);
+
+            return ResponseEntity.ok(res); // 200
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+        }
+
+    }
     @GetMapping("/{competitionId}/join/player/checkJoinable")
     public ResponseEntity<String> isJoinable(@PathVariable Long competitionId,
                                              @AuthenticationPrincipal User user) throws Exception{
