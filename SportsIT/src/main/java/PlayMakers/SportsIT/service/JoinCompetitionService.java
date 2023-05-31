@@ -124,11 +124,12 @@ public class JoinCompetitionService {
                 });
     }
 
-    public void checkAlreadyJoined(Long uid, Long competitionId) {
+    public boolean checkAlreadyJoined(Long uid, Long competitionId) {
         joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId)
                 .ifPresent(joinCompetition -> {
                     throw new IllegalArgumentException("이미 해당 대회에 신청한 회원입니다.");
                 });
+        return false;
     }
 
     private static boolean isNotPlayer(Member member) {
