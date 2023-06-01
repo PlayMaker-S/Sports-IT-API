@@ -57,6 +57,7 @@ class BodyInfoServiceTest {
                 .phone("010-1234-8765")
                 .build();
 
+        memberRepository.save(member);
 
         BodyInfoDto dto = BodyInfoDto.builder()
                 .member(member)
@@ -66,7 +67,7 @@ class BodyInfoServiceTest {
                 .smMass(33.2f)
                 .build();
         BodyInfo mockBodyInfo = dto.toEntity();
-        memberRepository.save(member);
+
 
         //mocking
         given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
@@ -127,6 +128,8 @@ class BodyInfoServiceTest {
                 .phone("010-1234-8765")
                 .build();
 
+        memberRepository.save(member);
+
         BodyInfo bodyInfo = BodyInfo.builder()
                 .id(bodyInfoId)
                 .member(member)
@@ -143,7 +146,6 @@ class BodyInfoServiceTest {
                 .smMass(33.5f)
                 .build();
 
-        memberRepository.save(member);
         bodyInfoRepository.save(bodyInfo);
 
         // mocking
