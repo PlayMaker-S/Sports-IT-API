@@ -25,9 +25,6 @@ public class BodyInfoController {
     private final BodyInfoService bodyInfoService;
     private final MemberService memberService;
 
-
-
-
     @PostMapping
     public ResponseEntity<BodyInfo> createBodyInfo(@RequestBody BodyInfoDto dto,
                                                    @AuthenticationPrincipal User user){

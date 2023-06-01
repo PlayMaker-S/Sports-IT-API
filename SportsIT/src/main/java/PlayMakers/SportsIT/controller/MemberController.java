@@ -1,15 +1,19 @@
 package PlayMakers.SportsIT.controller;
 
+import PlayMakers.SportsIT.domain.Feed;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -63,5 +67,22 @@ public class MemberController {
         } else {
             return "중복된 계정이 없습니다.";
         }
+    }
+    @GetMapping("member/feeds")
+    public ResponseEntity<Object> getAllFeedsByMember(@AuthenticationPrincipal User user) {
+        String memberEmail = user.getUsername();
+        Member member = memberService.findOne("yuk@naver.com");
+        List<Feed> feeds = memberService.getAllFeedsByMember(member);
+        for(Feed feed : feeds) {
+            log.info("id : {}", feed.getFeedId());
+            log.info("url : {}", feed.getImgUrl());
+            log.info("member : {}", feed.getMember());
+        }
+        //MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+
+        Object res = new HashMap<String, Object>() {{
+            put("feeds", feeds);
+        }};
+        return ResponseEntity.ok(res);
     }
 }

@@ -1,6 +1,7 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.auth.security.SecurityUtil;
+import PlayMakers.SportsIT.domain.Feed;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.domain.MemberType;
@@ -77,5 +78,8 @@ public class MemberService {
 
     public Boolean isDuplicateEmail(String email) {
         return memberRepository.existsByEmail(email);
+    }
+    public List<Feed> getAllFeedsByMember(Member member) {
+        return member.getFeeds();
     }
 }
