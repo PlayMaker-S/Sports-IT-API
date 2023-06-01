@@ -63,6 +63,10 @@ public class SecurityConfiguration {
 
         http
                 .csrf().disable()  // csrf 비활성화 -> token 방식이므로
+                .requiresChannel(channel ->
+                        channel.anyRequest().requiresSecure())
+                .authorizeHttpRequests(authorize ->
+                        authorize.anyRequest().permitAll())
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)  // cors 필터 추가
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
