@@ -37,9 +37,19 @@ public class CompetitionController {
     private final JoinCompetitionService joinCompetitionService;
     private final CompetitionTemplateService competitionTemplateService;
 
+    /*
+        대회 생성
+     */
+    /**
+     * 대회 생성 컨트롤러
+     * @param dto
+     * @param user
+     * @return success: true, result: 생성한 Competition
+     * @throws Exception 로그인 에러, 주최자가 아닌 경우
+     */
     @PostMapping
     public ResponseEntity<?> createCompetition(@RequestBody CompetitionDto dto,
-                                                         @AuthenticationPrincipal User user) throws Exception {
+                                               @AuthenticationPrincipal User user) throws Exception {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
         try {
@@ -62,13 +72,29 @@ public class CompetitionController {
                 .body(res); // 201
     }
 
+    /*
+        대회 조회, 수정, 요청
+     */
 
+    /**
+     * 모든 대회 조회 컨트롤러
+     * @return
+     */
     @GetMapping("/all")
     public ResponseEntity<Optional<Competition>> getCompetitions() {
         //List<Competition> competitions = competitionService.getCompetitions();
         Optional<Competition> competitions = null;
         return ResponseEntity.ok(competitions); // 200
     }
+
+    /**
+     * @param keyword
+     * @param filteringConditions
+     * @param orderBy
+     * @param page
+     * @param size
+     * @return ResponseEntity<?> - 200 : success: true, result: Slice<Competition>
+     */
     @GetMapping("/slice")
     public ResponseEntity<Slice<Competition>> getCompetitionSlice(@RequestParam(required = false) String keyword,
                                                                   @RequestParam(value = "filterBy", required = false) List<String> filteringConditions,
@@ -98,12 +124,48 @@ public class CompetitionController {
         competitionService.delete(competitionId);
         return ResponseEntity.noContent().build(); // 204
     }
-    @GetMapping("/{competitionId}/join/player/checkJoinable")
-    public ResponseEntity<String> isJoinable(@PathVariable Long competitionId,
+    /*
+        대회 참가
+     */
+
+    /**
+     * 대회 참가시 참가 가능한 인원 수를 반환, 대회 참가가 불가능할 경우 예외 발생
+     * @param competitionId
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/{competitionId}/join/init")
+    public ResponseEntity<Object> initJoin(@PathVariable Long competitionId,
+                                           @AuthenticationPrincipal User user) throws Exception{
+        Member member = memberService.findOne(user.getUsername());
+
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Map<String, String> result = joinCompetitionService.getJoinCounts(competitionId, member);
+            res.put("success", true);
+            res.put("result", result);
+
+            return ResponseEntity.ok(res); // 200
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+        }
+
+    }
+    @GetMapping("/{competitionId}/join/player")
+    public ResponseEntity<Object> isJoinable(@PathVariable Long competitionId,
                                              @AuthenticationPrincipal User user) throws Exception{
         Member member = memberService.findOne(user.getUsername());
 
-        joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId);
+        Map<String, Object> res = new HashMap<>();
+
+        if (!joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId)) {
+            res.put("success", false);
+            return ResponseEntity.ok(res); // 200
+        }
         joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.PLAYER);
 
         return ResponseEntity.ok("success"); // 200
