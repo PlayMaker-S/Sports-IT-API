@@ -31,6 +31,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath email = createString("email");
 
+    public final ListPath<Feed, QFeed> feeds = this.<Feed, QFeed>createList("feeds", Feed.class, QFeed.class, PathInits.DIRECT2);
+
     public final SetPath<MemberType, QMemberType> memberType = this.<MemberType, QMemberType>createSet("memberType", MemberType.class, QMemberType.class, PathInits.DIRECT2);
 
     public final StringPath name = createString("name");
