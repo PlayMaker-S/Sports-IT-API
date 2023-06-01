@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -122,11 +124,12 @@ public class JoinCompetitionService {
                 });
     }
 
-    public void checkAlreadyJoined(Long uid, Long competitionId) {
+    public boolean checkAlreadyJoined(Long uid, Long competitionId) {
         joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId)
                 .ifPresent(joinCompetition -> {
                     throw new IllegalArgumentException("이미 해당 대회에 신청한 회원입니다.");
                 });
+        return false;
     }
 
     private static boolean isNotPlayer(Member member) {
@@ -141,5 +144,46 @@ public class JoinCompetitionService {
 
     public boolean isAlreadyFull(Competition competition, JoinCompetition.joinType type) {
         return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competition.getCompetitionId(), type) >= competition.getMaxViewer();
+    }
+
+    public Map<String, String> getJoinCounts(Long competitionId, Member member) throws Exception {
+        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        // ROLE_PLAYER가 아니라면 예외 발생
+        if (isNotPlayer(member)) {
+            throw new IllegalAccessException("대회 참가 권한이 없는 회원입니다.");
+        }
+        // 이미 참가한 대회라면 예외 발생
+        if (alreadyJoinedPlayer(competitionId, member)) {
+            throw new IllegalAccessException("이미 참가한 대회입니다.");
+        }
+        // 현재 대회가 모집중이 아니라면 예외 발생
+        if (!competition.getState().equals(CompetitionState.RECRUITING)) {
+            throw new IllegalAccessException("대회 모집 기간이 아닙니다.");
+        }
+
+        String availablePlayer, availableViewer;
+        Integer maxPlayer = competition.getMaxPlayer();
+        Integer maxViewer = competition.getMaxViewer();
+
+
+        if (maxPlayer != null) {
+            availablePlayer = String.valueOf(maxPlayer - countCurrentPlayer(competitionId));
+        } else {
+            availablePlayer = "참석 가능";
+        }
+        if (maxViewer != null) {
+            availableViewer = String.valueOf(maxViewer - countCurrentViewer(competitionId));
+        } else {
+            availableViewer = "참석 가능";
+        }
+
+        return new HashMap<>() {{
+            put("availablePlayer", availablePlayer);
+            put("availableViewer", availableViewer);
+        }};
+    }
+
+    private boolean alreadyJoinedPlayer(Long competitionId, Member member) {
+        return joinCompetitionRepository.findByIdUidAndIdCompetitionId(member.getUid(), competitionId).isPresent();
     }
 }
