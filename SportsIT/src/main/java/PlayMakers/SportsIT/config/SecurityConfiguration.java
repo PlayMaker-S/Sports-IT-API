@@ -63,10 +63,6 @@ public class SecurityConfiguration {
 
         http
                 .csrf().disable()  // csrf 비활성화 -> token 방식이므로
-                .requiresChannel(channel ->
-                        channel.anyRequest().requiresSecure())
-                .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().permitAll())
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)  // cors 필터 추가
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -91,6 +87,10 @@ public class SecurityConfiguration {
                 .and().logout().logoutSuccessUrl("/login")  // 로그아웃시 로그인 페이지로 이동
                 .and().oauth2Login().loginPage("/loginform.html").defaultSuccessUrl("/")  // OAuth2 로그인
                 .and()
+                .requiresChannel(channel ->
+                        channel.anyRequest().requiresSecure())
+                .authorizeHttpRequests(authorize ->
+                        authorize.anyRequest().permitAll())
                 .apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
