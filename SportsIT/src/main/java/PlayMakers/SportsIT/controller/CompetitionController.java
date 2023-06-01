@@ -45,11 +45,11 @@ public class CompetitionController {
      * @param dto
      * @param user
      * @return success: true, result: 생성한 Competition
-     * @throws Exception (로그인 에러)
+     * @throws Exception 로그인 에러, 주최자가 아닌 경우
      */
     @PostMapping
     public ResponseEntity<?> createCompetition(@RequestBody CompetitionDto dto,
-                                                         @AuthenticationPrincipal User user) throws Exception {
+                                               @AuthenticationPrincipal User user) throws Exception {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
         try {
@@ -88,13 +88,12 @@ public class CompetitionController {
     }
 
     /**
-     * 대회 slice 조회 컨트롤러
      * @param keyword
      * @param filteringConditions
      * @param orderBy
      * @param page
      * @param size
-     * @return
+     * @return ResponseEntity<?> - 200 : success: true, result: Slice<Competition>
      */
     @GetMapping("/slice")
     public ResponseEntity<Slice<Competition>> getCompetitionSlice(@RequestParam(required = false) String keyword,
