@@ -34,7 +34,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'mysql:mysql-connector-java:8.0.32'
     implementation 'org.jetbrains:annotations:23.0.0'
-    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    //implementation 'org.springframework.boot:spring-boot-starter-batch'
     testImplementation 'junit:junit:4.13.1'
 	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
