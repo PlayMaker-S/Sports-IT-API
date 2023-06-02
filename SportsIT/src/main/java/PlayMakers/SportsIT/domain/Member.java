@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor @NoArgsConstructor
@@ -46,5 +47,8 @@ public class Member extends BaseEntity {
             joinColumns = {@JoinColumn(name = "member_uid", referencedColumnName = "uid")},
             inverseJoinColumns = {@JoinColumn(name = "member_type", referencedColumnName = "member_type")})
     private Set<MemberType> memberType;
+
+    @OneToMany(mappedBy = "member")
+    private List<Feed> feeds;
 
 }
