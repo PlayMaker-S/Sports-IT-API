@@ -4,6 +4,8 @@ import PlayMakers.SportsIT.dto.LoginDto;
 import PlayMakers.SportsIT.dto.TokenDto;
 import PlayMakers.SportsIT.auth.security.jwt.JwtAuthenticationFilter;
 import PlayMakers.SportsIT.auth.security.jwt.JwtTokenProvider;
+import PlayMakers.SportsIT.repository.MemberRepository;
+import PlayMakers.SportsIT.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,25 +16,30 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @Slf4j
 @RestController
 @RequestMapping("/api")
 public class AuthController {
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final MemberService memberService;
 
 
-    public AuthController(JwtTokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public AuthController(JwtTokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder,
+                          MemberService memberService) {
         try {
             this.tokenProvider = tokenProvider;
             this.authenticationManagerBuilder = authenticationManagerBuilder;
+            this.memberService = memberService;
         } catch (Exception e) {
             throw new RuntimeException("생성 실패");
         }
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<TokenDto> authorize(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<Object> authorize(@RequestBody LoginDto loginDto) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getLoginId(), loginDto.getPw());
@@ -45,6 +52,11 @@ public class AuthController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtAuthenticationFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+        HashMap<String, Object> res = new HashMap<>(){{
+            put("token", jwt);
+            put("role", memberService.findOne(loginDto.getLoginId()).getMemberType());
+        }};
+
+        return new ResponseEntity<>(res, httpHeaders, HttpStatus.OK);
     }
 }
