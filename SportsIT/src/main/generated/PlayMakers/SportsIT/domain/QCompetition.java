@@ -92,7 +92,7 @@ public class QCompetition extends EntityPathBase<Competition> {
 
     public QCompetition(Class<? extends Competition> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.host = inits.isInitialized("host") ? new QMember(forProperty("host")) : null;
+        this.host = inits.isInitialized("host") ? new QMember(forProperty("host"), inits.get("host")) : null;
     }
 
 }

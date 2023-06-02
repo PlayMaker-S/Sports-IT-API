@@ -60,7 +60,7 @@ public class QJoinCompetition extends EntityPathBase<JoinCompetition> {
         super(type, metadata, inits);
         this.competition = inits.isInitialized("competition") ? new QCompetition(forProperty("competition"), inits.get("competition")) : null;
         this.id = inits.isInitialized("id") ? new QJoinCompetition_JoinCompetitionId(forProperty("id")) : null;
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
     }
 
 }
