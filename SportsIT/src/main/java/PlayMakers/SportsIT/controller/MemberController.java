@@ -1,10 +1,12 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.Feed;
+import PlayMakers.SportsIT.domain.HostProfile;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.Host;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,11 +80,18 @@ public class MemberController {
             log.info("url : {}", feed.getImgUrl());
             log.info("member : {}", feed.getMember());
         }
-        //MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-
         Object res = new HashMap<String, Object>() {{
             put("feeds", feeds);
         }};
         return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("member/hostProfile")
+    public ResponseEntity<HostProfile> getHostProfile(@AuthenticationPrincipal User user) {
+        log.info("Hi!");
+        String memberEmail = user.getUsername();
+        Member member = memberService.findOne(memberEmail);
+        HostProfile hostProfile = memberService.getHostProfileByMember(member);
+        return ResponseEntity.ok(hostProfile);
     }
 }

@@ -2,9 +2,11 @@ package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.auth.security.SecurityUtil;
 import PlayMakers.SportsIT.domain.Feed;
+import PlayMakers.SportsIT.domain.HostProfile;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.domain.MemberType;
+import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -81,5 +83,12 @@ public class MemberService {
     }
     public List<Feed> getAllFeedsByMember(Member member) {
         return member.getFeeds();
+    }
+    public HostProfile getHostProfileByMember(Member host) {
+        if (!host.getMemberType().stream().anyMatch(memberType ->
+                memberType.getRoleName().equals("ROLE_INSTITUTION"))) {
+            throw new IllegalMemberTypeException("주최자 계정이 아닙니다.");
+        }
+        return host.getHostProfile();
     }
 }
