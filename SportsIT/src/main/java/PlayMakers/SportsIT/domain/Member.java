@@ -51,4 +51,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Feed> feeds;
 
+    @OneToOne(mappedBy = "member")
+    private HostProfile hostProfile;
 }

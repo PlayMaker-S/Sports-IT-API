@@ -44,7 +44,7 @@ class MemberRepositoryTest {
     @BeforeEach
     public void before() {
         queryFactory = new JPAQueryFactory(em);
-        memberRepository.deleteAll();
+        memberRepository.deleteAllInBatch();
 
         Member member1 = Member.builder()
                 .pw("1234")
@@ -118,11 +118,10 @@ class MemberRepositoryTest {
         List<Member> memberList = memberRepository.findByNameContaining(containName);
         List<Member> findAllList = memberRepository.findAll();
         for (Member m : memberList){
-            log.info("Name : {}", m.getName());
+            log.info("Find_List Name : {}", m.getName());
         }
-        assertThat(findAllList).isEqualTo(memberList);
-
         //then
+        assertThat(findAllList).isEqualTo(memberList);
 
     }
 
