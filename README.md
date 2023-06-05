@@ -8,9 +8,9 @@ Hi there ! 👋  본 Repository는 스포츠대회 운영관리 솔루션 Sport
 
 본 프로젝트의 개발환경을 개괄적으로 정리하자면 다음과 같습니다 🧐
 
-# 2. 시작 가이드
+# 2. 시작 가이드 🎬
 
-### Requirements
+### Requirements 
 
 - OS : Ubuntu 22.04
 - JAVA : openjdk 17.0.7
@@ -19,17 +19,17 @@ Hi there ! 👋  본 Repository는 스포츠대회 운영관리 솔루션 Sport
 - Spring Boot : 3.0.3
 - Gradle : 7.6.1
 
-## Installation
+## Installation 💻
 
-### GitHub으로 시작하기
+### GitHub으로 시작하기 🐙
 
-1. **git clone**
+1. **Git clone**
 
-```bash
-$ git clone https://github.com/PlayMaker-S/Sports-IT-API.git
-```
+  ```bash
+  $ git clone https://github.com/PlayMaker-S/Sports-IT-API.git
+  ```
 
-1. Build
+2. **Build**
 
 ```bash
 $ cd SportsIT/
@@ -38,7 +38,7 @@ $ java -jar build.libs/SportsIT-0.0.1-SNAPSHOT
 $ nohup java -jar build.libs/SportsIT-0.0.1-SNAPSHOT & [BG 실행]
 ```
 
-### Docker로 시작하기
+### Docker로 시작하기 🐳
 
 ```bash
 $ docker pull gmk0904/sports-it-api:latest
@@ -47,9 +47,9 @@ $ docker ps -q --filter name=sports-it-api | grep -q . && docker rm -f
 $ docker run -d -p 80:8080 -v {resource 디렉토리 위치}:/src/main/resources --name sports-it-api gmk0904/sports-it-api:latest
 ```
 
-## Start Locally
+## Start Locally 🏠
 
-### application.properties
+### application.properties 📃
 
 ```bash
 ### MySQL ###
@@ -93,7 +93,7 @@ API 인스턴스 실행을 위해 아래와 같은 리소스들이 필요합니�
 
 docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로 생성한 resources 디렉토리 위치를 입력
 
-# 3. 기술 스택 (Backend)
+# 3. 기술 스택 (Backend) 🥸
 
 ## Envirionment
 <div align=center>
