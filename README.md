@@ -96,22 +96,24 @@ docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로
 # 3. 기술 스택 (Backend) 🥸
 
 ### Envirionment
-<div align=center>
+<div align=left>
 <img src="https://img.shields.io/badge/intellijidea-000000?style=for-the-badge&logo=intellijidea&logoColor=white">
 <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
 <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
 <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
 <img src="https://img.shields.io/badge/amazonaws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
 <img src="https://img.shields.io/badge/apachetomcat-F8DC75?style=for-the-badge&logo=apachetomcat&logoColor=white">
+<img src="https://img.shields.io/badge/jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=white">
 </div>
 
+
 ### Docs
-<div align=center>
+<div align=left>
 <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white">
 </div>
 
 ### Development
-<div align=center>
+<div align=left>
 <img src="https://img.shields.io/badge/JAVA-007396?style=for-the-badge&logo=java&logoColor=white">
 <img src="https://img.shields.io/badge/gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
 <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
@@ -120,13 +122,41 @@ docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로
   </div>
   
 ### Test
-<div align=center>
+<div align=left>
   <img src="https://img.shields.io/badge/junit5-25A162?style=for-the-badge&logo=junit5&logoColor=white">
 </div>
 
 ### Communication
-<div align=center>
+<div align=left>
   <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">
   <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
   <img src="https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white">
 </div>
+
+
+# 4. API 명세서
+
+[API 서버 Swagger 페이지 방문하기](https://sports-it-test.store/swagger-ui/index.html#/)
+
+---
+
+# 5. Test Driven Development
+
+## Junit5
+
+- Java Unit Test Framework인 JUnit5를 활용하여 테스트 자동화를 구축했습니다.
+- [테스트 코드 확인하기](https://github.com/PlayMaker-S/Sports-IT-API/tree/main/SportsIT/src/test/java/PlayMakers/SportsIT)
+
+---
+
+# 6. Continual Integration / Continual Deployment
+
+## Jenkins CI/CD Pipeline
+
+- 지속 통합/배포를 위해 Jenkins 파이프라인을 구축했습니다.
+- **CI/CD Pipeine**
+    - Release Branch에 Merge 이벤트가 발생
+    - Jenkins 서버가 GitHub webhook을 감지해 Docker Image를 빌드
+    - API 서버에서 Image를 Pull 한 뒤 도커 컨테이너를 실행
+    
+![CICD 피규어](https://github.com/PlayMaker-S/Sports-IT-API/assets/56084058/e7251695-e3e2-4a40-8044-54e38009d9e3)
