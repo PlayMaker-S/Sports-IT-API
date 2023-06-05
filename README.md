@@ -23,13 +23,13 @@ Hi there ! 👋  본 Repository는 스포츠대회 운영관리 솔루션 Sport
 
 ### GitHub으로 시작하기 🐙
 
-1. **Git clone**
+**1. Git clone**
 
   ```bash
   $ git clone https://github.com/PlayMaker-S/Sports-IT-API.git
   ```
 
-2. **Build**
+**2. Build**
 
 ```bash
 $ cd SportsIT/
@@ -84,14 +84,14 @@ oneport.imp.uid={Oneport imp-uid}
 
 ### Resources
 
-API 인스턴스 실행을 위해 아래와 같은 리소스들이 필요합니다. 
+- API 인스턴스 실행을 위해 아래와 같은 리소스들이 필요합니다. 
 아래 파일들을 생성/다운받아 src/main/resources 밑에 저장해주세요.
+- docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로 생성한 resources 디렉토리 위치를 입력해주세요.
 
-**firebase-adminsjdk.json** : FireStore를 사용하기 위한 키를 발급
+> **firebase-adminsjdk.json** : FireStore를 사용하기 위한 키를 발급
+> 
+> **application.properties** : 위의 내용을 작성하여 저장
 
-**application.properties** : 위의 내용을 작성하여 저장
-
-docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로 생성한 resources 디렉토리 위치를 입력
 
 # 3. 기술 스택 (Backend) 🥸
 
@@ -136,9 +136,8 @@ docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로
 
 # 4. API 명세서
 
-[API 서버 Swagger 페이지 방문하기](https://sports-it-test.store/swagger-ui/index.html#/)
+- [API 서버 Swagger 페이지 방문하기](https://sports-it-test.store/swagger-ui/index.html#/)
 
----
 
 # 5. Test Driven Development
 
@@ -147,7 +146,6 @@ docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로
 - Java Unit Test Framework인 JUnit5를 활용하여 테스트 자동화를 구축했습니다.
 - [테스트 코드 확인하기](https://github.com/PlayMaker-S/Sports-IT-API/tree/main/SportsIT/src/test/java/PlayMakers/SportsIT)
 
----
 
 # 6. Continual Integration / Continual Deployment
 
