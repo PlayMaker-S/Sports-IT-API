@@ -71,7 +71,7 @@ public class MemberController {
         }
     }
     @GetMapping("member/feeds")
-    public ResponseEntity<Object> getAllFeedsByMember(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Map> getAllFeedsByMember(@AuthenticationPrincipal User user) {
         String memberEmail = user.getUsername();
         Member member = memberService.findOne("yuk@naver.com");
         List<Feed> feeds = memberService.getAllFeedsByMember(member);
@@ -80,7 +80,7 @@ public class MemberController {
             log.info("url : {}", feed.getImgUrl());
             log.info("member : {}", feed.getMember());
         }
-        Object res = new HashMap<String, Object>() {{
+        Map res = new HashMap<String, List<Feed>>() {{
             put("feeds", feeds);
         }};
         return ResponseEntity.ok(res);
