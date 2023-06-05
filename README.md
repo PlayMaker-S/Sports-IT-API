@@ -95,7 +95,7 @@ docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로
 
 # 3. 기술 스택 (Backend) 🥸
 
-## Envirionment
+### Envirionment
 <div align=center>
 <img src="https://img.shields.io/badge/intellijidea-000000?style=for-the-badge&logo=intellijidea&logoColor=white">
 <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
@@ -105,12 +105,12 @@ docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로
 <img src="https://img.shields.io/badge/apachetomcat-F8DC75?style=for-the-badge&logo=apachetomcat&logoColor=white">
 </div>
 
-## Docs
+### Docs
 <div align=center>
 <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white">
 </div>
 
-## Development
+### Development
 <div align=center>
 <img src="https://img.shields.io/badge/JAVA-007396?style=for-the-badge&logo=java&logoColor=white">
 <img src="https://img.shields.io/badge/gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
@@ -119,12 +119,12 @@ docker run 사용시 별도의 resources 디렉토리 생성 후 -v 옵션으로
 <img src="https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
   </div>
   
-## Test
+### Test
 <div align=center>
   <img src="https://img.shields.io/badge/junit5-25A162?style=for-the-badge&logo=junit5&logoColor=white">
 </div>
 
-## Communication
+### Communication
 <div align=center>
   <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">
   <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
