@@ -1,12 +1,11 @@
 package PlayMakers.SportsIT.service;
 
-import PlayMakers.SportsIT.domain.Competition;
-import PlayMakers.SportsIT.domain.CompetitionState;
-import PlayMakers.SportsIT.domain.JoinCompetition;
-import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
+import PlayMakers.SportsIT.dto.CompetitionFormDto;
 import PlayMakers.SportsIT.dto.JoinCountDto;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
+import PlayMakers.SportsIT.repository.CompetitionTemplateRepository;
 import PlayMakers.SportsIT.repository.JoinCompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
@@ -103,6 +103,42 @@ public class JoinCompetitionService {
                 .build();
         return countResult;
     }
+    public CompetitionForm createForm(CompetitionFormDto dto, String templateId) throws ExecutionException, InterruptedException {
+        log.info("대회 참가서 작성 요청: {}", dto);
+//
+//        try {
+//            CompetitionTemplate template = competitionTemplateRepository.findTemplate(templateId);
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException("해당 템플릿이 존재하지 않습니다.");
+//        }
+//
+//        CompetitionForm form = new CompetitionForm();
+//        Long amount = 0L;
+//        for (CompetitionFormDto.Sector sector : dto.getSectors()) {
+//            String sectorName = sector.getTitle();
+//            CompetitionForm.Sector newSector = new CompetitionForm.Sector();
+//            for (CompetitionFormDto.SubSector subSector : sector.getSubSectors()) {
+//                if(subSector.isChecked()) {
+//                    newSector.getSubSectors().add(new CompetitionForm.SubSector(subSector.getName()));
+//                }
+//            }
+//            if (newSector.getSubSectors().size() > 0) {
+//                newSector.setTitle(sectorName);
+//                form.getSectors().add(newSector);
+//                amount += newSector.getSubSectors().size() * ;
+//            }
+//        }
+
+
+//        CompetitionForm form = dto.toEntity();
+//        form.setMember(memberRepository.findById(dto.getUid()).get());
+//        form.setCompetition(competitionRepository.findById(dto.getCompetitionId()).get());
+//        log.info("대회 참가서 정보: {}", form);
+//
+//        return joinCompetitionFormRepository.save(form);
+        return null;
+    }
+
     private int countCurrentPlayer(Long competitionId){
         return joinCompetitionRepository.countByIdCompetitionIdAndJoinType(competitionId, JoinCompetition.joinType.PLAYER);
     }
@@ -125,10 +161,10 @@ public class JoinCompetitionService {
     }
 
     public boolean checkAlreadyJoined(Long uid, Long competitionId) {
-        joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId)
-                .ifPresent(joinCompetition -> {
-                    throw new IllegalArgumentException("이미 해당 대회에 신청한 회원입니다.");
-                });
+        JoinCompetition find = joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId).orElse(null);
+        if (find != null) {
+            return true;
+        }
         return false;
     }
 

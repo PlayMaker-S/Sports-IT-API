@@ -3,6 +3,7 @@ package PlayMakers.SportsIT.service;
 import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.CompetitionDto;
+import PlayMakers.SportsIT.dto.CompetitionFormDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
@@ -16,7 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -169,5 +173,57 @@ public class CompetitionService {
             errorMessage += "모집 종료일이 모집 시작일보다 빠릅니다.";
         }
         if(!errorMessage.equals("")) throw new IllegalArgumentException(errorMessage);
+    }
+
+    public Long calculatePrice(CompetitionTemplate template, CompetitionFormDto formDto) {
+        Long amount = 0L;
+        Map<String, Map> sectorPriceMap = new HashMap<>();
+        for (CompetitionTemplate.Sector sector : template.getSectors()) {
+            Map<String, Long> priceMap = new HashMap<>() {{
+                put("cost", sector.getCost());
+                put("expandCost", sector.getExpandCost());
+            }};
+            sectorPriceMap.put(sector.getTitle(), priceMap);
+        }
+        Map<String, List<Map>> sectorSubSectorMap = new HashMap<>();
+        for (CompetitionForm.Sector sector : formDto.getSectors()) {
+            for (CompetitionForm.SubSector subSector : sector.getSubSectors()) {
+                if(subSector.isChecked()) {
+                    // sectorSubSectorMap에 sector가 없다면 sector.getTitle을 추가
+                    if(!sectorSubSectorMap.containsKey(sector.getTitle())) {
+                        try {
+                            sectorPriceMap.get(sector.getTitle());
+                        } catch (NullPointerException e) {
+                            throw new IllegalArgumentException("선택한 부문이 템플릿에 존재하지 않습니다.");
+                        }
+                        Map<String, Long> priceMap = sectorPriceMap.get(sector.getTitle());
+                        log.info("priceMap: {}", priceMap);
+                        Long cost = priceMap.get("cost");
+                        sectorSubSectorMap.put(sector.getTitle(), new ArrayList<>() {{
+                            add(new HashMap<>() {{
+                                put(subSector.getName(), cost);
+                            }});
+                        }});
+                        amount += cost;
+                    } else {
+                        // sectorSubSectorMap에 sector가 있다면 sector에 subSector 추가
+                        Map<String, Long> priceMap = sectorPriceMap.get(sector.getTitle());
+                        Long cost = priceMap.get("expandCost");
+                        sectorSubSectorMap.get(sector.getTitle()).add(new HashMap<>() {{
+                            put(subSector.getName(), cost);
+                        }});
+                        amount += cost;
+                    }
+
+                }
+            }
+        }
+
+        Long vat = formDto.getVat();
+        Long fee = formDto.getFee();
+        Long insurance = formDto.getInsurance();
+        amount += vat + fee + insurance;
+
+        return amount;
     }
 }

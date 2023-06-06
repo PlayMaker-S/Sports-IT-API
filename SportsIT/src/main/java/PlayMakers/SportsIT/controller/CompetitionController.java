@@ -1,15 +1,11 @@
 package PlayMakers.SportsIT.controller;
 
-import PlayMakers.SportsIT.domain.JoinCompetition;
-import PlayMakers.SportsIT.domain.CompetitionTemplate;
-import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
+import PlayMakers.SportsIT.dto.CompetitionFormDto;
 import PlayMakers.SportsIT.dto.JoinCountDto;
-import PlayMakers.SportsIT.service.CompetitionService;
-import PlayMakers.SportsIT.service.JoinCompetitionService;
-import PlayMakers.SportsIT.service.CompetitionTemplateService;
-import PlayMakers.SportsIT.service.MemberService;
+import PlayMakers.SportsIT.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
-import PlayMakers.SportsIT.domain.Competition;
 
 import java.net.URI;
 import java.util.*;
@@ -36,6 +31,8 @@ public class CompetitionController {
     private final MemberService memberService;
     private final JoinCompetitionService joinCompetitionService;
     private final CompetitionTemplateService competitionTemplateService;
+    private final AgreementService agreementService;
+    private final CompetitionFormService competitionFormService;
 
     /*
         대회 생성
@@ -138,7 +135,7 @@ public class CompetitionController {
     @GetMapping("/{competitionId}/join/init")
     public ResponseEntity<Object> initJoin(@PathVariable Long competitionId,
                                            @AuthenticationPrincipal User user) throws Exception{
-        Member member = memberService.findOne(user.getUsername());
+        Member member = getMember(user);
 
         Map<String, Object> res = new HashMap<>();
         try {
@@ -155,26 +152,146 @@ public class CompetitionController {
         }
 
     }
-    @GetMapping("/{competitionId}/join/player")
-    public ResponseEntity<Object> isJoinable(@PathVariable Long competitionId,
-                                             @AuthenticationPrincipal User user) throws Exception{
-        Member member = memberService.findOne(user.getUsername());
+
+    /**
+     * 대회 참가시 참가 타입에 맞는 포맷 반환, 대회 참가가 불가능할 경우 예외 발생
+     * @param competitionId
+     * @param joinType
+     * @param user
+     * @return success: true, agreements: 규약, template: 신청서 템플릿
+     * @throws Exception
+     */
+    @GetMapping("/{competitionId}/join/format")
+    public ResponseEntity<Object> getCompetitionContents(@PathVariable Long competitionId,
+                                                         @RequestParam String joinType,
+                                                         @AuthenticationPrincipal User user) throws Exception{
+        Member member = getMember(user);
 
         Map<String, Object> res = new HashMap<>();
 
-        if (!joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId)) {
+        if (joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId)) {
             res.put("success", false);
+            res.put("message", "이미 참가한 대회입니다.");
             return ResponseEntity.ok(res); // 200
         }
-        joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.PLAYER);
+        try{
+            JoinCompetition.joinType type = getJoinType(joinType);
+            joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.PLAYER);
+        } catch (IllegalArgumentException e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.ok(res); // 200
+        }
+        Competition target = competitionService.findById(competitionId);
+        res.put("success", true);
+        res.put("agreements", target.getAgreements());
+        String templateId = target.getTemplateID();
+        res.put("template", competitionTemplateService.getTemplate(templateId));
 
-        return ResponseEntity.ok("success"); // 200
+        return ResponseEntity.ok(res); // 200
+    }
+
+    /**
+     * 선택한 부문과 체급에 맞는 대회 참가 신청서를 반환
+     * @param competitionId
+     * @param joinType
+     * @param formDto
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/{competitionId}/join/format")
+    public ResponseEntity<Object> postJoinForm(@PathVariable Long competitionId,
+                                               @RequestParam String joinType,
+                                               @RequestBody CompetitionFormDto formDto,
+                                               @AuthenticationPrincipal User user) throws Exception{
+        Member member = getMember(user);
+        Competition target = competitionService.findById(competitionId);
+        Map<String, Object> res = new HashMap<>();
+
+        if (joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId)) {
+            res.put("success", false);
+            res.put("message", "이미 참가한 대회입니다.");
+            return ResponseEntity.ok(res); // 200
+        }
+        JoinCompetition.joinType type = getJoinType(joinType);
+        try{
+            joinCompetitionService.checkJoinable(competitionId, type);
+        } catch (IllegalArgumentException e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.ok(res); // 200
+        }
+        // 결제 금액 계산
+        String templateId = target.getTemplateID();
+        CompetitionTemplate template = competitionTemplateService.getTemplate(templateId);
+        Long amount = competitionService.calculatePrice(template, formDto);
+
+        String formId = competitionFormService.createForm(formDto.toEntity());
+
+        res.put("success", true);
+        res.put("amount", amount);
+        res.put("form", formId); // 신청서 저장
+
+
+        // joinCompetitionForm 업로드
+        //String formId = joinCompetitionService.createForm(form, target.getTemplateID());
+
+        // joinCompetition 생성
+//        JoinCompetitionDto dto = new JoinCompetitionDto().builder()
+//                .competitionId(competitionId)
+//                .uid(member.getUid())
+//                .type(type)
+//                .formId(formId)
+//                .build();
+//        JoinCompetition joinCompetition = joinCompetitionService.join(dto);
+
+
+//        res.put("success", true);
+//        res.put("agreements", target.getAgreements());
+//        String templateId = target.getTemplateID();
+//        res.put("template", competitionTemplateService.getTemplate(templateId));
+
+        return ResponseEntity.ok(res); // 200
+    }
+
+    private Member getMember(User user) {
+        Member member = memberService.findOne(user.getUsername());
+        return member;
+    }
+
+    private static JoinCompetition.joinType getJoinType(String joinType) {
+        JoinCompetition.joinType type = null;
+        if (joinType.equals("player")) {
+            return JoinCompetition.joinType.PLAYER;
+        } else if (joinType.equals("viewer")) {
+            return JoinCompetition.joinType.VIEWER;
+        } else {
+            throw new IllegalArgumentException("joinType은 player 또는 viewer이어야 합니다.");
+        }
+    }
+
+    @GetMapping("/{competitionId}/join/player/agreements")
+    public ResponseEntity<Object> getAgreements(@PathVariable Long competitionId) throws Exception{
+        Map<String, Object> res = new HashMap<>();
+        try {
+            List<Agreement> agreements = agreementService.findAgreementsByCompetition(competitionService.findById(competitionId));
+            res.put("success", true);
+            res.put("result", agreements);
+
+            return ResponseEntity.ok(res); // 200
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+        }
     }
 
     @GetMapping("/join/{competitionId}/viewer/checkJoinable")
     public ResponseEntity<String> isJoinableViewer(@PathVariable Long competitionId,
                                              @AuthenticationPrincipal User user) throws Exception{
-        Member member = memberService.findOne(user.getUsername());
+        Member member = getMember(user);
 
         joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId);
         joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.VIEWER);
@@ -187,7 +304,7 @@ public class CompetitionController {
                                                   @AuthenticationPrincipal User user) throws Exception{
 
         log.info("대회 참가 요청 Controller: {}", joinCompetitionDto);
-        Member member = memberService.findOne(user.getUsername());
+        Member member = getMember(user);
         joinCompetitionDto.setUid(member.getUid());
         JoinCompetition joinCompetition = joinCompetitionService.join(joinCompetitionDto);
 
