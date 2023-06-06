@@ -4,6 +4,10 @@ import PlayMakers.SportsIT.domain.CompetitionResult;
 import PlayMakers.SportsIT.dto.CompetitionResultDto;
 import PlayMakers.SportsIT.service.CompetitionResultService;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -27,8 +32,8 @@ public class CompetitionResultController{
     }
 
     @PostMapping
-    public ResponseEntity<CompetitionResult> createCompetitionResult(@RequestBody CompetitionResultDto competitionResultDto) {
-        CompetitionResult competitionResult = competitionResultService.createCompetitionResult(competitionResultDto);
-        return ResponseEntity.ok(competitionResult);
+    public ResponseEntity<String> createCompetitionResult(@RequestBody Map<String, List<CompetitionResultDto>> param) {
+        List<CompetitionResultDto> dtoList = param.get("info");
+        return ResponseEntity.ok(competitionResultService.createCompetitionResult(dtoList));
     }
 }

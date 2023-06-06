@@ -12,26 +12,15 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class CompetitionResultDto {
-    private Competition competition;
-    private Member member;
+    private Long competitionId;
+    private Long uid;
     private String content;
-    private LocalDateTime historyDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public CompetitionResult toEntity(){
-
-        return CompetitionResult.builder()
-                .content(content)
-                .competition(competition)
-                .member(member)
-                .historyDate(historyDate)
-                .build();
-    }
 }

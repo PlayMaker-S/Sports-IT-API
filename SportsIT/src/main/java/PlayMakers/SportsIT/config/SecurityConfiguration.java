@@ -87,10 +87,10 @@ public class SecurityConfiguration {
                 .and().logout().logoutSuccessUrl("/login")  // 로그아웃시 로그인 페이지로 이동
                 .and().oauth2Login().loginPage("/loginform.html").defaultSuccessUrl("/")  // OAuth2 로그인
                 .and()
-//                .requiresChannel(channel ->
-//                        channel.anyRequest().requiresSecure())
-//                .authorizeHttpRequests(authorize ->
-//                        authorize.anyRequest().permitAll())
+                .requiresChannel(channel ->
+                        channel.anyRequest().requiresSecure())
+                .authorizeHttpRequests(authorize ->
+                        authorize.anyRequest().permitAll())
                 .apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
