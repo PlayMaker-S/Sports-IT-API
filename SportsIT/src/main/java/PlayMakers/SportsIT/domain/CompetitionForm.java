@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class CompetitionForm{
     private List<Sector> sectors;
+    @Builder.Default
     private List<Answer> answers = null;
 
 
