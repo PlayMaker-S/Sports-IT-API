@@ -62,4 +62,13 @@ public class PaymentController {
         return ResponseEntity.badRequest().body(response.toString());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("IllegalArgumentException 발생", e);
+        JsonObject response = new JsonObject();
+        response.addProperty("code", "401");
+        response.addProperty("message", e.getMessage());
+        return ResponseEntity.badRequest().body(response.toString());
+    }
+
 }
