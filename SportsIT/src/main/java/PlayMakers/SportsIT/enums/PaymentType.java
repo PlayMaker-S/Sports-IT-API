@@ -5,8 +5,8 @@ public enum PaymentType {
     TRANSFER,
     VIRTUAL_ACCOUNT,
     PHONE,
-    SAMSUNG_PAY,
-    KAKAO_PAY,
+    SAMSUNG,
+    KAKAO,
     PAYCO,
     TOSS,
     PAYPAL

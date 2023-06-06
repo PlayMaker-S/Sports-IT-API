@@ -1,12 +1,10 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.domain.Member;
-import PlayMakers.SportsIT.domain.Order;
-import PlayMakers.SportsIT.dto.OrderDto;
-import PlayMakers.SportsIT.dto.PaymentRequestDto;
-import PlayMakers.SportsIT.dto.PaymentResponseDto;
-import PlayMakers.SportsIT.enums.OrderStatus;
-import PlayMakers.SportsIT.repository.OrderRepository;
+import PlayMakers.SportsIT.domain.Payment;
+import PlayMakers.SportsIT.dto.PaymentDto;
+import PlayMakers.SportsIT.enums.PaymentStatus;
+import PlayMakers.SportsIT.repository.PaymentRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.gson.Gson;
@@ -26,33 +24,49 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class OrderService {
-    private final OrderRepository orderRepository;
+public class PaymentService {
+    private final PaymentRepository paymentRepository;
 
     @Value("${oneport.apikey}")
     private String impKey;
     @Value("${oneport.secret}")
     private String impSecret;
+    @Value("${oneport.imp.uid}")
+    private String impUid;
 
-    public PaymentResponseDto paymentPreRecord(PaymentRequestDto paymentRequestDto) throws IOException{
+    public PaymentDto.Response record(PaymentDto.PreRequest paymentDto) throws IOException, IllegalArgumentException{
         log.info("결제 내역 사전 등록");
+
+        if(paymentDto.getImp_uid() == null) {
+            String errMessage = "imp_uid가 null입니다.";
+            log.error(errMessage);
+            throw new IllegalArgumentException(errMessage);
+        }
+        if(!paymentDto.getImp_uid().equals(impUid)){
+            String errMessage = "IMP_UID가 일치하지 않습니다.";
+            log.error(errMessage);
+            throw new IllegalArgumentException(errMessage);
+        }
 
         // access token 받아오기
         String token = getToken();
         log.info("token : {}", token);
 
+        paymentDto.setMerchant_uid(generateMerchatUid());
+
         // 요청 생성
-        HttpEntity<PaymentRequestDto> request = createOneportHttpRequestEntity(paymentRequestDto, token);
+        HttpEntity<PaymentDto.PreRequest> request = createOneportHttpRequestEntity(paymentDto, token);
 
         // POST 요청 전송 & 수신
         String url = "https://api.iamport.kr/payments/prepare";
-        ResponseEntity<PaymentResponseDto> response = new RestTemplate().postForEntity(url, request, PaymentResponseDto.class);
-        PaymentResponseDto paymentResponseBody = response.getBody();
+        ResponseEntity<PaymentDto.Response> response = new RestTemplate().postForEntity(url, request, PaymentDto.Response.class);
+        PaymentDto.Response paymentResponseBody = response.getBody();
         log.info("response : {}", paymentResponseBody);
 
         // 응답 확인
@@ -65,7 +79,7 @@ public class OrderService {
         return paymentResponseBody;
     }
 
-    public boolean validate(PaymentRequestDto paymentRequestDto) throws IOException {
+    public boolean validate(PaymentDto.PreRequest paymentDto) throws IOException {
         log.info("결제 내역 사후 검증");
 
         // access token 받아오기
@@ -73,10 +87,10 @@ public class OrderService {
         log.info("token : {}", token);
 
         // 요청 생성
-        HttpEntity<PaymentRequestDto> request = createOneportHttpRequestEntity(paymentRequestDto, token);
+        HttpEntity<PaymentDto.PreRequest> request = createOneportHttpRequestEntity(paymentDto, token);
 
         // GET 요청 전송 & 수신
-        String url = "https://api.iamport.kr/payments/" + paymentRequestDto.getImp_uid();
+        String url = "https://api.iamport.kr/payments/" + paymentDto.getImp_uid();
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
@@ -93,32 +107,32 @@ public class OrderService {
         Long expected_amount = jsonNode.get("response").get("amount").asLong();
 
         // 검증
-        return isTampered(paymentRequestDto, expected_imp_uid, expected_merchant_uid, expected_amount);
+        return isTampered(paymentDto, expected_imp_uid, expected_merchant_uid, expected_amount);
     }
 
-    public Order createOrder(OrderDto orderDto, Member member){
+    public Payment createOrder(PaymentDto.Request requestDto, Member member){
         log.info("결제 생성");
 
-        Order newOrder = Order.builder()
-                .impUid(orderDto.getImp_uid())
-                .merchantUid(orderDto.getMerchant_uid())
-                .price(orderDto.getPrice())
-                .paymentType(orderDto.getPaymentType())
-                .content(orderDto.getContent())
-                .status(orderDto.getStatus())
-                .status(OrderStatus.PAID)
+        Payment newPayment = Payment.builder()
+                .impUid(requestDto.getImp_uid())
+                .merchantUid(requestDto.getMerchant_uid())
+                .amount(requestDto.getAmount())
+                .type(requestDto.getPaymentType())
+                .content(requestDto.getContent())
+                .status(requestDto.getStatus())
+                .status(PaymentStatus.PAID)
                 .buyer(member)
                 .build();
 
-        orderRepository.save(newOrder);
+        paymentRepository.save(newPayment);
 
-        return newOrder;
+        return newPayment;
     }
 
-    private static boolean isTampered(PaymentRequestDto paymentRequestDto, String expected_imp_uid, String expected_merchant_uid, Long expected_amount) {
-        if(paymentRequestDto.getImp_uid().equals(expected_imp_uid)
-                && paymentRequestDto.getMerchant_uid().equals(expected_merchant_uid)
-                && paymentRequestDto.getAmount().equals(expected_amount)){
+    private static boolean isTampered(PaymentDto.PreRequest paymentDto, String expected_imp_uid, String expected_merchant_uid, Long expected_amount) {
+        if(paymentDto.getImp_uid().equals(expected_imp_uid)
+                && paymentDto.getMerchant_uid().equals(expected_merchant_uid)
+                && paymentDto.getAmount().equals(expected_amount)){
             log.info("결제 내역 검증 성공");
             return false;
         } else {
@@ -128,14 +142,14 @@ public class OrderService {
     }
 
     @NotNull
-    private static HttpEntity<PaymentRequestDto> createOneportHttpRequestEntity(PaymentRequestDto paymentRequestDto, String token) {
+    private static HttpEntity<PaymentDto.PreRequest> createOneportHttpRequestEntity(PaymentDto.PreRequest paymentDto, String token) {
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", token);
 
         // 요청 생성
-        HttpEntity<PaymentRequestDto> request = new HttpEntity<>(paymentRequestDto, headers);
+        HttpEntity<PaymentDto.PreRequest> request = new HttpEntity<>(paymentDto, headers);
         return request;
     }
 
@@ -185,5 +199,15 @@ public class OrderService {
         return conn;
     }
 
+    private String generateMerchatUid() {
+        /*
+        * merchant_uid 생성
+        * */
+        String merchantUid = "PAY" + UUID.randomUUID().toString().replaceAll("-", "");
+        if(paymentRepository.existsById(merchantUid)){
+            return generateMerchatUid();
+        }
+        return "PAY"+UUID.randomUUID().toString().replaceAll("-", "");
+    }
 
 }
