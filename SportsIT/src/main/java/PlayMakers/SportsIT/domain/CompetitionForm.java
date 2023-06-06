@@ -7,9 +7,11 @@ import java.io.Serializable;
 import java.util.List;
 
 @Builder
-@Data
+@NoArgsConstructor @AllArgsConstructor
+@Getter @Setter
 public class CompetitionForm{
     private List<Sector> sectors;
+    @Builder.Default
     private List<Answer> answers = null;
 
 
@@ -25,7 +27,7 @@ public class CompetitionForm{
     @AllArgsConstructor @NoArgsConstructor
     public static class SubSector{
         private String name;
-        private boolean checked = false;
+        private boolean checked;
     }
 
     @Data
