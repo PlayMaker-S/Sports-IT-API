@@ -3,6 +3,7 @@ package PlayMakers.SportsIT.service;
 import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.CompetitionResult;
 import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.domain.MemberType;
 import PlayMakers.SportsIT.dto.CompetitionResultDto;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.CompetitionResultRepository;
@@ -30,6 +31,9 @@ public class CompetitionResultService {
         for(CompetitionResultDto dto : dtos){
             Competition competition = competitionRepository.findByCompetitionId(dto.getCompetitionId());
             Optional<Member> member = memberRepository.findById(dto.getUid());
+            if(member.isEmpty()){
+                return "No Member with that UID";
+            }
             CompetitionResult competitionResult = CompetitionResult.builder()
                     .competition(competition)
                     .historyDate(competition.getEndDate())
