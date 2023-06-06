@@ -38,9 +38,9 @@ public class AgreementService {
         log.info("savedAgreements: {}", savedAgreements);
         return savedAgreements;
     }
-//    public List<Agreement> findAgreementsByCompetitionId(Long competitionId) {
-//        return agreementRepository.findAllByCompetitionId(competitionId);
-//    }
+    public List<Agreement> findAgreementsByCompetition(Competition competition) {
+        return agreementRepository.findAllByCompetition(competition);
+    }
 
     public void deleteAgreement(String agreementUrl) {
         agreementRepository.deleteByAgreementUrl(agreementUrl);

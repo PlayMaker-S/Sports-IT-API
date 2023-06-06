@@ -47,7 +47,7 @@ public class AgreementController {
     }
     @PostMapping("/save/{competitionId}")
     public ResponseEntity<Object> saveAgreements (@PathVariable Long competitionId,
-                                             @RequestBody List<AgreementDto> agreements) {
+                                                  @RequestBody List<AgreementDto> agreements) {
 
 
         Competition competition = competitionService.findById(competitionId);
@@ -61,17 +61,18 @@ public class AgreementController {
         return ResponseEntity.created(URI.create("/api/competitions/" + competitionId))
                 .body(res); // 201
     }
-//    @GetMapping("/{competitionId}")
-//    public ResponseEntity<Object> getAllAgreements(@PathVariable Long competitionId) {
-//        List<Agreement> agreements = agreementService.findAgreementsByCompetitionId(competitionId);
-//
-//        Object res = new HashMap<String, Object>() {{
-//            put("success", true);
-//            put("result", agreements);
-//        }};
-//
-//        return ResponseEntity.ok(res);
-//    }
+    @GetMapping()
+    public ResponseEntity<Object> getAllAgreements(@RequestParam Long competitionId) {
+        Competition target = competitionService.findById(competitionId);
+        List<Agreement> agreements = agreementService.findAgreementsByCompetition(target);
+
+        Object res = new HashMap<String, Object>() {{
+            put("success", true);
+            put("result", agreements);
+        }};
+
+        return ResponseEntity.ok(res);
+    }
 
     // 핸들러
     @ExceptionHandler(IOException.class)

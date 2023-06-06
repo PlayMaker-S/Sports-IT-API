@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.controller;
 
+import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.LoginDto;
 import PlayMakers.SportsIT.dto.TokenDto;
 import PlayMakers.SportsIT.auth.security.jwt.JwtAuthenticationFilter;
@@ -51,10 +52,12 @@ public class AuthController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtAuthenticationFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-
+        Member member = memberService.findOne(loginDto.getLoginId());
         HashMap<String, Object> res = new HashMap<>(){{
             put("token", jwt);
-            put("role", memberService.findOne(loginDto.getLoginId()).getMemberType());
+            put("role", member.getMemberType());
+            put("email", member.getEmail());
+            put("name", member.getName());
         }};
 
         return new ResponseEntity<>(res, httpHeaders, HttpStatus.OK);
