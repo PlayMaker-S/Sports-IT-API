@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.enums;
 
-public enum OrderStatus {
+public enum PaymentStatus {
     READY,
     PAID,
     CANCELLED,

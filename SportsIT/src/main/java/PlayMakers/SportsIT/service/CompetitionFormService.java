@@ -14,5 +14,8 @@ public class CompetitionFormService {
     public String createForm(CompetitionForm form) throws Exception{
         return competitionFormRepository.saveForm(form);
     }
+    public CompetitionForm getForm(String formId) throws Exception{
+        return competitionFormRepository.findForm(formId);
+    }
 
 }

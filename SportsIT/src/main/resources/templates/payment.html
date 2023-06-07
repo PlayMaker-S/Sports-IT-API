@@ -49,14 +49,15 @@
         // }
         const requestPay = () => {
             const requestData = {
-                merchant_uid: "TESTUID",
-                amount: 1000
+                imp_uid: "imp22742363",
+                amount: 3000
             };
 
             fetch('/api/payment/record', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzcG9ydHNpdHRlc3QzMjUzQGFqb3UuYWMua3IiLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNjg2MDgwMTM3LCJleHAiOjE2ODYxNjY1Mzd9.JqCFD37uRL-2SW9iPyftumcu7CrRCDmwu7YW8uqsZPZpKofs7d1GerdbUGN8z1Z6WOAmo8vFM__8NQD5GeH-bw'
                 },
                 body: JSON.stringify(requestData)
             }).then(response => {
@@ -66,13 +67,13 @@
                     return response.json();
                 }
             }).then(rsp => {
-                if (rsp.success == 0) {
+                if (rsp.code == 0) {
 
                     IMP.request_pay({
                         pg: "html5_inicis.INIBillTst",
                         pay_method: "card",
-                        merchant_uid: rsp.merchant_uid,
-                        amount: rsp.amount,
+                        merchant_uid: rsp.response.merchant_uid,
+                        amount: rsp.response.amount,
                         name: "탁구대회",
                         buyer_email: "gildong@gmail.com",
                         buyer_name: "홍길동",
@@ -105,7 +106,7 @@
                         } else {
                             const errorMsg = '결제에 실패하였습니다.\n에러내용 : ' + rsp.error_msg;
                             console.log(errorMsg);
-                            window.location.href = 'http://localhost:8080/';
+                            //window.location.href = 'https://localhost:8443/test';
                         }
                     });
                     } else {
@@ -130,5 +131,5 @@
         </tr>
     </table>
 
-    <button onclick="requestPay()">결제하기</button>
+    <button onclick=requestPay()>결제하기</button>
 </body>

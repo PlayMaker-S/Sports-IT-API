@@ -1,7 +1,6 @@
 package PlayMakers.SportsIT.repository;
 
 import PlayMakers.SportsIT.domain.CompetitionForm;
-import PlayMakers.SportsIT.domain.CompetitionTemplate;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -10,7 +9,6 @@ import com.google.firebase.cloud.FirestoreClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j

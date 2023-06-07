@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -78,7 +79,7 @@ public class MemberService {
         return memberRepository.findByEmail(memberId);
     }
 
-    public Boolean isDuplicateEmail(String email) {
+    public Boolean isDuplicatedEmail(String email) {
         return memberRepository.existsByEmail(email);
     }
     public List<Feed> getAllFeedsByMember(Member member) {
@@ -90,5 +91,38 @@ public class MemberService {
             throw new IllegalMemberTypeException("주최자 계정이 아닙니다.");
         }
         return host.getHostProfile();
+    }
+
+    public boolean isDuplicatedPhone(String phoneNumber) { return memberRepository.existsByPhone(phoneNumber); }
+
+    public String findEmailByPhone(String phoneNumber) {
+        Member member = memberRepository.findByPhone(phoneNumber).orElse(null);
+        if (member == null) {
+            return null;
+        }
+        return member.getEmail();
+    }
+
+    public boolean isExistsWithPhoneAndEmail(String email, String phone) {
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            return false;
+        }
+        return member.getPhone().equals(phone);
+    }
+
+    public String generateNewPassword(String email) {
+        // 랜덤 비밀번호 생성
+        String newPassword = UUID.randomUUID().toString().substring(0, 9);
+
+        // ! @ # 중에서 랜덤으로 하나를 선택 후 newPassword의 임의의 위치에 삽입
+        char specialChar = "!@#".charAt((int) (Math.random() * 3));
+        int index = (int) (Math.random() * 8);
+        newPassword = newPassword.substring(0, index) + specialChar + newPassword.substring(index);
+
+        // 비밀번호 변경
+        Member member = memberRepository.findByEmail(email);
+        member.setPw(passwordEncoder.encode(newPassword));
+        return newPassword;
     }
 }

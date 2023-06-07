@@ -1,10 +1,7 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.*;
-import PlayMakers.SportsIT.dto.CompetitionDto;
-import PlayMakers.SportsIT.dto.JoinCompetitionDto;
-import PlayMakers.SportsIT.dto.CompetitionFormDto;
-import PlayMakers.SportsIT.dto.JoinCountDto;
+import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +30,7 @@ public class CompetitionController {
     private final CompetitionTemplateService competitionTemplateService;
     private final AgreementService agreementService;
     private final CompetitionFormService competitionFormService;
+    private final ParticipantService participantService;
 
     /*
         대회 생성
@@ -233,10 +231,6 @@ public class CompetitionController {
         res.put("amount", amount);
         res.put("form", formId); // 신청서 저장
 
-
-        // joinCompetitionForm 업로드
-        //String formId = joinCompetitionService.createForm(form, target.getTemplateID());
-
         // joinCompetition 생성
 //        JoinCompetitionDto dto = new JoinCompetitionDto().builder()
 //                .competitionId(competitionId)
@@ -270,6 +264,33 @@ public class CompetitionController {
             throw new IllegalArgumentException("joinType은 player 또는 viewer이어야 합니다.");
         }
     }
+    @GetMapping("/{competitionId}/participants")
+    public ResponseEntity<Object> loadParticipants(@PathVariable Long competitionId) throws Exception{
+        Map<String, Object> res = new HashMap<>();
+        List<ParticipantDto.Response> participantsDto = new ArrayList<>();
+        try {
+            for (Participant participant : participantService.findAllByCompetitionId(competitionId)) {
+                participantsDto.add(ParticipantDto.Response.builder()
+                                .uid(participant.getId().getUid())
+                                .userName(participant.getMember().getName())
+                                .sectorTitle(participant.getId().getSectorTitle())
+                                .subSectorName(participant.getId().getSubSectorName())
+                                .build());
+
+
+                System.out.println(participant);
+            }
+            res.put("success", true);
+            res.put("result", participantsDto);
+
+            return ResponseEntity.ok(res); // 200
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+        }
+    }
 
     @GetMapping("/{competitionId}/join/player/agreements")
     public ResponseEntity<Object> getAgreements(@PathVariable Long competitionId) throws Exception{
@@ -299,18 +320,59 @@ public class CompetitionController {
         return ResponseEntity.ok("success"); // 200
     }
 
-    @PostMapping("/join")
-    public ResponseEntity<String> joinCompetition(@RequestBody JoinCompetitionDto joinCompetitionDto,
+    @PostMapping("/{competitionId}/join")
+    public ResponseEntity<Object> joinCompetition(@RequestBody JoinCompetitionDto joinCompetitionDto,
+                                                  @RequestParam String joinType,
+                                                  @PathVariable Long competitionId,
                                                   @AuthenticationPrincipal User user) throws Exception{
+
+        Map<String, Object> res = new HashMap<>();
 
         log.info("대회 참가 요청 Controller: {}", joinCompetitionDto);
         Member member = getMember(user);
         joinCompetitionDto.setUid(member.getUid());
+        Competition competition = competitionService.findById(competitionId);
+        joinCompetitionDto.setCompetitionId(competitionId);
+        if (joinType.equals("viewer")) {
+            joinCompetitionDto.setType(JoinCompetition.joinType.VIEWER);
+        } else {
+            joinCompetitionDto.setType(JoinCompetition.joinType.PLAYER);
+        }
         JoinCompetition joinCompetition = joinCompetitionService.join(joinCompetitionDto);
+
+        List<Participant> participants = null;
+        List<ParticipantDto.Response> participantsDto = new ArrayList<>();
+
+        // Participants 객체 생성
+        if(joinType.equals("player")){
+            try {
+                CompetitionForm form = competitionFormService.getForm(joinCompetition.getFormId());
+                log.info("참가자 신청서: {}", form);
+                participants = participantService.parseAndSaveParticipants(member, competition, form);
+                for (Participant participant: participants) {
+                    participantsDto.add(ParticipantDto.Response.builder()
+                            .uid(participant.getId().getUid())
+                            .userName(participant.getMember().getName())
+                            .sectorTitle(participant.getId().getSectorTitle())
+                            .subSectorName(participant.getId().getSubSectorName())
+                            .build());
+                }
+            } catch (Exception e) {
+                String errMessage = "참가자 신청서 불러오기 실패";
+                log.error(errMessage);
+                res.put("success", false);
+                res.put("message", errMessage);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+            }
+
+        }
+        res.put("success", true);
+        res.put("joinCompetition", joinCompetitionDto);
+        res.put("participants", participantsDto);
 
         // 생성된 리소스의 uri와 함께 201코드, "success" 응답
         return ResponseEntity.created(URI.create("/" + joinCompetition.getId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
-                .body("success"); // 201
+                .body(res); // 201
     }
     @DeleteMapping("/join")
     public ResponseEntity<String> cancelJoinCompetition(@RequestBody JoinCompetitionDto joincompetitionDto) throws Exception{
@@ -371,6 +433,20 @@ public class CompetitionController {
         competitionTemplateService.deleteTemplate(templateId);
         return ResponseEntity.noContent().build(); // 204
     }
+    @GetMapping("/form/{formId}")
+    public ResponseEntity<?> getForm(@PathVariable String formId) throws Exception {
+        log.info("템플릿 조회 요청 Controller: {}", formId);
+        CompetitionForm form = competitionFormService.getForm(formId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("result", form);
+        return ResponseEntity.ok(result); // 200
+    }
+
+
+    /*
+        예외 처리
+     */
 
 
     @ExceptionHandler(EntityNotFoundException.class)
