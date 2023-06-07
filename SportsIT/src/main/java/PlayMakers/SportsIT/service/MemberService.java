@@ -78,7 +78,7 @@ public class MemberService {
         return memberRepository.findByEmail(memberId);
     }
 
-    public Boolean isDuplicateEmail(String email) {
+    public Boolean isDuplicatedEmail(String email) {
         return memberRepository.existsByEmail(email);
     }
     public List<Feed> getAllFeedsByMember(Member member) {
@@ -91,4 +91,6 @@ public class MemberService {
         }
         return host.getHostProfile();
     }
+
+    public boolean isDuplicatedPhone(String phoneNumber) { return memberRepository.existsByPhone(phoneNumber); }
 }

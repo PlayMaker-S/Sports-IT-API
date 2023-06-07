@@ -16,7 +16,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         Member findByEmail(String email);
         List<Member> findAll();
         Boolean existsByEmail(String email);
+        Boolean existsByPhone(String phoneNumber);
 
         @EntityGraph(attributePaths = "memberType") // Eager 조회로 가져옴
         Optional<Member> findOneWithMemberTypeByEmail(String email);
+
 }
