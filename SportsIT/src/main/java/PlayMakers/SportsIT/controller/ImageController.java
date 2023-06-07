@@ -3,10 +3,7 @@ package PlayMakers.SportsIT.controller;
 import PlayMakers.SportsIT.domain.Agreement;
 import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Poster;
-import PlayMakers.SportsIT.service.AgreementService;
-import PlayMakers.SportsIT.service.CompetitionService;
-import PlayMakers.SportsIT.service.PosterService;
-import PlayMakers.SportsIT.service.S3Uploader;
+import PlayMakers.SportsIT.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,7 @@ public class ImageController {
     private final PosterService posterService;
     private final AgreementService agreementService;
     private final CompetitionService competitionService;
+    private final MemberService memberService;
 
     @PostMapping
     public String upload(@RequestBody MultipartFile image) throws IOException{
@@ -62,6 +60,13 @@ public class ImageController {
 
         return ResponseEntity.created(URI.create("/" + savedUrls.get(0)))
                 .body(savedUrls); // 201
+    }
+
+    @PostMapping("member/{memberId}")
+    public ResponseEntity<String> uploadProfileImage(@RequestBody MultipartFile ProfileImage, @PathVariable Long memberId) throws IOException {
+        String savedUrl = s3Uploader.upload(ProfileImage, "Profile/"+memberId);
+
+        return ResponseEntity.created(URI.create("/" + savedUrl)).body(savedUrl);
     }
 
     // 핸들러
