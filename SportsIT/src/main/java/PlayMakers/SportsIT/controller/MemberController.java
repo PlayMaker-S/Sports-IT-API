@@ -110,4 +110,35 @@ public class MemberController {
         HostProfile hostProfile = memberService.getHostProfileByMember(member);
         return ResponseEntity.ok(hostProfile);
     }
+
+    @GetMapping("member/find/id")
+    public ResponseEntity<Object> findIdWithPhone(@RequestParam String phoneNumber) {
+        Map<String, Object> res = new HashMap<>();
+        String id = memberService.findEmailByPhone(phoneNumber);
+        if(id == null) {
+            res.put("isExist", false);
+            res.put("message", "가입된 계정이 없습니다.");
+        } else {
+            res.put("isExist", true);
+            res.put("message", "아이디는 " + id + "입니다.");
+        }
+        return ResponseEntity.ok(res);
+    }
+    @PostMapping("member/find/password")
+    public ResponseEntity<Object> findPasswordWithEmailAndPhone(@RequestBody Map<String, Object> data) {
+        String email = String.valueOf(data.get("email"));
+        String phone = String.valueOf(data.get("phone"));
+        log.info("비밀번호 찾기 요청: {} {}", email, phone);
+        Map<String, Object> res = new HashMap<>();
+        if (memberService.isExistsWithPhoneAndEmail(email, phone)) {
+            String newPassword = memberService.generateNewPassword(email);
+            res.put("success", true);
+            res.put("message", "임시 비밀번호는 "+ newPassword +"입니다.");
+        }
+        else {
+            res.put("success", false);
+            res.put("message", "입력한 정보와 일치하는 계정이 없습니다.");
+        }
+        return ResponseEntity.ok(res);
+    }
 }

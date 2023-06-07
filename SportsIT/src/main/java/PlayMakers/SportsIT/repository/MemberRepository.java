@@ -21,4 +21,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         @EntityGraph(attributePaths = "memberType") // Eager 조회로 가져옴
         Optional<Member> findOneWithMemberTypeByEmail(String email);
 
+        Optional<Member> findByPhone(String phoneNumber);
 }
