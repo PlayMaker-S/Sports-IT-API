@@ -272,8 +272,7 @@ public class CompetitionController {
             for (Participant participant : participantService.findAllByCompetitionId(competitionId)) {
                 participantsDto.add(ParticipantDto.Response.builder()
                                 .uid(participant.getId().getUid())
-                                .userName("김아무개")
-                                //.userName(memberService.findOne(participant.getId().getUid()).getName())
+                                .userName(participant.getMember().getName())
                                 .sectorTitle(participant.getId().getSectorTitle())
                                 .subSectorName(participant.getId().getSubSectorName())
                                 .build());
@@ -342,6 +341,7 @@ public class CompetitionController {
         JoinCompetition joinCompetition = joinCompetitionService.join(joinCompetitionDto);
 
         List<Participant> participants = null;
+        List<ParticipantDto.Response> participantsDto = new ArrayList<>();
 
         // Participants 객체 생성
         if(joinType.equals("player")){
@@ -349,6 +349,14 @@ public class CompetitionController {
                 CompetitionForm form = competitionFormService.getForm(joinCompetition.getFormId());
                 log.info("참가자 신청서: {}", form);
                 participants = participantService.parseAndSaveParticipants(member, competition, form);
+                for (Participant participant: participants) {
+                    participantsDto.add(ParticipantDto.Response.builder()
+                            .uid(participant.getId().getUid())
+                            .userName(participant.getMember().getName())
+                            .sectorTitle(participant.getId().getSectorTitle())
+                            .subSectorName(participant.getId().getSubSectorName())
+                            .build());
+                }
             } catch (Exception e) {
                 String errMessage = "참가자 신청서 불러오기 실패";
                 log.error(errMessage);
@@ -359,8 +367,8 @@ public class CompetitionController {
 
         }
         res.put("success", true);
-        res.put("joinCompetition", joinCompetition);
-        res.put("participants", participants);
+        res.put("joinCompetition", joinCompetitionDto);
+        res.put("participants", participantsDto);
 
         // 생성된 리소스의 uri와 함께 201코드, "success" 응답
         return ResponseEntity.created(URI.create("/" + joinCompetition.getId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄

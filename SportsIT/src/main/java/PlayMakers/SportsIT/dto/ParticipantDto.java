@@ -12,5 +12,7 @@ public class ParticipantDto {
         private Long uid;
         private String sectorTitle;
         private String subSectorName;
+        @Builder.Default
+        private String profileImg = "";
     }
 }
