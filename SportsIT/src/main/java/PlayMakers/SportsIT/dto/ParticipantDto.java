@@ -10,6 +10,7 @@ public class ParticipantDto {
     public static class Response {
         private String userName;
         private Long uid;
+        private String phone;
         private String sectorTitle;
         private String subSectorName;
         @Builder.Default
