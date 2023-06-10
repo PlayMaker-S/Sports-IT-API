@@ -78,10 +78,11 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers("/api/signup").permitAll()  // 회원가입은 누구나 가능
                 .requestMatchers("/api/login").permitAll()  // 로그인은 누구나 가능
+                .requestMatchers("/admin/**").permitAll()
                 .requestMatchers("/api/authenticate").permitAll()
                 .requestMatchers("/members/**").authenticated()  // 인증만 필요
                 .requestMatchers("/institution/**").hasAnyRole("ROLE_INSTITUTION", "ROLE_ADMIN")
-                .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")  // 권한도 필요
+//                .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")  // 권한도 필요
                 .requestMatchers("/**").permitAll()
                 .and().formLogin().loginPage("/loginform.html").defaultSuccessUrl("/")// 로그인 페이지
                 .and().logout().logoutSuccessUrl("/login")  // 로그아웃시 로그인 페이지로 이동
