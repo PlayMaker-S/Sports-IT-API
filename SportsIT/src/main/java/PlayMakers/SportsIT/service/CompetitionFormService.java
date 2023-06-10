@@ -17,5 +17,8 @@ public class CompetitionFormService {
     public CompetitionForm getForm(String formId) throws Exception{
         return competitionFormRepository.findForm(formId);
     }
+    public void deleteForm(String formId) throws Exception{
+        competitionFormRepository.deleteForm(formId);
+    }
 
 }

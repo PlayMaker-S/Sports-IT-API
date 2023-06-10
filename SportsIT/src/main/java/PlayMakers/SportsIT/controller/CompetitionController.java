@@ -350,11 +350,36 @@ public class CompetitionController {
                 .body(res); // 201
     }
     @DeleteMapping("/join")
-    public ResponseEntity<String> cancelJoinCompetition(@RequestBody JoinCompetitionDto joincompetitionDto) throws Exception{
-        joinCompetitionService.deleteJoinCompetition(joincompetitionDto);
+    public ResponseEntity<Object> cancelJoinCompetition(@RequestBody JoinCompetitionDto joincompetitionDto) throws Exception{
+        Map<String, Object> res = new HashMap<>();
+        List<ParticipantDto.DeleteResponse> result;
+        try {
+            JoinCompetition join = joinCompetitionService.getJoinCompetition(joincompetitionDto.getUid(), joincompetitionDto.getCompetitionId()).get();
+            result = joinCompetitionService.deleteJoinCompetition(joincompetitionDto);
+            String formId = join.getFormId();
+            if (formId != null) {
+                competitionFormService.deleteForm(formId);
+            }
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+        }
+        res.put("success", true);
+        res.put("result", result);
+        res.put("message", "대회 참가가 취소되었습니다.");
 
-        return ResponseEntity.accepted().body("대회가 취소되었습니다."); // 202
+        return ResponseEntity.accepted().body(res); // 202
     }
+
+    /**
+     * 체육인 별 참가 대회 조회
+     * @param userId : Member의 uid
+     * @param page : 페이지 번호
+     * @param size : 페이지 사이즈
+     * @return : Slice<JoinCompetitionDto.UserJoinResponse>
+     * @throws Exception
+     */
     @GetMapping("/join/slice/{userId}")
     public ResponseEntity<Object> getJoinCompetitionSlice(@PathVariable Long userId,
                                                                       @RequestParam(required = false) Long page,
@@ -380,13 +405,6 @@ public class CompetitionController {
     public ResponseEntity<JoinCountDto> getJoinCompetitionCounts(@PathVariable Long competitionId) throws Exception {
         JoinCountDto result =  joinCompetitionService.countJoinCompetition(competitionId);
         return ResponseEntity.ok(result); // 200
-    }
-
-    @PostMapping("/firebase-test")
-    public ResponseEntity<String> testFirebase(@RequestBody CompetitionTemplate template) throws Exception {
-        log.info("템플릿 생성 요청 Controller: {}", template);
-        String docId = competitionTemplateService.saveTemplate(template);
-        return ResponseEntity.ok(docId); // 200
     }
 
     /*

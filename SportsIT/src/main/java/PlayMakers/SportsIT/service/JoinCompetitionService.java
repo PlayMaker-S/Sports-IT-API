@@ -1,10 +1,7 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.domain.*;
-import PlayMakers.SportsIT.dto.CompetitionDto;
-import PlayMakers.SportsIT.dto.JoinCompetitionDto;
-import PlayMakers.SportsIT.dto.JoinCountDto;
-import PlayMakers.SportsIT.dto.MemberDto;
+import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +21,7 @@ public class JoinCompetitionService {
     final private CompetitionCustomRepository competitionCustomRepository;
     final private MemberRepository memberRepository;
     final private JoinCompetitionRepository joinCompetitionRepository;
+    final private ParticipantRepository participantRepository;
 
     public JoinCompetition join(JoinCompetitionDto dto) {
         log.info("대회 참가 요청: {}", dto);
@@ -58,8 +56,13 @@ public class JoinCompetitionService {
 
         return joinCompetitionRepository.save(target);
     }
+    public Optional<JoinCompetition> getJoinCompetition(Long uid, Long competitionId){
+        log.info("대회 참가 정보 조회 요청: uid={}, competitionId={}", uid, competitionId);
 
-    public void deleteJoinCompetition(JoinCompetitionDto dto){
+        return joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId);
+    }
+
+    public List<ParticipantDto.DeleteResponse> deleteJoinCompetition(JoinCompetitionDto dto){
         log.info("대회 참가 정보 삭제 요청: {}", dto);
 
         // 대회가 이미 시작되었는지 확인
@@ -71,9 +74,23 @@ public class JoinCompetitionService {
                 });
 
         JoinCompetition target = joinCompetitionRepository.findByIdUidAndIdCompetitionId(dto.getUid(), dto.getCompetitionId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 대회에 참가한 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 대회에 참가하지 않습니다."));
+
+        // 대회 참가 정보 삭제
+        List<Participant> participated = participantRepository.findAllByCompetitionCompetitionIdAndMemberUid(dto.getCompetitionId(), dto.getUid());
+        List<ParticipantDto.DeleteResponse> deleted = new ArrayList<>();
+        for (Participant participant : participated) {
+            deleted.add(ParticipantDto.DeleteResponse.builder()
+                    .competitionName(participant.getCompetition().getName())
+                    .sectorTitle(participant.getId().getSectorTitle())
+                    .subSectorName(participant.getId().getSubSectorName())
+                    .build());
+        }
+        participantRepository.deleteAll(participated);
 
         joinCompetitionRepository.delete(target);
+
+        return deleted;
     }
 
     public void checkJoinable(Long competitionId, JoinCompetition.joinType type) {

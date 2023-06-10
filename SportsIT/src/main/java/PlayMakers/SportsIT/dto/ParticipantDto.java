@@ -1,7 +1,9 @@
 package PlayMakers.SportsIT.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 public class ParticipantDto {
@@ -15,5 +17,14 @@ public class ParticipantDto {
         private String subSectorName;
         @Builder.Default
         private String profileImg = "";
+    }
+
+    @Data
+    @AllArgsConstructor @NoArgsConstructor
+    @Builder
+    public static class DeleteResponse {
+        private String competitionName;
+        private String sectorTitle;
+        private String subSectorName;
     }
 }

@@ -5,10 +5,7 @@ import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import PlayMakers.SportsIT.enums.Subscribe;
-import PlayMakers.SportsIT.repository.CompetitionCustomRepository;
-import PlayMakers.SportsIT.repository.CompetitionRepository;
-import PlayMakers.SportsIT.repository.JoinCompetitionRepository;
-import PlayMakers.SportsIT.repository.MemberRepository;
+import PlayMakers.SportsIT.repository.*;
 import PlayMakers.SportsIT.service.JoinCompetitionService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -41,6 +38,8 @@ public class JoinCompetitionServiceIntegrationTest {
     JoinCompetitionRepository joinCompetitionRepository;
     @Autowired
     CompetitionCustomRepository competitionCustomRepository;
+    @Autowired
+    ParticipantRepository participantRepository;
 
     MemberType userTypePlayer = MemberType.builder()
             .roleName("ROLE_USER")
@@ -58,7 +57,7 @@ public class JoinCompetitionServiceIntegrationTest {
     @DisplayName("체육인은 대회 참가를 신청할 수 있다.")
     void 대회_신청(){
         // given
-        JoinCompetitionService joinCompetitionService = new JoinCompetitionService(competitionRepository, competitionCustomRepository, memberRepository, joinCompetitionRepository);
+        JoinCompetitionService joinCompetitionService = new JoinCompetitionService(competitionRepository, competitionCustomRepository, memberRepository, joinCompetitionRepository, participantRepository);
 
         int hostIdx = 1;
         MemberType hostMemberType = userTypeInst;
