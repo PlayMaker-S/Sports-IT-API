@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 import static PlayMakers.SportsIT.domain.JoinCompetition.*;
 
 @Data
@@ -23,5 +25,14 @@ public class JoinCompetitionDto {
                 .joinType(type)
                 .formId(formId)
                 .build();
+    }
+
+    @Data
+    @AllArgsConstructor @NoArgsConstructor
+    @Builder
+    public static class UserJoinResponse {
+        private CompetitionDto.Summary competition;
+        private joinType type;
+        private LocalDateTime joinDate;
     }
 }

@@ -1,13 +1,12 @@
 package PlayMakers.SportsIT.service;
 
+import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.Payment;
 import PlayMakers.SportsIT.dto.PaymentDto;
 import PlayMakers.SportsIT.enums.PaymentStatus;
 import PlayMakers.SportsIT.enums.PaymentType;
 import PlayMakers.SportsIT.repository.PaymentRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import jakarta.transaction.Transactional;
@@ -25,10 +24,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -121,18 +117,6 @@ public class PaymentService {
             log.error("결제 내역 사후 검증 실패: {}", "결제 내역이 존재하지 않습니다.");
             return false;
         }
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        log.info("responseBody : {}", responseBody.get("response").toString());
-//
-//        PaymentDto.PortOneResponse portOneResponse = mapper.readValue(responseBody.get("response").toString(), PaymentDto.PortOneResponse.class);
-//        log.info("code : {}, message : {} response : {}", portOneResponse.getCode(), portOneResponse.getMessage(), portOneResponse.getResponse());
-//        JsonNode jsonNode = mapper.readTree(String.valueOf(responseBody.get("response")));
-//
-//        // 필요한 속성 추출
-//        String expected_imp_uid = jsonNode.get("response").get("imp_uid").asText();
-//        String expected_merchant_uid = jsonNode.get("response").get("merchant_uid").asText();
-//        Long expected_amount = jsonNode.get("response").get("amount").asLong();
 
         // 필요한 속성 추출
         String expected_imp_uid = paymentDto.getImp_uid();
@@ -143,7 +127,7 @@ public class PaymentService {
         return !isTampered(paymentDto, expected_imp_uid, expected_merchant_uid, expected_amount);
     }
 
-    public Payment createOrder(PaymentDto.Request requestDto, Member member){
+    public Payment createOrder(PaymentDto.Request requestDto, Member member, Competition competition){
         log.info("결제 생성");
         log.info(requestDto.toString());
 
@@ -158,11 +142,29 @@ public class PaymentService {
                 .content(requestDto.getContent())
                 .status(status)
                 .buyer(member)
+                .competition(competition)
                 .build();
 
         paymentRepository.save(newPayment);
 
         return newPayment;
+    }
+    public List<PaymentDto.Detail> getPaymentsByBuyer(Member buyer){
+        List<Payment> payments = paymentRepository.findByBuyer(buyer);
+        List<PaymentDto.Detail> paymentDtos = new ArrayList<>();
+
+        for(Payment payment : payments){
+            paymentDtos.add(PaymentDto.Detail.builder()
+                    .imp_uid(payment.getImpUid())
+                    .merchant_uid(payment.getMerchantUid())
+                    .amount(payment.getAmount())
+                    .paymentType(payment.getType())
+                    .content(payment.getContent())
+                    .status(payment.getStatus())
+                    .build());
+        }
+
+        return paymentDtos;
     }
 
     private static boolean isTampered(PaymentDto.PreRequest paymentDto, String expected_imp_uid, String expected_merchant_uid, Long expected_amount) {

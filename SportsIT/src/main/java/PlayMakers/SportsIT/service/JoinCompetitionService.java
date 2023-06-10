@@ -1,22 +1,16 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.domain.*;
-import PlayMakers.SportsIT.dto.JoinCompetitionDto;
-import PlayMakers.SportsIT.dto.CompetitionFormDto;
-import PlayMakers.SportsIT.dto.JoinCountDto;
-import PlayMakers.SportsIT.repository.CompetitionRepository;
-import PlayMakers.SportsIT.repository.CompetitionTemplateRepository;
-import PlayMakers.SportsIT.repository.JoinCompetitionRepository;
-import PlayMakers.SportsIT.repository.MemberRepository;
+import PlayMakers.SportsIT.dto.*;
+import PlayMakers.SportsIT.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -24,8 +18,10 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class JoinCompetitionService {
     final private CompetitionRepository competitionRepository;
+    final private CompetitionCustomRepository competitionCustomRepository;
     final private MemberRepository memberRepository;
     final private JoinCompetitionRepository joinCompetitionRepository;
+    final private ParticipantRepository participantRepository;
 
     public JoinCompetition join(JoinCompetitionDto dto) {
         log.info("대회 참가 요청: {}", dto);
@@ -60,8 +56,13 @@ public class JoinCompetitionService {
 
         return joinCompetitionRepository.save(target);
     }
+    public Optional<JoinCompetition> getJoinCompetition(Long uid, Long competitionId){
+        log.info("대회 참가 정보 조회 요청: uid={}, competitionId={}", uid, competitionId);
 
-    public void deleteJoinCompetition(JoinCompetitionDto dto){
+        return joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId);
+    }
+
+    public List<ParticipantDto.DeleteResponse> deleteJoinCompetition(JoinCompetitionDto dto){
         log.info("대회 참가 정보 삭제 요청: {}", dto);
 
         // 대회가 이미 시작되었는지 확인
@@ -73,9 +74,23 @@ public class JoinCompetitionService {
                 });
 
         JoinCompetition target = joinCompetitionRepository.findByIdUidAndIdCompetitionId(dto.getUid(), dto.getCompetitionId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 대회에 참가한 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 대회에 참가하지 않습니다."));
+
+        // 대회 참가 정보 삭제
+        List<Participant> participated = participantRepository.findAllByCompetitionCompetitionIdAndMemberUid(dto.getCompetitionId(), dto.getUid());
+        List<ParticipantDto.DeleteResponse> deleted = new ArrayList<>();
+        for (Participant participant : participated) {
+            deleted.add(ParticipantDto.DeleteResponse.builder()
+                    .competitionName(participant.getCompetition().getName())
+                    .sectorTitle(participant.getId().getSectorTitle())
+                    .subSectorName(participant.getId().getSubSectorName())
+                    .build());
+        }
+        participantRepository.deleteAll(participated);
 
         joinCompetitionRepository.delete(target);
+
+        return deleted;
     }
 
     public void checkJoinable(Long competitionId, JoinCompetition.joinType type) {
@@ -102,41 +117,6 @@ public class JoinCompetitionService {
                 .viewerCount(countCurrentViewer(competitionId))
                 .build();
         return countResult;
-    }
-    public CompetitionForm createForm(CompetitionFormDto dto, String templateId) throws ExecutionException, InterruptedException {
-        log.info("대회 참가서 작성 요청: {}", dto);
-//
-//        try {
-//            CompetitionTemplate template = competitionTemplateRepository.findTemplate(templateId);
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("해당 템플릿이 존재하지 않습니다.");
-//        }
-//
-//        CompetitionForm form = new CompetitionForm();
-//        Long amount = 0L;
-//        for (CompetitionFormDto.Sector sector : dto.getSectors()) {
-//            String sectorName = sector.getTitle();
-//            CompetitionForm.Sector newSector = new CompetitionForm.Sector();
-//            for (CompetitionFormDto.SubSector subSector : sector.getSubSectors()) {
-//                if(subSector.isChecked()) {
-//                    newSector.getSubSectors().add(new CompetitionForm.SubSector(subSector.getName()));
-//                }
-//            }
-//            if (newSector.getSubSectors().size() > 0) {
-//                newSector.setTitle(sectorName);
-//                form.getSectors().add(newSector);
-//                amount += newSector.getSubSectors().size() * ;
-//            }
-//        }
-
-
-//        CompetitionForm form = dto.toEntity();
-//        form.setMember(memberRepository.findById(dto.getUid()).get());
-//        form.setCompetition(competitionRepository.findById(dto.getCompetitionId()).get());
-//        log.info("대회 참가서 정보: {}", form);
-//
-//        return joinCompetitionFormRepository.save(form);
-        return null;
     }
 
     private int countCurrentPlayer(Long competitionId){
@@ -221,5 +201,39 @@ public class JoinCompetitionService {
 
     private boolean alreadyJoinedPlayer(Long competitionId, Member member) {
         return joinCompetitionRepository.findByIdUidAndIdCompetitionId(member.getUid(), competitionId).isPresent();
+    }
+
+    public Slice<JoinCompetitionDto.UserJoinResponse> findJoinedCompetitions(Long uid, Long page, Long size) {
+        List<JoinCompetition> joins = joinCompetitionRepository.findByIdUid(uid);
+        joins.sort(Comparator.comparing(JoinCompetition::getCreatedDate).reversed());
+
+        List<Long> competitionIds = joins.stream().map(join -> join.getId().getCompetitionId()).toList();
+
+        Pageable pageable = PageRequest.of(page.intValue(), size.intValue(), Sort.by("startDate").descending());
+        Slice<Competition> competitions = competitionCustomRepository.findCompetitionsBySliceWithIdsAndUid(competitionIds, uid, pageable);
+
+        List<JoinCompetitionDto.UserJoinResponse> result = new ArrayList<>();
+        for (JoinCompetition join : joins) {
+            result.add(JoinCompetitionDto.UserJoinResponse.builder()
+                    .competition(getCompetitionSummary(join.getCompetition()))
+                    .type(join.getJoinType())
+                    .joinDate(join.getCreatedDate())
+                    .build());
+        }
+        return new SliceImpl<>(result, pageable, competitions.hasNext());
+    }
+
+    private static CompetitionDto.Summary getCompetitionSummary(Competition competition) {
+        return CompetitionDto.Summary.builder()
+                .competitionId(competition.getCompetitionId())
+                .name(competition.getName())
+                .host(MemberDto.Summary.builder()
+                        .uid(competition.getHost().getUid())
+                        .name(competition.getHost().getName())
+                        .build())
+                .posters(competition.getPosters())
+                .startDate(competition.getStartDate())
+                .sportCategory(competition.getCategory())
+                .build();
     }
 }
