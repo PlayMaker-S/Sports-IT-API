@@ -144,6 +144,7 @@ public class CompetitionService {
         return competition.getCompetitionResults();
     }
 
+
     /*
     *   대회 생성/수정 시 필수 정보 체크
      */
