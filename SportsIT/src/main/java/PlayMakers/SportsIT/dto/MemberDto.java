@@ -47,4 +47,12 @@ public class MemberDto {
 //                .memberType(memberEntityType)
 //                .build();
 //    }
+
+    @Data
+    @AllArgsConstructor @NoArgsConstructor
+    @Builder
+    public static class Summary {
+        private Long uid;
+        private String name;
+    }
 }

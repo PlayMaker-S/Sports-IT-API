@@ -11,10 +11,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,6 +46,38 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
 
         return new SliceImpl<>(competitions, pageable, hasNext);
     }
+
+    /**
+     * 유저가 참가한 대회 목록 조회
+     * @param competitionIds 대회 아이디 리스트
+     * @param pageable 페이지 정보
+     * @return 유저가 참가한 대회 목록
+     */
+    @Override
+    public Slice<Competition> findCompetitionsBySliceWithIdsAndUid(List<Long> competitionIds, Long uid, Pageable pageable) {
+        QCompetition competition = QCompetition.competition;
+        QJoinCompetition joinCompetition = QJoinCompetition.joinCompetition;
+
+        OrderSpecifier<LocalDateTime> orderByCreatedAt = joinCompetition.createdDate.desc();
+
+        List<Competition> competitions = jpaQueryFactory
+                .selectFrom(competition)
+                .join(joinCompetition).on(competition.competitionId.eq(joinCompetition.competition.competitionId))
+                .where(joinCompetition.member.uid.eq(uid)
+                        .and(joinCompetition.competition.competitionId.in(competitionIds)))
+                .orderBy(
+                        orderByCreatedAt,
+                        competition.startDate.desc()
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        boolean hasNext = removeOneIfHasNext(pageable, competitions);
+
+        return new SliceImpl<>(competitions, pageable, hasNext);
+    }
+
 
     @NotNull
     private static OrderSpecifier getOrderSpecifier(Pageable pageable, QCompetition competition) {

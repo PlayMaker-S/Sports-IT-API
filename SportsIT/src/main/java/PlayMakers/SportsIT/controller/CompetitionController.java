@@ -6,7 +6,9 @@ import PlayMakers.SportsIT.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -231,21 +233,6 @@ public class CompetitionController {
         res.put("amount", amount);
         res.put("form", formId); // 신청서 저장
 
-        // joinCompetition 생성
-//        JoinCompetitionDto dto = new JoinCompetitionDto().builder()
-//                .competitionId(competitionId)
-//                .uid(member.getUid())
-//                .type(type)
-//                .formId(formId)
-//                .build();
-//        JoinCompetition joinCompetition = joinCompetitionService.join(dto);
-
-
-//        res.put("success", true);
-//        res.put("agreements", target.getAgreements());
-//        String templateId = target.getTemplateID();
-//        res.put("template", competitionTemplateService.getTemplate(templateId));
-
         return ResponseEntity.ok(res); // 200
     }
 
@@ -380,6 +367,26 @@ public class CompetitionController {
 
         return ResponseEntity.accepted().body("대회가 취소되었습니다."); // 202
     }
+    @GetMapping("/join/slice/{userId}")
+    public ResponseEntity<Object> getJoinCompetitionSlice(@PathVariable Long userId,
+                                                                      @RequestParam(required = false) Long page,
+                                                                      @RequestParam(required = false) Long size) throws Exception {
+        Map<String, Object> res = new HashMap<>();
+        Slice<JoinCompetitionDto.UserJoinResponse> result = null;
+        page = page == null ? 0 : page;
+        size = size == null ? 15 : size;
+        try {
+            result =  joinCompetitionService.findJoinedCompetitions(userId, page, size);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        res.put("success", true);
+        res.put("result", result);
+
+        return ResponseEntity.ok(res); // 200
+    }
 
     @GetMapping("/count-join/{competitionId}")
     public ResponseEntity<JoinCountDto> getJoinCompetitionCounts(@PathVariable Long competitionId) throws Exception {
@@ -467,5 +474,10 @@ public class CompetitionController {
     @ExceptionHandler
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage()); // 400
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage()); // 500
     }
 }
