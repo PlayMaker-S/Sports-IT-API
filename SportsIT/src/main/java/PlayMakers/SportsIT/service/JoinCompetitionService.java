@@ -200,6 +200,7 @@ public class JoinCompetitionService {
             result.add(JoinCompetitionDto.UserJoinResponse.builder()
                     .competition(getCompetitionSummary(join.getCompetition()))
                     .type(join.getJoinType())
+                    .joinDate(join.getCreatedDate())
                     .build());
         }
         return new SliceImpl<>(result, pageable, competitions.hasNext());
