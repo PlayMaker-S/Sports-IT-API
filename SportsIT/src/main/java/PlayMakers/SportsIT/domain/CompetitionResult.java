@@ -22,7 +22,6 @@ public class CompetitionResult extends BaseEntity{
     @JoinColumn(name = "competition_id")
     private Competition competition;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uid")
     private Member member;

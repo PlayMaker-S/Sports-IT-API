@@ -4,6 +4,7 @@ import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.CompetitionFormDto;
+import PlayMakers.SportsIT.dto.CompetitionResultDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
@@ -139,9 +140,19 @@ public class CompetitionService {
         //competition.setAgreements(dto.getAgreements());  // 변경하면 참조가 깨져버림
     }
 
-    public List<CompetitionResult> getAllResultsByCompetition(Long competitionId) {
+    public List<CompetitionResultDto> getAllResultsByCompetition(Long competitionId) {
         Competition competition = competitionRepository.findByCompetitionId(competitionId);
-        return competition.getCompetitionResults();
+        List<CompetitionResult> competitionResults = competition.getCompetitionResults();
+        List<CompetitionResultDto> competitionResultDtos = new ArrayList<>();
+        for(CompetitionResult cr : competitionResults){
+            CompetitionResultDto dto = CompetitionResultDto.builder()
+                    .content(cr.getContent())
+                    .uid(cr.getMember().getUid())
+                    .historyDate(cr.getHistoryDate())
+                    .build();
+            competitionResultDtos.add(dto);
+        }
+        return competitionResultDtos;
     }
 
 
