@@ -16,6 +16,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -64,6 +67,24 @@ public class PaymentController {
 
         if(payment != null) return ResponseEntity.ok("결제 내역 생성 완료");
         else return ResponseEntity.internalServerError().body("결제 내역 생성 실패");
+    }
+    @GetMapping("/myTransaction")
+    public ResponseEntity<?> getMyTransaction(@AuthenticationPrincipal User user) throws Exception {
+        log.info("내 결제 내역 조회 / 클라이언트: {}", user.getUsername());
+        Map<String, Object> response = new HashMap<>();
+        List<PaymentDto.Detail> transactions;
+        try {
+            Member client = memberService.findOne(user.getUsername());
+            transactions = paymentService.getPaymentsByBuyer(client);
+        } catch (Exception e) {
+            log.error("내 결제 내역 조회 실패", e);
+            response.put("success", false);
+            response.put("message", "내 결제 내역 조회 실패" + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+        response.put("success", true);
+        response.put("result", transactions);
+        return ResponseEntity.ok(response);
     }
 
     @ExceptionHandler(IOException.class)
