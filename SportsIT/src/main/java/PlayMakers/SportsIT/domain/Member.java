@@ -32,6 +32,9 @@ public class Member extends BaseEntity {
     @Column
     private String birth;
 
+    @Column
+    private String profileImageUrl;
+
     @Column(nullable = false)
     @Builder.Default
     @Enumerated(EnumType.STRING)
