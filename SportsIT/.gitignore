@@ -42,3 +42,5 @@ out/
 /src/main/resources/application.properties
 /src/main/resources/sportsit-test-firebase-adminsdk-z9zhb-71e9f2f186.json
 /src/main/resources/keystore.p12
+/keystore.p12
+
