@@ -30,6 +30,8 @@ public class QCompetition extends EntityPathBase<Competition> {
 
     public final NumberPath<Long> competitionId = createNumber("competitionId", Long.class);
 
+    public final ListPath<CompetitionResult, QCompetitionResult> competitionResults = this.<CompetitionResult, QCompetitionResult>createList("competitionResults", CompetitionResult.class, QCompetitionResult.class, PathInits.DIRECT2);
+
     public final EnumPath<PlayMakers.SportsIT.enums.CompetitionType> competitionType = createEnum("competitionType", PlayMakers.SportsIT.enums.CompetitionType.class);
 
     public final StringPath content = createString("content");

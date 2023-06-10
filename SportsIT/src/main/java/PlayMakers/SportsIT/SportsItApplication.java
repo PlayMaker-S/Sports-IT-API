@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT;
 
+import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 
 @Slf4j
 @EnableAsync
+@EnableAdminServer
 @EnableScheduling
 @SpringBootApplication
 public class SportsItApplication {

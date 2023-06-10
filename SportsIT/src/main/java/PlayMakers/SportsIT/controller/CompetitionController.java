@@ -267,27 +267,15 @@ public class CompetitionController {
     @GetMapping("/{competitionId}/participants")
     public ResponseEntity<Object> loadParticipants(@PathVariable Long competitionId) throws Exception{
         Map<String, Object> res = new HashMap<>();
-        List<ParticipantDto.Response> participantsDto = new ArrayList<>();
+        List<ParticipantDto.Response> participants;
         try {
-            for (Participant participant : participantService.findAllByCompetitionId(competitionId)) {
-                participantsDto.add(ParticipantDto.Response.builder()
-                                .uid(participant.getId().getUid())
-                                .userName(participant.getMember().getName())
-                                .sectorTitle(participant.getId().getSectorTitle())
-                                .subSectorName(participant.getId().getSubSectorName())
-                                .build());
-
-
-                System.out.println(participant);
-            }
+            participants = participantService.findAllDtoByCompetitionId(competitionId);
             res.put("success", true);
-            res.put("result", participantsDto);
-
+            res.put("result", participants);
             return ResponseEntity.ok(res); // 200
         } catch (Exception e) {
             res.put("success", false);
             res.put("message", e.getMessage());
-
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
         }
     }
@@ -441,6 +429,11 @@ public class CompetitionController {
         result.put("success", true);
         result.put("result", form);
         return ResponseEntity.ok(result); // 200
+    }
+    @GetMapping("/result/{competitionId}")
+    public ResponseEntity<List<CompetitionResultDto>> getCompetitionResult(@PathVariable Long competitionId){
+        log.info("대회 결과 조회");
+        return ResponseEntity.ok(competitionService.getAllResultsByCompetition(competitionId));
     }
 
 
