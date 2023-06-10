@@ -114,6 +114,8 @@ public class Competition extends BaseEntity {
         }
         //if (isChanged) competitionRepository.save(this);
     }
+    @OneToMany(mappedBy = "competition")
+    private List<CompetitionResult> competitionResults;
 
     @Override
     public String toString() {

@@ -43,6 +43,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath phone = createString("phone");
 
+    public final StringPath profileImageUrl = createString("profileImageUrl");
+
     public final StringPath pw = createString("pw");
 
     public final EnumPath<PlayMakers.SportsIT.enums.Subscribe> subscription = createEnum("subscription", PlayMakers.SportsIT.enums.Subscribe.class);

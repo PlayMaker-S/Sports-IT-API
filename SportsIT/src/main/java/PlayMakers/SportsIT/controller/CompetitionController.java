@@ -437,6 +437,11 @@ public class CompetitionController {
         result.put("result", form);
         return ResponseEntity.ok(result); // 200
     }
+    @GetMapping("/result/{competitionId}")
+    public ResponseEntity<List<CompetitionResultDto>> getCompetitionResult(@PathVariable Long competitionId){
+        log.info("대회 결과 조회");
+        return ResponseEntity.ok(competitionService.getAllResultsByCompetition(competitionId));
+    }
 
 
     /*

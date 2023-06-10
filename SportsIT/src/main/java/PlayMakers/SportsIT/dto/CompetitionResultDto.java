@@ -23,4 +23,5 @@ public class CompetitionResultDto {
     private Long competitionId;
     private Long uid;
     private String content;
+    private LocalDateTime historyDate;
 }
