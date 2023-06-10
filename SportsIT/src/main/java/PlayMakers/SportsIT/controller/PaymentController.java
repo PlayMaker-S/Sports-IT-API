@@ -36,6 +36,7 @@ public class PaymentController {
     public ResponseEntity<String> complete(@RequestBody PaymentDto.Request requestDto,
                                       @AuthenticationPrincipal User user) throws Exception {
         log.info("결제이력 저장 / 클라이언트: {}", user.getUsername());
+        log.info("imp_uid: {}", requestDto.getImp_uid());
         Member client = memberService.findOne(user.getUsername());
 
         // 결제 내역 사후 검증
