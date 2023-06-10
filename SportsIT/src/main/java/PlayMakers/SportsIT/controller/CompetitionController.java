@@ -442,6 +442,10 @@ public class CompetitionController {
         result.put("result", form);
         return ResponseEntity.ok(result); // 200
     }
+    @GetMapping("/result/{competitionId}")
+    public ResponseEntity<List<CompetitionResult>> getCompetitionResult(@PathVariable Long competitionId){
+        return ResponseEntity.ok(competitionService.getAllResultsByCompetition(competitionId));
+    }
 
 
     /*

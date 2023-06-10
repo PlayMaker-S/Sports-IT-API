@@ -13,8 +13,8 @@ import java.sql.SQLException;
 
 @Slf4j
 @EnableAsync
-@EnableScheduling
 @EnableAdminServer
+@EnableScheduling
 @SpringBootApplication
 public class SportsItApplication {
 

@@ -139,6 +139,11 @@ public class CompetitionService {
         //competition.setAgreements(dto.getAgreements());  // 변경하면 참조가 깨져버림
     }
 
+    public List<CompetitionResult> getAllResultsByCompetition(Long competitionId) {
+        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        return competition.getCompetitionResults();
+    }
+
     /*
     *   대회 생성/수정 시 필수 정보 체크
      */
