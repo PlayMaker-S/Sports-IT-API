@@ -80,6 +80,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/login").permitAll()  // 로그인은 누구나 가능
                 .requestMatchers("/api/authenticate").permitAll()
                 .requestMatchers("/api/member/all").permitAll()
+                .requestMatchers("/api/competitions/all").permitAll()
                 .requestMatchers("/members/**").authenticated()  // 인증만 필요
                 .requestMatchers("/institution/**").hasAnyRole("ROLE_INSTITUTION", "ROLE_ADMIN")
                 .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")  // 권한도 필요

@@ -85,9 +85,8 @@ public class CompetitionController {
      * @return
      */
     @GetMapping("/all")
-    public ResponseEntity<Optional<Competition>> getCompetitions() {
-        //List<Competition> competitions = competitionService.getCompetitions();
-        Optional<Competition> competitions = null;
+    public ResponseEntity<List<Competition>> getCompetitions() {
+        List<Competition> competitions = competitionService.findAll();
         return ResponseEntity.ok(competitions); // 200
     }
 
