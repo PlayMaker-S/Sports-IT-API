@@ -89,6 +89,9 @@ dependencies {
 
 	// Spring Boot Admin Server 라이브러리
 	implementation 'de.codecentric:spring-boot-admin-starter-server:2.4.1'
+
+	// AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
  test {
