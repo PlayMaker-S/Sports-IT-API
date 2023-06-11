@@ -50,6 +50,10 @@ public class Competition extends BaseEntity {
     private String location; // 대회 장소
     @Column(nullable = false, length = 100)
     private String locationDetail; // 대회 장소 상세
+    @Column
+    private Double latitude; // 위도
+    @Column
+    private Double longitude; // 경도
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private CompetitionState state = CompetitionState.RECRUITING; // 대회 상태 - enum으로 구현했을 때
