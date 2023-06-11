@@ -81,6 +81,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/authenticate").permitAll()
                 .requestMatchers("/api/member/all").permitAll()
                 .requestMatchers("/api/competitions/all").permitAll()
+                .requestMatchers("/api/payment/all").permitAll()
                 .requestMatchers("/members/**").authenticated()  // 인증만 필요
                 .requestMatchers("/institution/**").hasAnyRole("ROLE_INSTITUTION", "ROLE_ADMIN")
                 .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")  // 권한도 필요

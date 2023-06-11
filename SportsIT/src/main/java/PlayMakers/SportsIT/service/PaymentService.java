@@ -248,4 +248,18 @@ public class PaymentService {
         return "PAY"+UUID.randomUUID().toString().replaceAll("-", "");
     }
 
+    public List<PaymentDto.Detail> findAll(){
+        List<PaymentDto.Detail> paymentDtos = new ArrayList<>();
+        for(Payment payment : paymentRepository.findAll()) {
+            paymentDtos.add(PaymentDto.Detail.builder()
+                    .imp_uid(payment.getImpUid())
+                    .merchant_uid(payment.getMerchantUid())
+                    .amount(payment.getAmount())
+                    .paymentType(payment.getType())
+                    .content(payment.getContent())
+                    .status(payment.getStatus())
+                    .build());
+        }
+        return paymentDtos;
+    }
 }
