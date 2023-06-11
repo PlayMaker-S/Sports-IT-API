@@ -6,9 +6,8 @@ import PlayMakers.SportsIT.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -406,6 +405,38 @@ public class CompetitionController {
         size = size == null ? 15 : size;
         try {
             result =  joinCompetitionService.findJoinedCompetitions(userId, page, size);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        res.put("success", true);
+        res.put("result", result);
+
+        return ResponseEntity.ok(res); // 200
+    }
+    @GetMapping("/all/{hostId}")
+    public ResponseEntity<Object> getAllCompetitions(@PathVariable Long hostId,
+                                                     @RequestParam(required = false) Long page,
+                                                     @RequestParam(required = false) Long size
+                                                     ) throws Exception {
+        Map<String, Object> res = new HashMap<>();
+        Slice<CompetitionDto.Summary> result = null;
+        page = page == null ? 0 : page;
+        size = size == null ? 15 : size;
+        try {
+            List<Competition> competitions = competitionService.getCompetitionSliceByHostId(hostId, page.intValue(), size.intValue()).getContent();
+            result = new SliceImpl<>(competitions.stream().map(competition -> CompetitionDto.Summary.builder()
+                    .competitionId(competition.getCompetitionId())
+                    .name(competition.getName())
+                    .host(MemberDto.Summary.builder()
+                            .uid(competition.getHost().getUid())
+                            .name(competition.getHost().getName())
+                            .build())
+                    .startDate(competition.getStartDate())
+                    .posters(competition.getPosters())
+                    .sportCategory(competition.getCategory())
+                    .build()).toList());
         } catch (Exception e) {
             res.put("success", false);
             res.put("message", e.getMessage());

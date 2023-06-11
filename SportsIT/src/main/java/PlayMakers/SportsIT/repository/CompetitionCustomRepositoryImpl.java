@@ -78,6 +78,34 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
         return new SliceImpl<>(competitions, pageable, hasNext);
     }
 
+    /**
+     * 주최자 기준 대회 목록 조회
+     * @param hostUid 주최자 uid
+     * @param pageable 페이지 정보
+     * @return 주최자가 주최한 대회 목록
+     */
+
+    public Slice<Competition> findCompetitionsBySliceWithHostUid(Long hostUid, Pageable pageable) {
+        QCompetition competition = QCompetition.competition;
+
+        OrderSpecifier<LocalDateTime> orderByCreatedAt = competition.createdDate.desc();
+
+        List<Competition> competitions = jpaQueryFactory
+                .selectFrom(competition)
+                .where(competition.host.uid.eq(hostUid))
+                .orderBy(
+                        orderByCreatedAt,
+                        competition.startDate.desc()
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        boolean hasNext = removeOneIfHasNext(pageable, competitions);
+
+        return new SliceImpl<>(competitions, pageable, hasNext);
+    }
+
 
     @NotNull
     private static OrderSpecifier getOrderSpecifier(Pageable pageable, QCompetition competition) {
