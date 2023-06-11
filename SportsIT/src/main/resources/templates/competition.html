@@ -10,6 +10,26 @@
   <div>
     <h1>대회 데이터 조회</h1>
     <!-- 여기에 회원 정보 조회 페이지의 내용을 작성합니다 -->
+    <table class="table">
+      <thead>
+      <tr>
+        <th>대회ID</th>
+        <th>이름</th>
+        <th>종목</th>
+        <th>내용</th>
+        <th>상태</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="competition : ${competitions}">
+        <td th:text="${competition.competitionId}"></td>
+        <td th:text="${competition.name}"></td>
+        <td th:text="${competition.category}"></td>
+        <td th:text="${competition.content}"></td>
+        <td th:text="${competition.state}"></td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </th:block>
 </body>
