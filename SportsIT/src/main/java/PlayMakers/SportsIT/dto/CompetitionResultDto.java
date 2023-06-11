@@ -24,4 +24,5 @@ public class CompetitionResultDto {
     private Long uid;
     private String content;
     private LocalDateTime historyDate;
+    private String name;
 }
