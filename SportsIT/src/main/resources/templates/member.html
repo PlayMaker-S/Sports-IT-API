@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout.html">
+<head>
+  <title>Sports-IT 관리자 페이지</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+  <div>
+    <h1>회원 정보 조회 페이지</h1>
+    <!-- 여기에 회원 정보 조회 페이지의 내용을 작성합니다 -->
+    <table class="table">
+      <thead>
+      <tr>
+        <th>uid</th>
+        <th>이름</th>
+        <th>이메일</th>
+        <th>휴대폰번호</th>
+        <th>가입일</th>
+        <th>상태</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="member : ${members}">
+        <td th:text="${member.uid}"></td>
+        <td th:text="${member.name}"></td>
+        <td th:text="${member.email}"></td>
+        <td th:text="${member.phone}"></td>
+        <td th:text="${member.createdDate}"></td>
+        <td th:text="${member.activated}"></td>
+
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</th:block>
+</body>
+</html>
