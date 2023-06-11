@@ -11,4 +11,5 @@ public interface CompetitionCustomRepository {
     // member가 참가한 대회 목록 조회
 
     Slice<Competition> findCompetitionsBySliceWithIdsAndUid(List<Long> competitionIds, Long uid, Pageable pageable);
+    Slice<Competition> findCompetitionsBySliceWithHostUid(Long hostUid, Pageable pageable);
 }

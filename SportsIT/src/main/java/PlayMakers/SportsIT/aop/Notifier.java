@@ -35,7 +35,7 @@ public class Notifier {
         if (competition == null) return;
         log.info("경기 상태 변경 알림 발송");
         Member sender = competition.getHost();
-        String link = "/competition/"+competition.getCompetitionId();
+        String link = "/competitions/"+competition.getCompetitionId();
         String competitionName = competition.getName();
         NotificationTitle title;
         switch (competition.getState()) {
@@ -65,7 +65,7 @@ public class Notifier {
         log.info("경기 참가 알림 발송");
         Member sender = joinCompetition.getMember();
         Member receiver = joinCompetition.getCompetition().getHost();
-        String link = "/competition"+joinCompetition.getCompetition().getCompetitionId();
+        String link = "/competitions/"+joinCompetition.getCompetition().getCompetitionId();
         if(joinCompetition.getJoinType().equals(JoinCompetition.joinType.PLAYER))
             notificationService.sendNotification(receiver, NotificationTitle.NEW_PLAYER, link, sender, joinCompetition.getCompetition().getName());
         else if(joinCompetition.getJoinType().equals(JoinCompetition.joinType.VIEWER))
@@ -77,7 +77,7 @@ public class Notifier {
         log.info("경기 결과 알림 발송");
         Competition competition = result.getCompetition();
         Member sender = competition.getHost();
-        String link = "/competition"+competition.getCompetitionId();
+        String link = "competitions/result"+competition.getCompetitionId();
         String competitionName = competition.getName();
         NotificationTitle title = NotificationTitle.CHECK_RESULT;
         for(Member receiver : joinCompetitionService.getJoinedMembersByCompetition(competition)){
