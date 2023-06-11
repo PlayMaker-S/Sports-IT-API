@@ -67,6 +67,7 @@ public class Member extends BaseEntity {
     @Builder.Default
     private Set<Follow> followers = null;
 
+    @JsonIgnoreProperties({"member"})
     @OneToMany(mappedBy = "member")
     private List<CompetitionResult> competitionResults;
 }
