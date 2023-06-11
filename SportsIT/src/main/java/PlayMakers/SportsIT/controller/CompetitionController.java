@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,7 +49,7 @@ public class CompetitionController {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
         try {
-            hostEmail = user.getUsername(); // 로그인한 회원 ID를 가져옴
+            hostEmail = getUserEmailFromAuthenticationToken(user); // 로그인한 회원 ID를 가져옴
         } catch (Exception e) {
             throw new EntityNotFoundException("로그인이 필요합니다.");
         }
@@ -65,6 +66,14 @@ public class CompetitionController {
 
         return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(res); // 201
+    }
+
+    private static String getUserEmailFromAuthenticationToken(User user) {
+        try {
+            return user.getUsername();
+        } catch (Exception e) {
+            throw new EntityNotFoundException("로그인 정보가 없습니다.");
+        }
     }
 
     /*
@@ -103,9 +112,17 @@ public class CompetitionController {
     }
 
     @GetMapping("/{competitionId}")
-    public ResponseEntity<Competition> getCompetition(@PathVariable Long competitionId) {
+    public ResponseEntity<Object> getCompetition(@PathVariable Long competitionId,
+                                                 @AuthenticationPrincipal User user) throws Exception {
         Competition competition = competitionService.findById(competitionId);
-        return ResponseEntity.ok(competition); // 200
+        boolean joined = joinCompetitionService.checkAlreadyJoined(memberService.findOne(getUserEmailFromAuthenticationToken(user)).getUid(), competitionId);
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", true);
+            put("result", competition);
+            put("joined", joined);
+        }};
+
+        return ResponseEntity.ok(res); // 200
     }
 
     @PutMapping("/{competitionId}")
@@ -231,26 +248,11 @@ public class CompetitionController {
         res.put("amount", amount);
         res.put("form", formId); // 신청서 저장
 
-        // joinCompetition 생성
-//        JoinCompetitionDto dto = new JoinCompetitionDto().builder()
-//                .competitionId(competitionId)
-//                .uid(member.getUid())
-//                .type(type)
-//                .formId(formId)
-//                .build();
-//        JoinCompetition joinCompetition = joinCompetitionService.join(dto);
-
-
-//        res.put("success", true);
-//        res.put("agreements", target.getAgreements());
-//        String templateId = target.getTemplateID();
-//        res.put("template", competitionTemplateService.getTemplate(templateId));
-
         return ResponseEntity.ok(res); // 200
     }
 
     private Member getMember(User user) {
-        Member member = memberService.findOne(user.getUsername());
+        Member member = memberService.findOne(getUserEmailFromAuthenticationToken(user));
         return member;
     }
 
@@ -267,27 +269,15 @@ public class CompetitionController {
     @GetMapping("/{competitionId}/participants")
     public ResponseEntity<Object> loadParticipants(@PathVariable Long competitionId) throws Exception{
         Map<String, Object> res = new HashMap<>();
-        List<ParticipantDto.Response> participantsDto = new ArrayList<>();
+        List<ParticipantDto.Response> participants;
         try {
-            for (Participant participant : participantService.findAllByCompetitionId(competitionId)) {
-                participantsDto.add(ParticipantDto.Response.builder()
-                                .uid(participant.getId().getUid())
-                                .userName(participant.getMember().getName())
-                                .sectorTitle(participant.getId().getSectorTitle())
-                                .subSectorName(participant.getId().getSubSectorName())
-                                .build());
-
-
-                System.out.println(participant);
-            }
+            participants = participantService.findAllDtoByCompetitionId(competitionId);
             res.put("success", true);
-            res.put("result", participantsDto);
-
+            res.put("result", participants);
             return ResponseEntity.ok(res); // 200
         } catch (Exception e) {
             res.put("success", false);
             res.put("message", e.getMessage());
-
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
         }
     }
@@ -375,23 +365,93 @@ public class CompetitionController {
                 .body(res); // 201
     }
     @DeleteMapping("/join")
-    public ResponseEntity<String> cancelJoinCompetition(@RequestBody JoinCompetitionDto joincompetitionDto) throws Exception{
-        joinCompetitionService.deleteJoinCompetition(joincompetitionDto);
+    public ResponseEntity<Object> cancelJoinCompetition(@RequestBody JoinCompetitionDto joincompetitionDto) throws Exception{
+        Map<String, Object> res = new HashMap<>();
+        List<ParticipantDto.DeleteResponse> result;
+        try {
+            JoinCompetition join = joinCompetitionService.getJoinCompetition(joincompetitionDto.getUid(), joincompetitionDto.getCompetitionId()).get();
+            result = joinCompetitionService.deleteJoinCompetition(joincompetitionDto);
+            String formId = join.getFormId();
+            if (formId != null) {
+                competitionFormService.deleteForm(formId);
+            }
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+        }
+        res.put("success", true);
+        res.put("result", result);
+        res.put("message", "대회 참가가 취소되었습니다.");
 
-        return ResponseEntity.accepted().body("대회가 취소되었습니다."); // 202
+        return ResponseEntity.accepted().body(res); // 202
+    }
+
+    /**
+     * 체육인 별 참가 대회 조회
+     * @param userId : Member의 uid
+     * @param page : 페이지 번호
+     * @param size : 페이지 사이즈
+     * @return : Slice<JoinCompetitionDto.UserJoinResponse>
+     * @throws Exception
+     */
+    @GetMapping("/join/slice/{userId}")
+    public ResponseEntity<Object> getJoinCompetitionSlice(@PathVariable Long userId,
+                                                                      @RequestParam(required = false) Long page,
+                                                                      @RequestParam(required = false) Long size) throws Exception {
+        Map<String, Object> res = new HashMap<>();
+        Slice<JoinCompetitionDto.UserJoinResponse> result = null;
+        page = page == null ? 0 : page;
+        size = size == null ? 15 : size;
+        try {
+            result =  joinCompetitionService.findJoinedCompetitionsByUid(userId, page, size);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        res.put("success", true);
+        res.put("result", result);
+
+        return ResponseEntity.ok(res); // 200
+    }
+    @GetMapping("/all/{hostId}")
+    public ResponseEntity<Object> getAllCompetitions(@PathVariable Long hostId,
+                                                     @RequestParam(required = false) Long page,
+                                                     @RequestParam(required = false) Long size
+                                                     ) throws Exception {
+        Map<String, Object> res = new HashMap<>();
+        Slice<CompetitionDto.Summary> result = null;
+        page = page == null ? 0 : page;
+        size = size == null ? 15 : size;
+        try {
+            List<Competition> competitions = competitionService.getCompetitionSliceByHostId(hostId, page.intValue(), size.intValue()).getContent();
+            result = new SliceImpl<>(competitions.stream().map(competition -> CompetitionDto.Summary.builder()
+                    .competitionId(competition.getCompetitionId())
+                    .name(competition.getName())
+                    .host(MemberDto.Summary.builder()
+                            .uid(competition.getHost().getUid())
+                            .name(competition.getHost().getName())
+                            .build())
+                    .startDate(competition.getStartDate())
+                    .posters(competition.getPosters())
+                    .sportCategory(competition.getCategory())
+                    .build()).toList());
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        res.put("success", true);
+        res.put("result", result);
+
+        return ResponseEntity.ok(res); // 200
     }
 
     @GetMapping("/count-join/{competitionId}")
     public ResponseEntity<JoinCountDto> getJoinCompetitionCounts(@PathVariable Long competitionId) throws Exception {
         JoinCountDto result =  joinCompetitionService.countJoinCompetition(competitionId);
         return ResponseEntity.ok(result); // 200
-    }
-
-    @PostMapping("/firebase-test")
-    public ResponseEntity<String> testFirebase(@RequestBody CompetitionTemplate template) throws Exception {
-        log.info("템플릿 생성 요청 Controller: {}", template);
-        String docId = competitionTemplateService.saveTemplate(template);
-        return ResponseEntity.ok(docId); // 200
     }
 
     /*
@@ -470,7 +530,30 @@ public class CompetitionController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res); // 500
     }
     @ExceptionHandler
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
-        return ResponseEntity.badRequest().body(exception.getMessage()); // 400
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException exception) {
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", false);
+            put("message", exception.getMessage());
+        }};
+        return ResponseEntity.badRequest().body(res); // 400
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> NullPoniterException(NullPointerException exception) {
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", false);
+            put("message", exception.getMessage());
+        }};
+        return ResponseEntity.badRequest().body(res); // 400
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleException(Exception exception) {
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", false);
+            put("message", exception.getMessage() + " " + exception.getClass().getName());
+        }};
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res); // 500
     }
 }

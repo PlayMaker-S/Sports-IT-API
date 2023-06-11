@@ -35,7 +35,11 @@ public class QHostProfile extends EntityPathBase<HostProfile> {
 
     public final StringPath instagramUrl = createString("instagramUrl");
 
+    public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
+
     public final StringPath location = createString("location");
+
+    public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
 
     public final QMember member;
 

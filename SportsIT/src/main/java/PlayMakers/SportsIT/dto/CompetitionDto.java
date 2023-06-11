@@ -29,6 +29,8 @@ public class CompetitionDto {
     private String content;
     private String location;
     private String locationDetail;
+    private Double latitude;
+    private Double longitude;
     private CompetitionState state;
     private String stateDetail;
     private CompetitionType competitionType;
@@ -60,6 +62,8 @@ public class CompetitionDto {
                 .content(content)
                 .location(location)
                 .locationDetail(locationDetail)
+                .latitude(latitude)
+                .longitude(longitude)
                 .state(state)
                 .stateDetail(stateDetail)
                 .competitionType(competitionType)
@@ -69,5 +73,16 @@ public class CompetitionDto {
                 .posters(posters)
                 .agreements(agreements)
                 .build();
+    }
+    @Data
+    @AllArgsConstructor @NoArgsConstructor
+    @Builder
+    public static class Summary {
+        private Long competitionId;
+        private String name;
+        private MemberDto.Summary host;
+        private SportCategory sportCategory;
+        private List<Poster> posters;
+        private LocalDateTime startDate;
     }
 }

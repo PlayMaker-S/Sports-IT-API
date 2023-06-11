@@ -8,8 +8,6 @@ import PlayMakers.SportsIT.dto.CompetitionResultDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -111,6 +109,16 @@ public class CompetitionService {
         Pageable pageable = getPageableProperties(orderBy, page, size);
 
         Slice<Competition> competitions = competitionRepository.findCompetitionBySlice(keyword, filteringConditions, pageable);
+
+        return competitions;
+    }
+    public Slice<Competition> getCompetitionSliceByHostId(Long hostId,
+                                                          int page, int size) {
+        log.info("주최자 기준 대회 목록 조회 요청: {}", hostId);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
+        Slice<Competition> competitions = competitionRepository.findCompetitionsBySliceWithHostUid(hostId, pageable);
 
         return competitions;
     }

@@ -28,12 +28,20 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath birth = createString("birth");
 
+    public final ListPath<CompetitionResult, QCompetitionResult> competitionResults = this.<CompetitionResult, QCompetitionResult>createList("competitionResults", CompetitionResult.class, QCompetitionResult.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
+
+    public final StringPath description = createString("description");
 
     public final StringPath email = createString("email");
 
     public final ListPath<Feed, QFeed> feeds = this.<Feed, QFeed>createList("feeds", Feed.class, QFeed.class, PathInits.DIRECT2);
+
+    public final SetPath<Follow, QFollow> followers = this.<Follow, QFollow>createSet("followers", Follow.class, QFollow.class, PathInits.DIRECT2);
+
+    public final SetPath<Follow, QFollow> following = this.<Follow, QFollow>createSet("following", Follow.class, QFollow.class, PathInits.DIRECT2);
 
     public final QHostProfile hostProfile;
 

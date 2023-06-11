@@ -43,9 +43,13 @@ public class QCompetition extends EntityPathBase<Competition> {
 
     public final QMember host;
 
+    public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
+
     public final StringPath location = createString("location");
 
     public final StringPath locationDetail = createString("locationDetail");
+
+    public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
 
     public final NumberPath<Integer> maxPlayer = createNumber("maxPlayer", Integer.class);
 

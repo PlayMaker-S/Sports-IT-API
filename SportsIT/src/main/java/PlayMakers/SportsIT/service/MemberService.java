@@ -45,6 +45,7 @@ public class MemberService {
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
+                .description(dto.getDescription())
                 .memberType(Collections.singleton(memberType))
                 .activated(true)
                 .build();

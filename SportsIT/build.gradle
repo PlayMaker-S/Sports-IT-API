@@ -88,6 +88,8 @@ dependencies {
 	implementation 'org.webjars:jquery:3.6.0'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
 
+	// AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
  test {
