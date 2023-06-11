@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +42,7 @@ public class CompetitionScheduler {
     }
 
     @Transactional
-    public void updateStateByTime(Competition competition, LocalDateTime now) {
+    public Competition updateStateByTime(Competition competition, LocalDateTime now) {
 
         boolean isChanged = false;
         if (competition.getState() == CompetitionState.PLANNING && competition.getRecruitingEnd().isBefore(now)) {
@@ -60,6 +61,10 @@ public class CompetitionScheduler {
             competition.setState(CompetitionState.END);
             isChanged = true;
         }
-        if (isChanged) competitionRepository.save(competition);
+        if (isChanged) {
+            log.info("대회 상태 변경: {}", competition.getName());
+            return competitionRepository.save(competition);
+        }
+        return null;
     }
 }

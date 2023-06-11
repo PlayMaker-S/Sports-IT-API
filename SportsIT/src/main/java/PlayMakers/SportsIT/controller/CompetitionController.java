@@ -6,9 +6,7 @@ import PlayMakers.SportsIT.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -405,7 +403,7 @@ public class CompetitionController {
         page = page == null ? 0 : page;
         size = size == null ? 15 : size;
         try {
-            result =  joinCompetitionService.findJoinedCompetitions(userId, page, size);
+            result =  joinCompetitionService.findJoinedCompetitionsByUid(userId, page, size);
         } catch (Exception e) {
             res.put("success", false);
             res.put("message", e.getMessage());

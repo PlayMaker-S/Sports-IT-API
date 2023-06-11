@@ -25,8 +25,13 @@ public class Notification extends BaseEntity{
     private boolean checked = false;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = Member.class, optional = false)
-    @JoinColumn(name = "member_uid")
-    private Member member;
+    @JoinColumn(name = "receiver_uid")
+    private Member receiver;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = Member.class, optional = true)
+    @JoinColumn(name = "sender_uid")
+    private Member sender;
+
 
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;

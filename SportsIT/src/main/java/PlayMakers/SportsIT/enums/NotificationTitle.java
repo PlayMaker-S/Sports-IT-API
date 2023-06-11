@@ -8,5 +8,6 @@ public enum NotificationTitle {
     CANCELED,
     END,
     NEED_TO_COMPLETE,
-    CHECK_RESULT;
+    CHECK_RESULT,
+    NEW_PLAYER, NEW_SPECTATOR;
 }

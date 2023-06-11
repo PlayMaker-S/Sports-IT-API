@@ -26,53 +26,49 @@ public class NotificationService {
     public List<Notification> getActivityNotificationsByMember(Member member) {
         log.debug("활동 알림 목록 조회");
         Pageable pageable = PageRequest.of(0, 15);
-        return notificationRepository.findByMemberAndNotificationType(member, NotificationType.ACTIVITY, pageable).getContent();
+        return notificationRepository.findByReceiverAndNotificationType(member, NotificationType.ACTIVITY, pageable).getContent();
     }
 
     public List<Notification> getCompetitionNotificationsByMember(Member member) {
         log.debug("공지 알림 목록 조회");
         Pageable pageable = PageRequest.of(0, 15);
-        return notificationRepository.findByMemberAndNotificationType(member, NotificationType.COMPETITION, pageable).getContent();
+        return notificationRepository.findByReceiverAndNotificationType(member, NotificationType.COMPETITION, pageable).getContent();
     }
 
     public void checkNotification(Long id, Member viewer) {
         log.debug("알림 확인");
         Notification notification = notificationRepository.findById(id).orElseThrow();
-        if (notification.getMember().getUid().equals(viewer.getUid())) notification.setChecked(true);
+        if (notification.getReceiver().getUid().equals(viewer.getUid())) notification.setChecked(true);
+    }
+    public int getUncheckedNotificationCount(Member member) {
+        log.debug("확인하지 않은 알림 개수 조회");
+        return notificationRepository.countByReceiverAndChecked(member, false);
     }
 
-    public void sendGreetings(Member member) {
-        log.info("회원가입 축하 알림 발송");
-        Notification notification = Notification.builder()
-                .member(member)
-                .title(NotificationTitle.JOIN)
-                .message("회원가입을 진심으로 환영합니다! FEEL-IT을 채워 내 포르필을 관리하세요!")
-                .link("/member/profile")
-                .notificationType(NotificationType.ACTIVITY)
-                .checked(false)
-                .build();
-        notificationRepository.save(notification);
-    }
-    public void sendCompetitionNotification(Member member, NotificationTitle title, String link) {
+    public void sendNotification(Member receiver, NotificationTitle title, String link, Member sender, String content) {
         log.info("공지 알림 발송");
         String message="";
         NotificationType type = null;
         switch (title) {
-            case JOIN -> message = member.getName() + "님의 회원가입을 진심으로 환영합니다! FEEL-IT을 채워 내 포르필을 관리하세요!";
-            case RECRUITING_END -> message = "대회 모집이 종료되었습니다. 참가자를 확인해보세요!";
-            case START_SOON -> message = "대회가 곧 시작됩니다.";
-            case STARTED -> message = "대회가 시작되었습니다.";
-            case END -> message = "대회가 종료되었습니다.";
-            case NEED_TO_COMPLETE -> message = "대회가 종료되었습니다. 대회 결과를 입력해주세요.";
-            case CHECK_RESULT -> message = "대회가 종료되었습니다. 대회 결과를 확인하세요!";
-            case CANCELED -> message = "대회가 취소되었습니다.";
+            case JOIN -> message = receiver.getName() + "님의 회원가입을 진심으로 환영합니다! FEEL-IT을 채워 내 포르필을 관리하세요!";
+            case RECRUITING_END -> message = "대회 모집이 종료되었습니다. 참가자를 확인해보세요!" + " : " + content;
+            case START_SOON -> message = "대회가 곧 시작됩니다." + " : " + content;
+            case STARTED -> message = "대회가 시작되었습니다." + " : " + content;
+            case END -> message = "대회가 종료되었습니다." + " : " + content;
+            case NEED_TO_COMPLETE -> message = "대회가 종료되었습니다. 대회 결과를 입력해주세요." + " : " + content;
+            case CHECK_RESULT -> message = "대회가 종료되었습니다. 대회 결과를 확인하세요!" + " : " + content;
+            case CANCELED -> message = "대회가 취소되었습니다." + " : " + content;
+            case NEW_PLAYER -> message = "대회에 새로운 참가자가 등록되었습니다." + " : " + content;
+            case NEW_SPECTATOR -> message = "대회에 새로운 관람객이 등록되었습니다." + " : " + content;
+            default -> throw new IllegalStateException("Unexpected notification title: " + title);
         }
         Notification notification = Notification.builder()
-                .member(member)
+                .receiver(receiver)
                 .title(title)
                 .message(message)
                 .link(link)
                 .notificationType(getNotificationType(title))
+                .sender(sender)
                 .build();
         notificationRepository.save(notification);
     }
