@@ -58,6 +58,7 @@ public class AuthController {
             put("role", member.getMemberType());
             put("email", member.getEmail());
             put("name", member.getName());
+            put("uid", member.getUid());
         }};
 
         return new ResponseEntity<>(res, httpHeaders, HttpStatus.OK);
