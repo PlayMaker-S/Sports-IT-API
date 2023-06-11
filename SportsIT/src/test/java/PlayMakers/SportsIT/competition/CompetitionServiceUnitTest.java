@@ -5,6 +5,7 @@ import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
+import PlayMakers.SportsIT.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.service.CompetitionService;
@@ -35,6 +36,8 @@ class CompetitionServiceUnitTest {
     CompetitionRepository competitionRepository;
     @Mock
     MemberRepository memberRepository;
+    @Mock
+    CategoryRepository categoryRepository;
     @Mock @MainCompetitionPolicy
     CompetitionPolicy competitionPolicy;
     @InjectMocks
@@ -80,6 +83,7 @@ class CompetitionServiceUnitTest {
             // when 대회 dto 생성
             given(memberRepository.findById(memberId)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(Optional.of(mockCompetition).get());
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             Competition created = competitionService.create(dto);
 
             // then
@@ -132,6 +136,7 @@ class CompetitionServiceUnitTest {
         CompetitionDto dto = CompetitionDto.builder()
                 .host(host)
                 .sportCategory(SportCategory.ARM_WRESTLING)
+                .categories(new ArrayList<>(Arrays.asList("ARM_WRESTLING")))
                 .totalPrize(10000)
                 .location("대회장소")
                 .locationDetail("대회장소상세")
@@ -144,6 +149,7 @@ class CompetitionServiceUnitTest {
                 .build();
 
         given(memberRepository.findById(memberId)).willReturn(Optional.ofNullable(host));
+        given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
 
         //then
         try {
@@ -182,7 +188,7 @@ class CompetitionServiceUnitTest {
                     .build();
 
             given(memberRepository.findById(memberId)).willReturn(Optional.ofNullable(host));
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             //then
             assertFalse(dto.getRecruitingEnd().isAfter(dto.getRecruitingStart()));
             assertThrows(IllegalArgumentException.class, () -> competitionService.create(dto));
@@ -213,7 +219,7 @@ class CompetitionServiceUnitTest {
                     .build();
 
             given(memberRepository.findById(memberId)).willReturn(Optional.ofNullable(host));
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             //then
             assertFalse(dto.getStartDate().isAfter(dto.getRecruitingEnd()));
             assertThrows(IllegalArgumentException.class, () -> competitionService.create(dto));
@@ -242,7 +248,7 @@ class CompetitionServiceUnitTest {
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
             given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.PLANNING);
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             // then
@@ -269,7 +275,7 @@ class CompetitionServiceUnitTest {
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
             given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.RECRUITING);
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             // then
@@ -289,13 +295,14 @@ class CompetitionServiceUnitTest {
             LocalDateTime endDate = today.plusDays(4);
 
             // when
+            List<String> categories = new ArrayList<>() {{add("기타");}};
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate, endDate);
             Competition mockCompetition = dto.toEntity();
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
             given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.RECRUITING_END);
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
             // then
@@ -317,10 +324,12 @@ class CompetitionServiceUnitTest {
             // when
             CompetitionDto dto = getCompetitionDto(host, recruitingStart, recruitingEnd, startDate, endDate);
             Competition mockCompetition = dto.toEntity();
+            Category category = Category.builder().category("ETC").name("기타").build();
 
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
             given(competitionPolicy.getCompetitionState(any(Competition.class))).willReturn(CompetitionState.IN_PROGRESS);
+            given(categoryRepository.findById(any(String.class))).willReturn(Optional.ofNullable(category));
 
             mockCompetition.setState(competitionPolicy.getCompetitionState(mockCompetition));
 
@@ -353,7 +362,7 @@ class CompetitionServiceUnitTest {
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionPolicy.getCompetitionType(host)).willReturn(CompetitionType.FREE);
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             mockCompetition.setCompetitionType(competitionPolicy.getCompetitionType(host));
 
             // then
@@ -371,7 +380,7 @@ class CompetitionServiceUnitTest {
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionPolicy.getCompetitionType(host)).willReturn(CompetitionType.PREMIUM);
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             mockCompetition.setCompetitionType(competitionPolicy.getCompetitionType(host));
 
             // then
@@ -389,7 +398,7 @@ class CompetitionServiceUnitTest {
             given(memberRepository.findById(1L)).willReturn(Optional.ofNullable(host));
             given(competitionPolicy.getCompetitionType(host)).willReturn(CompetitionType.VIP);
             given(competitionRepository.save(any(Competition.class))).willReturn(mockCompetition);
-
+            given(categoryRepository.findById(any())).willReturn(Optional.ofNullable(Category.builder().category("ETC").name("기타").build()));
             mockCompetition.setCompetitionType(competitionPolicy.getCompetitionType(host));
 
             // then

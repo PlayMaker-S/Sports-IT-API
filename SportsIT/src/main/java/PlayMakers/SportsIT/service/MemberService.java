@@ -37,6 +37,9 @@ public class MemberService {
                 .build();
 
         Set<Category> categories = new HashSet<>();
+        if (dto.getCategories() == null) {
+            dto.setCategories(new ArrayList<>(){{add("ETC");}});
+        }
         for (String category : dto.getCategories()) {
             categories.add(categoryRepository.findById(category).get());
         }
