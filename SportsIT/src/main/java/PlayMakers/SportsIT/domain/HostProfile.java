@@ -37,4 +37,8 @@ public class HostProfile extends BaseEntity{
 
     @Column
     private String location;
+    @Column
+    private Double latitude;
+    @Column
+    private Double longitude;
 }
