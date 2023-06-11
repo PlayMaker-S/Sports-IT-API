@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 // @AllArgsConstructor: 모든 필드값이 들어간 생성자 선언 @NoArgsConstructor : 이하 생략
 @AllArgsConstructor @NoArgsConstructor
@@ -120,6 +121,13 @@ public class Competition extends BaseEntity {
     }
     @OneToMany(mappedBy = "competition")
     private List<CompetitionResult> competitionResults;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = Category.class)
+    @JoinTable(
+            name = "competition_category",
+            joinColumns = {@JoinColumn(name = "competitionId")},
+            inverseJoinColumns = {@JoinColumn(name = "category", referencedColumnName = "category")})
+    private Set<Category> categories;
 
     @Override
     public String toString() {

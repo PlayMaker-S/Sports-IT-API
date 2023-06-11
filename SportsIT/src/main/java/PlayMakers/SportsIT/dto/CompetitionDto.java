@@ -16,6 +16,7 @@ public class CompetitionDto {
     private Long competitionId;
     private String name;
     private Member host;
+    private List<String> categories;
     private SportCategory sportCategory;
     @Builder.Default
     private Integer viewCount = 0;
@@ -45,6 +46,7 @@ public class CompetitionDto {
     private List<Agreement> agreements = new ArrayList<>();
     private String createdDate;
     private String updatedDate;
+    private List<String> category;
 
     public Competition toEntity() {
         return Competition.builder()
