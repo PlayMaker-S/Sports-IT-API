@@ -84,11 +84,10 @@ dependencies {
 	// OnePort
 	//implementation 'com.github.iamport:iamport-rest-client-java:0.2.22'
 
-	// 접속 시 로그인 웹 화면
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.webjars:bootstrap:5.5.0'
+	implementation 'org.webjars:jquery:3.6.0'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
 
-	// Spring Boot Admin Server 라이브러리
-	implementation 'de.codecentric:spring-boot-admin-starter-server:2.4.1'
 }
 
  test {
