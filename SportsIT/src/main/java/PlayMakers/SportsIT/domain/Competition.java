@@ -122,7 +122,7 @@ public class Competition extends BaseEntity {
         return "Competition{" +
                 "competitionId=" + competitionId +
                 ", name='" + name + '\'' +
-                ", host=" + host +
+                ", host=" + host.getUid() +
                 ", category=" + category +
                 ", viewCount=" + viewCount +
                 ", scrapCount=" + scrapCount +

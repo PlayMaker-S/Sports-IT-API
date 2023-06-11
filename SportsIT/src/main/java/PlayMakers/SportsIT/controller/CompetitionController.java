@@ -404,7 +404,7 @@ public class CompetitionController {
         page = page == null ? 0 : page;
         size = size == null ? 15 : size;
         try {
-            result =  joinCompetitionService.findJoinedCompetitions(userId, page, size);
+            result =  joinCompetitionService.findJoinedCompetitionsByUid(userId, page, size);
         } catch (Exception e) {
             res.put("success", false);
             res.put("message", e.getMessage());

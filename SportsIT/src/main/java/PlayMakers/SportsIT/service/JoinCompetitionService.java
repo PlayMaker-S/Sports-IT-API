@@ -203,7 +203,7 @@ public class JoinCompetitionService {
         return joinCompetitionRepository.findByIdUidAndIdCompetitionId(member.getUid(), competitionId).isPresent();
     }
 
-    public Slice<JoinCompetitionDto.UserJoinResponse> findJoinedCompetitions(Long uid, Long page, Long size) {
+    public Slice<JoinCompetitionDto.UserJoinResponse> findJoinedCompetitionsByUid(Long uid, Long page, Long size) {
         List<JoinCompetition> joins = joinCompetitionRepository.findByIdUid(uid);
         joins.sort(Comparator.comparing(JoinCompetition::getCreatedDate).reversed());
 
@@ -221,6 +221,14 @@ public class JoinCompetitionService {
                     .build());
         }
         return new SliceImpl<>(result, pageable, competitions.hasNext());
+    }
+    public List<Member> getJoinedMembersByCompetition(Competition competition){
+        List<JoinCompetition> joinCompetitions = joinCompetitionRepository.findByIdCompetitionId(competition.getCompetitionId());
+        List<Member> members = new ArrayList<>();
+        for(JoinCompetition joinCompetition : joinCompetitions){
+            members.add(joinCompetition.getMember());
+        }
+        return members;
     }
 
     private static CompetitionDto.Summary getCompetitionSummary(Competition competition) {
