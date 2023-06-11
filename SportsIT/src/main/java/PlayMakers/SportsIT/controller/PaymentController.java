@@ -87,6 +87,11 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<PaymentDto.Detail>> findAll(){
+        return ResponseEntity.ok(paymentService.findAll());
+    }
+
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException e) {
         log.error("IOException 발생", e);

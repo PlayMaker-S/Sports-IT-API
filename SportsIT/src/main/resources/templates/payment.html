@@ -10,6 +10,30 @@
     <div>
         <h1>결제 현황 데이터</h1>
         <!-- 여기에 회원 정보 조회 페이지의 내용을 작성합니다 -->
+        <table class="table">
+            <thead>
+            <tr>
+                <th>결제ID</th>
+                <th>IMP_ID</th>
+                <th>결제상품</th>
+                <th>결제금액</th>
+                <th>결제상태</th>
+                <th>결제방식</th>
+                <th>환불사유</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="payment : ${payments}">
+                <td th:text="${payment.merchant_uid}"></td>
+                <td th:text="${payment.imp_uid}"></td>
+                <td th:text="${payment.content}"></td>
+                <td th:text="${payment.amount}"></td>
+                <td th:text="${payment.status}"></td>
+                <td th:text="${payment.paymentType}"></td>
+                <td th:text="${payment.refundReason}"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </th:block>
 </body>
