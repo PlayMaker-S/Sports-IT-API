@@ -50,7 +50,7 @@ public class CompetitionController {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
         try {
-            hostEmail = user.getUsername(); // 로그인한 회원 ID를 가져옴
+            hostEmail = getUserEmailFromAuthenticationToken(user); // 로그인한 회원 ID를 가져옴
         } catch (Exception e) {
             throw new EntityNotFoundException("로그인이 필요합니다.");
         }
@@ -67,6 +67,14 @@ public class CompetitionController {
 
         return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(res); // 201
+    }
+
+    private static String getUserEmailFromAuthenticationToken(User user) {
+        try {
+            return user.getUsername();
+        } catch (Exception e) {
+            throw new EntityNotFoundException("로그인 정보가 없습니다.");
+        }
     }
 
     /*
@@ -105,9 +113,17 @@ public class CompetitionController {
     }
 
     @GetMapping("/{competitionId}")
-    public ResponseEntity<Competition> getCompetition(@PathVariable Long competitionId) {
+    public ResponseEntity<Object> getCompetition(@PathVariable Long competitionId,
+                                                 @AuthenticationPrincipal User user) throws Exception {
         Competition competition = competitionService.findById(competitionId);
-        return ResponseEntity.ok(competition); // 200
+        boolean joined = joinCompetitionService.checkAlreadyJoined(memberService.findOne(getUserEmailFromAuthenticationToken(user)).getUid(), competitionId);
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", true);
+            put("result", competition);
+            put("joined", joined);
+        }};
+
+        return ResponseEntity.ok(res); // 200
     }
 
     @PutMapping("/{competitionId}")
@@ -237,7 +253,7 @@ public class CompetitionController {
     }
 
     private Member getMember(User user) {
-        Member member = memberService.findOne(user.getUsername());
+        Member member = memberService.findOne(getUserEmailFromAuthenticationToken(user));
         return member;
     }
 
@@ -483,12 +499,30 @@ public class CompetitionController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res); // 500
     }
     @ExceptionHandler
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
-        return ResponseEntity.badRequest().body(exception.getMessage()); // 400
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException exception) {
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", false);
+            put("message", exception.getMessage());
+        }};
+        return ResponseEntity.badRequest().body(res); // 400
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleException(Exception exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage()); // 500
+    public ResponseEntity<Object> NullPoniterException(NullPointerException exception) {
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", false);
+            put("message", exception.getMessage());
+        }};
+        return ResponseEntity.badRequest().body(res); // 400
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleException(Exception exception) {
+        Map<String, Object> res = new HashMap<>(){{
+            put("success", false);
+            put("message", exception.getMessage() + " " + exception.getClass().getName());
+        }};
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res); // 500
     }
 }
