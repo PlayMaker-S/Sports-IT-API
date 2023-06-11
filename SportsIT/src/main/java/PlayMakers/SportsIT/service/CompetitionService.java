@@ -147,7 +147,7 @@ public class CompetitionService {
         for(CompetitionResult cr : competitionResults){
             CompetitionResultDto dto = CompetitionResultDto.builder()
                     .content(cr.getContent())
-                    .uid(cr.getMember().getUid())
+                    .name(cr.getMember().getName())
                     .historyDate(cr.getHistoryDate())
                     .build();
             competitionResultDtos.add(dto);
