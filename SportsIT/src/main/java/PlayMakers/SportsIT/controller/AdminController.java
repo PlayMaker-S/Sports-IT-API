@@ -20,7 +20,7 @@ public class AdminController {
     @GetMapping("/member_admin")
     public String getMembers(Model model) {
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = "http://localhost:8080/api/member/all"; // 실제 API 엔드포인트
+        String apiUrl = "https://sports-it-test.store/api/member/all"; // 실제 API 엔드포인트
 
         // API 호출하여 데이터 가져오기
         Member[] members = restTemplate.getForObject(apiUrl, Member[].class);
@@ -33,7 +33,7 @@ public class AdminController {
     @GetMapping("/competition_admin")
     public String getCompetitions(Model model) {
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = "http://localhost:8080/api/competitions/all"; // 실제 API 엔드포인트
+        String apiUrl = "https://sports-it-test.store/api/competitions/all"; // 실제 API 엔드포인트
 
         // API 호출하여 데이터 가져오기
         Competition[] competitions = restTemplate.getForObject(apiUrl, Competition[].class);
