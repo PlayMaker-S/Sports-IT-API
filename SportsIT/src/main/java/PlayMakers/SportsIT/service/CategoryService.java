@@ -33,7 +33,6 @@ public class CategoryService {
                 .build();
         return categoryRepository.save(newCategory);
     }
-
     public void delete(String category) {
         categoryRepository.deleteById(category);
     }

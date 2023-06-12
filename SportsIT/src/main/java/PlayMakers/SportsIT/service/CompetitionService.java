@@ -258,4 +258,10 @@ public class CompetitionService {
 
         return amount;
     }
+
+    public Object getCategoriesByCompetition(Long competitionId) {
+        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        return competition.getCategories();
+
+    }
 }
