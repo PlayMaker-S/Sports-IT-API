@@ -70,4 +70,11 @@ public class Member extends BaseEntity {
     @JsonIgnoreProperties({"member"})
     @OneToMany(mappedBy = "member")
     private List<CompetitionResult> competitionResults;
+
+    @ManyToMany
+    @JoinTable(
+            name = "member_category",
+            joinColumns = {@JoinColumn(name = "member_uid", referencedColumnName = "uid")},
+            inverseJoinColumns = {@JoinColumn(name = "category", referencedColumnName = "category")})
+    private Set<Category> categories;
 }

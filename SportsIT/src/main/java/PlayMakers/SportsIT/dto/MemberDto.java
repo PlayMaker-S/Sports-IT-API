@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
 @Data
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class MemberDto {
     private String description;
     private boolean activated;
     private String memberType;
+    private List<String> categories;
 
     @Data
     @AllArgsConstructor @NoArgsConstructor
