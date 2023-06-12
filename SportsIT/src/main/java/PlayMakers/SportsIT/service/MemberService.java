@@ -131,4 +131,12 @@ public class MemberService {
         member.setPw(passwordEncoder.encode(newPassword));
         return newPassword;
     }
+
+    public Object getCategoriesByUid(Long uid) {
+        Member member = memberRepository.findById(uid).orElse(null);
+        if (member == null) {
+            return null;
+        }
+        return member.getCategories();
+    }
 }
