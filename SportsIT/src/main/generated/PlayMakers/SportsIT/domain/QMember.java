@@ -28,6 +28,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath birth = createString("birth");
 
+    public final SetPath<Category, QCategory> categories = this.<Category, QCategory>createSet("categories", Category.class, QCategory.class, PathInits.DIRECT2);
+
     public final ListPath<CompetitionResult, QCompetitionResult> competitionResults = this.<CompetitionResult, QCompetitionResult>createList("competitionResults", CompetitionResult.class, QCompetitionResult.class, PathInits.DIRECT2);
 
     //inherited

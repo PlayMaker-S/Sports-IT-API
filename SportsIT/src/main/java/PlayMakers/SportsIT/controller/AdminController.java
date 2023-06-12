@@ -57,4 +57,16 @@ public class AdminController {
         model.addAttribute("payments", payments);
         return "payment";
     }
+    @GetMapping("customcategory_admin")
+    public String getInquiry(Model model){
+        RestTemplate restTemplate = new RestTemplate();
+        String apiUrl = "https://sports-it-test.store/api/payment/all"; // 실제 API 엔드포인트
+
+        // API 호출하여 데이터 가져오기
+        PaymentDto.Detail[] payments = restTemplate.getForObject(apiUrl, PaymentDto.Detail[].class);
+
+        // 모델에 데이터 추가
+        //model.addAttribute("customcategorys", payments);
+        return "customcategory";
+    }
 }

@@ -6,6 +6,7 @@ import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.CompetitionFormDto;
 import PlayMakers.SportsIT.dto.CompetitionResultDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
+import PlayMakers.SportsIT.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,10 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +27,7 @@ public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final MemberRepository memberRepository;
     private final @MainCompetitionPolicy CompetitionPolicy competitionPolicy;
+    private final CategoryRepository categoryRepository;
 
     public Competition create(CompetitionDto dto) {
         log.info("대회 생성 요청: {}", dto);
@@ -43,6 +42,14 @@ public class CompetitionService {
         }
 
         Competition newCompetition = dto.toEntity();
+        Set<Category> categories = new HashSet<>();
+        if (dto.getCategories() == null) {
+            dto.setCategories(new ArrayList<>(){{add("ETC");}});
+        }
+        for (String categoryId : dto.getCategories()) {
+            categories.add(categoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.")));
+        }
+        newCompetition.setCategories(categories);
         newCompetition.setViewCount(0);
         newCompetition.setScrapCount(0);
 
@@ -250,5 +257,11 @@ public class CompetitionService {
         amount += vat + fee + insurance;
 
         return amount;
+    }
+
+    public Object getCategoriesByCompetition(Long competitionId) {
+        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        return competition.getCategories();
+
     }
 }

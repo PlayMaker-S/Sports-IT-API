@@ -1,12 +1,10 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.auth.security.SecurityUtil;
-import PlayMakers.SportsIT.domain.Feed;
-import PlayMakers.SportsIT.domain.HostProfile;
-import PlayMakers.SportsIT.domain.Member;
+import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.MemberDto;
-import PlayMakers.SportsIT.domain.MemberType;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
+import PlayMakers.SportsIT.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -25,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final CategoryRepository categoryRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -39,6 +35,14 @@ public class MemberService {
         MemberType memberType = MemberType.builder()
                 .roleName(memberTypeString)
                 .build();
+
+        Set<Category> categories = new HashSet<>();
+        if (dto.getCategories() == null) {
+            dto.setCategories(new ArrayList<>(){{add("ETC");}});
+        }
+        for (String category : dto.getCategories()) {
+            categories.add(categoryRepository.findById(category).get());
+        }
         log.info("memberType: {}", memberType);
         Member member = Member.builder()
                 .pw(passwordEncoder.encode(dto.getPw()))
@@ -48,6 +52,7 @@ public class MemberService {
                 .description(dto.getDescription())
                 .memberType(Collections.singleton(memberType))
                 .activated(true)
+                .categories(categories)
                 .build();
 
         return memberRepository.save(member);
@@ -125,5 +130,13 @@ public class MemberService {
         Member member = memberRepository.findByEmail(email);
         member.setPw(passwordEncoder.encode(newPassword));
         return newPassword;
+    }
+
+    public Object getCategoriesByUid(Long uid) {
+        Member member = memberRepository.findById(uid).orElse(null);
+        if (member == null) {
+            return null;
+        }
+        return member.getCategories();
     }
 }

@@ -26,6 +26,8 @@ public class QCompetition extends EntityPathBase<Competition> {
 
     public final ListPath<Agreement, QAgreement> agreements = this.<Agreement, QAgreement>createList("agreements", Agreement.class, QAgreement.class, PathInits.DIRECT2);
 
+    public final SetPath<Category, QCategory> categories = this.<Category, QCategory>createSet("categories", Category.class, QCategory.class, PathInits.DIRECT2);
+
     public final EnumPath<SportCategory> category = createEnum("category", SportCategory.class);
 
     public final NumberPath<Long> competitionId = createNumber("competitionId", Long.class);
