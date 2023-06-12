@@ -18,15 +18,18 @@
         <th>종목</th>
         <th>내용</th>
         <th>상태</th>
+        <th>전송</th>
       </tr>
       </thead>
       <tbody>
       <tr th:each="competition : ${competitions}">
         <td th:text="${competition.competitionId}"></td>
-        <td th:text="${competition.name}"></td>
+        <td th:text="${competition.name}">
+        </td>
         <td th:text="${competition.category}"></td>
         <td th:text="${competition.content}"></td>
         <td th:text="${competition.state}"></td>
+        <td><button type="button" class="btn btn-primary">수정</button></td>
       </tr>
       </tbody>
     </table>
