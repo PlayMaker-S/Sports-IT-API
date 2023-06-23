@@ -30,7 +30,9 @@ public class JoinCompetitionService {
         Long competitionId = dto.getCompetitionId();
 
         // 대회 참가 요청을 보낸 회원이 해당 대회에 이미 참가한 회원인지 확인
-        checkAlreadyJoined(uid, competitionId);
+        if (checkAlreadyJoined(uid, competitionId)) {
+            throw new IllegalArgumentException("이미 해당 대회에 참가한 회원입니다.");
+        }
         // 대회 참가 요청을 보낸 회원이 해당 대회에 참가할 수 있는 회원인지 확인
         checkPlayer(uid);
         // 대회 참가 요청을 받은 대회가 신청 가능한지 확인
@@ -142,6 +144,7 @@ public class JoinCompetitionService {
 
     public boolean checkAlreadyJoined(Long uid, Long competitionId) {
         JoinCompetition find = joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId).orElse(null);
+        log.info("이미 참가한 대회인지 확인: {}", find);
         if (find != null) {
             return true;
         }

@@ -521,6 +521,9 @@ class CompetitionServiceUnitTest {
             Slice<Competition> actualSlice = competitionService.getCompetitionSlice(keyword, null, null, 0, 10);
 
             // then
+            for(int i = 0; i < expectedSlice.getContent().size(); i++) {
+                log.info("expectedSlice = {}", expectedSlice.getContent().get(i));
+            }
             assertEquals(expectedSlice, actualSlice);
             log.info("actualSlice = {}", actualSlice.getNumberOfElements());
         }
@@ -540,6 +543,9 @@ class CompetitionServiceUnitTest {
 
             // then
             assertEquals(expectedSlice, actualSlice);
+            for (int i = 0; i < expectedSlice.getContent().size(); i++) {
+                log.info("expectedSlice = {}", expectedSlice.getContent().get(i));
+            }
             log.info("expectedSlice = {}", expectedSlice);
             log.info("actualSlice = {}", actualSlice);
 
@@ -564,7 +570,9 @@ class CompetitionServiceUnitTest {
             assertEquals(expectedSlice, actualSlice);
             log.info("expectedSlice = {}", expectedSlice);
             log.info("actualSlice = {}", actualSlice);
-
+            for(int i = 0; i < expectedSlice.getContent().size(); i++) {
+                log.info("expectedSlice = {}", expectedSlice.getContent().get(i));
+            }
         }
         @Test
         @DisplayName("대회 목록 조회시 추천 기준으로 필터링을 적용할 수 있다.")
@@ -594,7 +602,25 @@ class CompetitionServiceUnitTest {
             return dto;
         }
 
+        @Test
+        @DisplayName("주최자는 자신이 개최한 대회를 조회할 수 있다.")
+        public void 주최자_대회_조회() {
+            // given
+            Member host = members.get(4);
+            List<Competition> expectedCompetitions = competitions.stream().filter(competition -> competition.getHost().equals(host)).collect(Collectors.toList());
+            Slice<Competition> expectedSlice = new SliceImpl<>(expectedCompetitions, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate")), false);
+            // when
+            Mockito.when(competitionRepository.findCompetitionsBySliceWithHostUid(host.getUid(), PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate")))).thenReturn(expectedSlice);
+            List<Competition> actualCompetitions = competitionService.getCompetitionSliceByHostId(host.getUid(), 0, 10).getContent();
+
+            // then
+            assertEquals(expectedCompetitions, actualCompetitions);
+            for (int i = 0; i < expectedCompetitions.size(); i++) {
+                log.info("expectedCompetitions = {}", expectedCompetitions.get(i));
+            }
+        }
     }
+
     /*
     대회 조회 점검 사항
     1. 대회 조회 시 대회 상태에 따라 조회되는 대회가 다르다. (PLANNING, RECRUITING, RECRUITING_END, IN_PROGRESS, END, SUSPEND)
