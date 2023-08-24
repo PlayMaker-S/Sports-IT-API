@@ -133,13 +133,16 @@ public class JoinCompetitionServiceIntegrationTest {
         @Test
         @DisplayName("모집중인 대회의 여석을 확인할 수 있다.")
         void 남은_선수_여석_확인() {
-            // given
+            // given (선행 조건 설정)
             Member host = memberRepository.save(getMember(1, userTypeInst, Subscribe.BASIC_HOST));
-            Competition recruitingCompetition = competitionRepository.save(getCompetition(host, LocalDateTime.now().minusDays(2), CompetitionState.RECRUITING));
-            JoinCompetitionService joinCompetitionService = new JoinCompetitionService(competitionRepository, competitionCustomRepository, memberRepository, joinCompetitionRepository, participantRepository);
+            Competition recruitingCompetition =
+                    competitionRepository.save(getCompetition(host, LocalDateTime.now().minusDays(2), CompetitionState.RECRUITING));
+            JoinCompetitionService joinCompetitionService =
+                    new JoinCompetitionService(competitionRepository, competitionCustomRepository, memberRepository, joinCompetitionRepository, participantRepository);
             Member player = getMember(2, userTypePlayer, Subscribe.BASIC_PLAYER);
             memberRepository.save(player);
-            // when
+
+            // when (테스트할 데이터 입력 및 메소드 실행)
             joinCompetitionService.join(JoinCompetitionDto.builder()
                     .competitionId(recruitingCompetition.getCompetitionId())
                     .uid(player.getUid())
@@ -147,7 +150,7 @@ public class JoinCompetitionServiceIntegrationTest {
                     .formId("111")
                     .build());
 
-            // then
+            // then (테스트 결과 확인)
             try {
                 Map<String, String> joinCounts = joinCompetitionService.getJoinCounts(recruitingCompetition.getCompetitionId(), player);
                 Assertions.assertEquals("79", joinCounts.get("availablePlayer"));
