@@ -3,9 +3,17 @@ package PlayMakers.SportsIT.controller;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.service.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpStatus;
@@ -21,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import static java.lang.Integer.parseInt;
 
 @Slf4j
+@Tag(name = "대회 API", description = "\uD83D\uDCAA 대회 생성, 조회, 수정, 취소 및 대회 참가 신청/취소 관련 API 목록입니다.")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/competitions")
@@ -43,9 +52,20 @@ public class CompetitionController {
      * @return success: true, result: 생성한 Competition
      * @throws Exception 로그인 에러, 주최자가 아닌 경우
      */
+    @Operation(summary = "대회 생성 API", description = """
+            \uD83D\uDCCC 클라이언트에서 대회 정보와 사용자 토큰 정보를 받아 대회를 생성합니다. 토큰 값이 필요합니다.\n\n
+            ✔️ 성공시 생성한 대회 정보와 success: true를 반환합니다.\n\n
+            ❌ 실패시 success: false를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "대회 생성 성공", content = @Content(schema = @Schema(implementation = CompetitionDto.class))),
+            @ApiResponse(responseCode = "400", description = "대회 생성 실패")
+    })
     @PostMapping
-    public ResponseEntity<?> createCompetition(@RequestBody CompetitionDto dto,
-                                               @AuthenticationPrincipal User user) throws Exception {
+    public ResponseEntity<?> createCompetition(
+            @Parameter(name = "competitionDto", description = "대회 정보 객체", required = true)
+            @RequestBody CompetitionDto dto,
+            @AuthenticationPrincipal User user) throws Exception {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
         try {
