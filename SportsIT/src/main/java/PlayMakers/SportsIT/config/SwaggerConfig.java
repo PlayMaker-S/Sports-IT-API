@@ -3,7 +3,10 @@ package PlayMakers.SportsIT.config;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +37,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("Competitions")
                 .pathsToMatch(paths)
+                .addOpenApiCustomizer(buildSecurityOpenApi())
                 .build();
     }
 
@@ -45,6 +49,17 @@ public class SwaggerConfig {
                 .group("Member")
                 .pathsToMatch(paths)
                 .build();
+    }
+
+    public OpenApiCustomizer buildSecurityOpenApi() {
+        // 설정된 jwt 토큰을 Header에 넣어주는 코드
+        return OpenApi -> OpenApi.addSecurityItem(new SecurityRequirement().addList("jwt token"))
+                .getComponents().addSecuritySchemes("jwt token", new SecurityScheme()
+                        .name("Authorization")
+                        .type(SecurityScheme.Type.HTTP)
+                        .in(SecurityScheme.In.HEADER)
+                        .bearerFormat("JWT")
+                        .scheme("bearer"));
     }
 
 }
