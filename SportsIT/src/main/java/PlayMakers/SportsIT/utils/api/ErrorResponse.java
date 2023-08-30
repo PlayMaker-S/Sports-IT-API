@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.FieldError;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -15,6 +16,7 @@ public class ErrorResponse {
 
     private int code;
     private String message;
+    private Timestamp timestamp;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<FieldError> errors;
@@ -24,6 +26,7 @@ public class ErrorResponse {
         this.code = code;
         this.message = message;
         this.errors = errors;
+        this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
 }
