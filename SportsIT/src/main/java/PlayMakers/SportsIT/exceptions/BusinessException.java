@@ -1,7 +1,18 @@
 package PlayMakers.SportsIT.exceptions;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
 public class BusinessException extends RuntimeException{
-    public BusinessException(String msg) {
-        super(msg);
+    private final ErrorCode errorCode;
+
+    public BusinessException(ErrorCode errorCode) {
+        super();
+        this.errorCode = errorCode;
+    }
+    public BusinessException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
     }
 }
