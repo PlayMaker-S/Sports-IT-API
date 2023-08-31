@@ -10,7 +10,4 @@ public class ApiUtils {
         if (resource.equals(CompetitionDto.Form.class)) return new CompetitionResponse(code, true, (CompetitionDto) resource);
         return new CommonResponse<>(code, true, resource);
     }
-    public static ErrorResponse fail(int code, String message, List<FieldError> errors) {
-        return new ErrorResponse(code, message, errors);
-    }
 }
