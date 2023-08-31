@@ -3,6 +3,8 @@ package PlayMakers.SportsIT.config;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.sql.Array;
 import java.util.Arrays;
+import java.util.Map;
 
 @OpenAPIDefinition(
         info = @Info(title = "스포츠잇 API 명세서",
@@ -24,11 +27,13 @@ import java.util.Arrays;
         })
 @Configuration
 public class SwaggerConfig {
-    String basePath = "/api";
 
-    public String[] addPrefixToMany(String prefix, String[] stringSet) {
-        return Arrays.stream(stringSet).map(s -> prefix + s).toArray(String[]::new);
-    }
+    // Schemas
+    Schema PostResponse = new Schema<Map<String, Object>>()
+            .addProperty("timestamp",new StringSchema().example("2023-08-30T13:17:04.846Z"))
+            .addProperty("code",new StringSchema().example("201"))
+            .addProperty("success",new StringSchema().example("true"))
+            .addProperty("result",new StringSchema().example("{}"));
 
     @Bean
     public GroupedOpenApi competitionOpenApi() {
@@ -38,6 +43,7 @@ public class SwaggerConfig {
                 .group("Competitions")
                 .pathsToMatch(paths)
                 .addOpenApiCustomizer(buildSecurityOpenApi())
+                .addOpenApiCustomizer(registerSchemas())
                 .build();
     }
 
@@ -60,6 +66,10 @@ public class SwaggerConfig {
                         .in(SecurityScheme.In.HEADER)
                         .bearerFormat("JWT")
                         .scheme("bearer"));
+    }
+
+    public OpenApiCustomizer registerSchemas() {
+        return openApi -> openApi.getComponents().addSchemas("PostResponse", PostResponse);
     }
 
 }
