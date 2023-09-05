@@ -5,6 +5,8 @@ import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.CompetitionFormDto;
 import PlayMakers.SportsIT.dto.CompetitionResultDto;
+import PlayMakers.SportsIT.exceptions.ErrorCode;
+import PlayMakers.SportsIT.exceptions.*;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
@@ -32,13 +34,13 @@ public class CompetitionService {
     public Competition create(CompetitionDto dto) {
         log.info("대회 생성 요청: {}", dto);
         // host가 존재하지 않으면 예외 발생
-        Member host = memberRepository.findById(dto.getHost().getUid()).orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
+        Member host = dto.getHost();
 
         // host의 memberType이 ROLE_INSTITUTION 또는 ROLE_ADMIN이 아니면 예외 발생
-        if (!host.getMemberType().stream().anyMatch(memberType ->
+        if (host.getMemberType().stream().noneMatch(memberType ->
                         memberType.getRoleName().equals("ROLE_INSTITUTION") ||
                         memberType.getRoleName().equals("ROLE_ADMIN"))) {
-            throw new IllegalMemberTypeException("대회 생성 권한이 없습니다.");
+            throw new UnAuthorizedException(ErrorCode.NOT_HOST, "대회 주최 권한이 없습니다.");
         }
 
         Competition newCompetition = dto.toEntity();
@@ -47,7 +49,8 @@ public class CompetitionService {
             dto.setCategories(new ArrayList<>(){{add("ETC");}});
         }
         for (String categoryId : dto.getCategories()) {
-            categories.add(categoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.")));
+            categories.add(categoryRepository.findById(categoryId).orElseThrow(
+                    () -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.")));
         }
         newCompetition.setCategories(categories);
         newCompetition.setViewCount(0);
@@ -74,7 +77,8 @@ public class CompetitionService {
     }
     public Competition findById(Long competitionId) {
         log.info("대회 조회 요청: {}", competitionId);
-        Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new EntityNotFoundException("해당 대회가 존재하지 않습니다."));
+        Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new PlayMakers.SportsIT.exceptions.EntityNotFoundException(
+                ErrorCode.COMPETITION_NOT_FOUND, "대회 ID: " + competitionId));
         competition.setViewCount(competition.getViewCount() + 1);
         return competition;
     }
@@ -83,19 +87,21 @@ public class CompetitionService {
         return competitionRepository.findAll();
     }
 
-    public Competition update(Long competitionId, CompetitionDto dto) {
+    public Competition update(Long competitionId, CompetitionDto.Form dto) {
         log.info("대회 수정 : {}", competitionId);
 
         // 수정 사항 검증
-        Competition updated = dto.toEntity();
+        Competition updated = dto.toAllArgsDto().toEntity();
         checkTimeValidity(updated); // 일정정보가 비정상적이면 IllegalArgumentException 발생
 
         // 대회 찾기
-        Competition competition = competitionRepository.findById(
-                competitionId).orElseThrow(() -> new EntityNotFoundException("해당 대회가 존재하지 않습니다."));
+        Competition competition = competitionRepository.findById(competitionId).orElseThrow(
+                () -> new PlayMakers.SportsIT.exceptions.EntityNotFoundException(
+                        ErrorCode.COMPETITION_NOT_FOUND,
+                        "대회 ID: " + competitionId));
 
         // 수정 사항 적용
-        updateCompetition(competition, dto);
+        updateCompetition(competition, dto.toAllArgsDto());
 
         return competitionRepository.save(competition);
     }
@@ -176,35 +182,35 @@ public class CompetitionService {
      */
 
     private static void checkRequiredInfo(Competition newCompetition) {
-        String errorMessage = "";
-        if (newCompetition.getName() == null) errorMessage += "\n대회 이름";
-        if (newCompetition.getHost() == null) errorMessage += "\n대회 주최자";
-        if (newCompetition.getCategory() == null) errorMessage += "\n대회 종목";
-        if (newCompetition.getContent() == null) errorMessage += "\n대회 내용";
-        if (newCompetition.getLocation() == null) errorMessage += "\n대회 장소";
-        if (newCompetition.getLocationDetail() == null) errorMessage += "\n대회 장소 상세";
-        if (newCompetition.getStartDate() == null) errorMessage += "\n대회 시작일";
-        if (newCompetition.getEndDate() == null) errorMessage += "\n대회 종료일";
-        if (newCompetition.getRecruitingStart() == null) errorMessage += "\n대회 모집 시작일";
-        if (newCompetition.getRecruitingEnd() == null) errorMessage += "\n대회 모집 종료일";
-        if (newCompetition.getCompetitionType() == null) errorMessage += "\n대회 프리미엄";
-        if (errorMessage.length() > 0) {
-            errorMessage = "필수 정보가 없습니다." + errorMessage;
-            throw new IllegalArgumentException(errorMessage);
+        String reason = "";
+        if (newCompetition.getName() == null) reason += "\n대회 이름";
+        if (newCompetition.getHost() == null) reason += "\n대회 주최자";
+        if (newCompetition.getCategory() == null) reason += "\n대회 종목";
+        if (newCompetition.getContent() == null) reason += "\n대회 내용";
+        if (newCompetition.getLocation() == null) reason += "\n대회 장소";
+        if (newCompetition.getLocationDetail() == null) reason += "\n대회 장소 상세";
+        if (newCompetition.getStartDate() == null) reason += "\n대회 시작일";
+        if (newCompetition.getEndDate() == null) reason += "\n대회 종료일";
+        if (newCompetition.getRecruitingStart() == null) reason += "\n대회 모집 시작일";
+        if (newCompetition.getRecruitingEnd() == null) reason += "\n대회 모집 종료일";
+        if (newCompetition.getCompetitionType() == null) reason += "\n대회 프리미엄";
+        if (reason.length() > 0) {
+            reason = "대회 필수 정보가 없습니다." + reason;
+            throw new InvalidValueException(ErrorCode.INVALID_COMPETITION_PARAMETER, reason);
         }
     }
     private static void checkTimeValidity(Competition competition) {
-        String errorMessage = "";
+        String reason = "";
         if (competition.getEndDate().isBefore(competition.getStartDate())) {
-            errorMessage += "대회 종료일이 대회 시작일보다 빠릅니다.";
+            reason += "대회 종료일이 대회 시작일보다 빠릅니다. ";
         }
-        else if (competition.getStartDate().isBefore(competition.getRecruitingEnd())) {
-            errorMessage += "대회 시작일이 모집 종료일보다 빠릅니다.";
+        if (competition.getStartDate().isBefore(competition.getRecruitingEnd())) {
+            reason += "대회 시작일이 대회 모집 종료일보다 빠릅니다. ";
         }
-        else if (competition.getRecruitingEnd().isBefore(competition.getRecruitingStart())) {
-            errorMessage += "모집 종료일이 모집 시작일보다 빠릅니다.";
+        if (competition.getRecruitingEnd().isBefore(competition.getRecruitingStart())) {
+            reason += "대회 모집 종료일이 대회 모집 시작일보다 빠릅니다. ";
         }
-        if(!errorMessage.equals("")) throw new IllegalArgumentException(errorMessage);
+        if(!reason.isEmpty()) throw new InvalidValueException(ErrorCode.INVALID_COMPETITION_PARAMETER, reason);
     }
 
     public Long calculatePrice(CompetitionTemplate template, CompetitionFormDto formDto) {
