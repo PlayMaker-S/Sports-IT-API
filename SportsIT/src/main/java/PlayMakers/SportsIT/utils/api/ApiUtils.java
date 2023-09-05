@@ -6,8 +6,11 @@ import org.springframework.validation.FieldError;
 import java.util.List;
 
 public class ApiUtils {
-    public static <T> CommonResponse success(int code, T resource) {
-        if (resource.equals(CompetitionDto.Form.class)) return new CompetitionResponse(code, true, (CompetitionDto) resource);
+    public static <T> CommonResponse<T> success(int code, T resource) {
         return new CommonResponse<>(code, true, resource);
+    }
+
+    public static CommonResponse<Object> created(int code) {
+        return new CommonResponse<>(code, true, null);
     }
 }
