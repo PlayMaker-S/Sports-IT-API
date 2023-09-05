@@ -30,14 +30,9 @@ public enum ErrorCode {
 
     // COMPETITION
     INVALID_COMPETITION_PARAMETER(400, "COMPETITION-001", "대회 정보를 정확히 입력해주세요."),
-    RECRUITING_ENDS_BEFORE_STARTS(400, "COMPETITION-001", "모집 마감일이 모집 시작일보다 빠릅니다."),
-    COMPETITION_STARTS_BEFORE_RECRUITING_ENDS(400, "COMPETITION-002", "대회 시작일이 모집 마감일보다 빠릅니다."),
-    COMPETITION_ENDS_BEFORE_STARTS(400, "COMPETITION-003", "대회 종료일이 대회 시작일보다 빠릅니다."),
-    COMPETITION_ALREADY_STARTED(400, "COMPETITION-004", "대회가 이미 시작되었습니다."),
-    COMPETITION_ALREADY_CLOSED(400, "COMPETITION-005", "대회가 이미 종료되었습니다."),
-    CONTENT_NOT_COMPLETE(400, "COMPETITION-006", "대회 내용을 모두 입력해주세요."),
-    COMPETITION_NOT_FOUND(404, "COMPETITION-007", "해당 대회가 존재하지 않습니다."),
-    CONVERTING_FAILED(400, "COMPETITION-008", "파일 변환에 실패했습니다."),
+    CONTENT_NOT_COMPLETE(400, "COMPETITION-002", "대회 내용을 모두 입력해주세요."),
+    COMPETITION_NOT_FOUND(404, "COMPETITION-003", "해당 대회가 존재하지 않습니다."),
+    CONVERTING_FAILED(400, "COMPETITION-004", "파일 변환에 실패했습니다."),
     ;
 
     private final int status;
