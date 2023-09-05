@@ -1,17 +1,11 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.Member;
-import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.LoginDto;
-import PlayMakers.SportsIT.dto.TokenDto;
 import PlayMakers.SportsIT.auth.security.jwt.JwtAuthenticationFilter;
 import PlayMakers.SportsIT.auth.security.jwt.JwtTokenProvider;
-import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.service.MemberService;
-import com.google.api.gax.rpc.UnauthenticatedException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,12 +18,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 
 @Slf4j
-@Tag(name = "인증 API", description = "\uD83D\uDCAA 회원 가입/탈퇴, 로그인, 로그아웃 등 회원 권한 관련 API 목록입니다.")
+@Tag(name = "1. 인증 API", description = "\uD83D\uDCAA 회원 가입/탈퇴, 로그인, 로그아웃 등 회원 권한 관련 API 목록입니다.")
 @RestController
 @RequestMapping("/api")
 public class AuthController {

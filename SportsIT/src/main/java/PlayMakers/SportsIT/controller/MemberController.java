@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @Slf4j
-@Tag(name = "Member", description = "회원 API")
+@Tag(name = "3. 회원 API", description = "\uD83D\uDCAA 회원 조회, 회원 정보 수정, 회원 가입/탈퇴 등 회원 관련 API 목록입니다.")
 @RestController
 @RequestMapping("/api")
 public class MemberController {
@@ -35,7 +35,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @Tag(name = "인증 API", description = "\uD83D\uDCAA 회원 가입/탈퇴, 로그인, 로그아웃 등 회원 권한 관련 API 목록입니다.")
+    @Tag(name = "1. 인증 API", description = "\uD83D\uDCAA 회원 가입/탈퇴, 로그인, 로그아웃 등 회원 권한 관련 API 목록입니다.")
     @Operation(summary = "회원 가입", description = """
             \uD83D\uDCCC 사용자 정보를 토대로 회원 계정을 생성합니다. 회원 기본 정보와 계정 권한(체육인/주최자), 관심 종목 값이 필요합니다.\n\n
             ✔️ 성공시 생성된 회원 객체를 반환합니다.\n\n

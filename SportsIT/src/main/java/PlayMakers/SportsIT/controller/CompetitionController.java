@@ -2,9 +2,13 @@ package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
+import PlayMakers.SportsIT.exceptions.ErrorCode;
 import PlayMakers.SportsIT.service.*;
+import PlayMakers.SportsIT.utils.api.ApiUtils;
+import PlayMakers.SportsIT.utils.api.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,11 +17,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +31,15 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.Integer.parseInt;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @Slf4j
-@Tag(name = "대회 API", description = "\uD83D\uDCAA 대회 생성, 조회, 수정, 취소 및 대회 참가 신청/취소 관련 API 목록입니다.")
+@Tag(name = "2. 대회 API", description = "\uD83D\uDCAA 대회 생성, 조회, 수정, 취소 및 대회 참가 신청/취소 관련 API 목록입니다.")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/competitions")
 public class CompetitionController {
+
     private final CompetitionService competitionService;
     private final MemberService memberService;
     private final JoinCompetitionService joinCompetitionService;
@@ -53,36 +59,44 @@ public class CompetitionController {
      * @throws Exception 로그인 에러, 주최자가 아닌 경우
      */
     @Operation(summary = "대회 생성 API", description = """
-            \uD83D\uDCCC 클라이언트에서 대회 정보와 사용자 토큰 정보를 받아 대회를 생성합니다. 토큰 값이 필요합니다.\n\n
-            ✔️ 성공시 생성한 대회 정보와 success: true를 반환합니다.\n\n
-            ❌ 실패시 success: false를 반환합니다.
+            \uD83D\uDCCC 클라이언트에서 대회 정보와 사용자 토큰 정보를 받아 대회를 생성합니다. 토큰 값이 필요합니다. 생성된 대회는 "location" 헤더에서 확인할 수 있습니다.(location:/api/competitions/{competitionId})\n\n
+            ✔️ 성공시 success: true를 반환합니다. (201)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "대회 생성 성공", content = @Content(schema = @Schema(implementation = CompetitionDto.class))),
-            @ApiResponse(responseCode = "400", description = "대회 생성 실패")
+            @ApiResponse(responseCode = "201", description = "대회 생성 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/PostResponse"))),
+            @ApiResponse(responseCode = "400", description = "(COMPETITION-001) 대회 정보가 누락되거나 잘못되었을 경우", content = @Content),
+            @ApiResponse(responseCode = "401", description = "(AUTH-001) Access Token이 비어있거나 잘못 되었을 경우", content = @Content),
+            @ApiResponse(responseCode = "403", description = "(AUTH-003) 주최자 계정이 아닐 경우", content = @Content)
     })
     @PostMapping
-    public ResponseEntity<?> createCompetition(
+    public ResponseEntity<CommonResponse<Object>> createCompetition(
             @Parameter(name = "competitionDto", description = "대회 정보 객체", required = true)
-            @RequestBody CompetitionDto dto,
+            @RequestBody CompetitionDto.Form dto,
             @AuthenticationPrincipal User user) throws Exception {
         // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
         String hostEmail = null;
+        Member host;
         try {
-            hostEmail = getUserEmailFromAuthenticationToken(user); // 로그인한 회원 ID를 가져옴
-        } catch (Exception e) {
-            throw new EntityNotFoundException("로그인이 필요합니다.");
+            host = getMember(user);
+        } catch (BadCredentialsException e) {
+            log.error("로그인 에러");
+            throw new PlayMakers.SportsIT.exceptions.EntityNotFoundException(ErrorCode.EMPTY_TOKEN, "Access Token이 비어있거나 잘못 되었습니다.");
+        } catch (EntityNotFoundException e) {
+            log.error("User Not Found : {}", hostEmail);
+            throw new PlayMakers.SportsIT.exceptions.EntityNotFoundException(ErrorCode.USER_NOT_FOUND, "로그인한 사용자가 존재하지 않습니다.");
         }
 
-        Member host = memberService.findOne(hostEmail);
-        dto.setHost(host);
+        /*
+        CompetitionDto -> CompetitionDto.Form으로 동작하도록 Refactoring 필요
+        2023.08.29 - MyeongQ
+        * */
+        CompetitionDto temp = dto.toAllArgsDto();
+        temp.setHost(host);
 
         // 대회 생성
-        Competition competition = competitionService.create(dto);
-
-        Map<String, Object> res = new HashMap<>();
-        res.put("success", true);
-        res.put("result", competition);
+        Competition competition = competitionService.create(temp);
+        CommonResponse<Object> res = new CommonResponse<>(CREATED.value(), true, null);
 
         return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(res); // 201
@@ -92,7 +106,7 @@ public class CompetitionController {
         try {
             return user.getUsername();
         } catch (Exception e) {
-            throw new EntityNotFoundException("로그인 정보가 없습니다.");
+            throw new PlayMakers.SportsIT.exceptions.EntityNotFoundException(ErrorCode.EMPTY_TOKEN);
         }
     }
 
@@ -130,24 +144,74 @@ public class CompetitionController {
         return ResponseEntity.ok(competitions); // 200
     }
 
+    /**
+     * 대회 상세 조회 컨트롤러
+     * @param competitionId Long
+     * @param user User
+     * @return ResponseEntity
+     */
+    @Operation(summary = "대회 상세 조회 API", description = """
+            \uD83D\uDCCC 대회 ID로 대회 정보를 조회합니다. 참가 여부, 스크랩 여부를 함께 확인하려면 토큰 값이 필요합니다.\n\n
+            ✔️ 성공시 생성한 대회 정보(result)와 success: true를 반환합니다. (200)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "대회 조회 성공", content = @Content(schema = @Schema(implementation = CompetitionDto.Info.class))),
+            @ApiResponse(responseCode = "404", description = "(COMPETITION-007) 해당 ID의 대회가 존재하지 않을 경우", content = @Content)
+    })
     @GetMapping("/{competitionId}")
-    public ResponseEntity<Object> getCompetition(@PathVariable Long competitionId,
-                                                 @AuthenticationPrincipal User user) throws Exception {
+    public ResponseEntity<CommonResponse<CompetitionDto.Info>> getCompetition(
+            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH)
+            @PathVariable Long competitionId,
+            @AuthenticationPrincipal User user) throws Exception {
         Competition competition = competitionService.findById(competitionId);
-        boolean joined = joinCompetitionService.checkAlreadyJoined(memberService.findOne(getUserEmailFromAuthenticationToken(user)).getUid(), competitionId);
-        Map<String, Object> res = new HashMap<>(){{
-            put("success", true);
-            put("result", competition);
-            put("joined", joined);
-        }};
+        boolean joined = (user != null) && joinCompetitionService.checkAlreadyJoined(memberService.findOne(getUserEmailFromAuthenticationToken(user)).getUid(), competitionId);
+
+        CompetitionDto.Info dto = CompetitionDto.Info.entityToInfo(competition);
+        dto.setJoined(joined);
+
+        CommonResponse<CompetitionDto.Info> res = ApiUtils.success(HttpStatus.OK.value(), dto);
 
         return ResponseEntity.ok(res); // 200
     }
 
+    /**
+     * 대회 수정 컨트롤러
+     * @param competitionId Long
+     * @param dto CompetitionDto.Form
+     * @return
+     */
+    @Operation(summary = "대회 수정 API", description = """
+            \uD83D\uDCCC 대회 ID로 대회 정보를 수정합니다.\n\n
+            ✔️ 성공시 수정된 대회 정보와 success: true를 반환합니다. (200)\n\n
+            ❌ 실패시 success: false를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "대회 수정 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/CompetitionForm"))),
+            @ApiResponse(responseCode = "404", description = "(COMPETITION-007) 해당 ID의 대회가 존재하지 않을 경우", content = @Content)
+    })
     @PutMapping("/{competitionId}")
-    public ResponseEntity<Competition> updateCompetition(@PathVariable Long competitionId, @RequestBody CompetitionDto dto) {
-        Competition competition = competitionService.update(competitionId, dto);
-        return ResponseEntity.ok(competition); // 200
+    public ResponseEntity<CommonResponse<CompetitionDto.Form>> updateCompetition(
+            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH)
+            @PathVariable Long competitionId,
+            @Parameter(name = "competitionDto", description = "대회 입력 객체", required = true)
+            @RequestBody CompetitionDto.Form dto,
+            @AuthenticationPrincipal User user) throws Exception {
+
+        Competition competition = competitionService.findById(competitionId);
+        try {
+            Member host = getMember(user);
+            if (competition.getHost().getUid() != host.getUid() || !host.getMemberType().stream().anyMatch(
+                    memberType -> memberType.getRoleName().equals("ROLE_ADMIN"))) {
+                throw new PlayMakers.SportsIT.exceptions.UnAuthorizedException(ErrorCode.UNAUTHORIZED, "관리자 또는 작성자 본인만 수정할 수 있습니다.");
+            }
+        } catch (Exception e) {
+            throw new PlayMakers.SportsIT.exceptions.EntityNotFoundException(ErrorCode.EMPTY_TOKEN);
+        }
+        competition = competitionService.update(competitionId, dto);
+
+        CommonResponse<CompetitionDto.Form> res = ApiUtils.success(HttpStatus.OK.value(), dto);
+        return ResponseEntity.ok(res); // 200
     }
 
     @DeleteMapping("/{competitionId}")
@@ -566,13 +630,4 @@ public class CompetitionController {
         return ResponseEntity.badRequest().body(res); // 400
     }
 
-    @ExceptionHandler
-    public ResponseEntity<Object> handleException(Exception exception) {
-        Map<String, Object> res = new HashMap<>(){{
-            put("success", false);
-            put("message", exception.getMessage() + " " + exception.getClass().getName());
-        }};
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res); // 500
-    }
 }
