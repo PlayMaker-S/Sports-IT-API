@@ -185,8 +185,8 @@ public class CompetitionController {
      */
     @Operation(summary = "대회 수정 API", description = """
             \uD83D\uDCCC 대회 ID로 대회 정보를 수정합니다.\n\n
-            ✔️ 성공시 success: true를 반환합니다. (201)\n\n
-            ❌ 실패시 success: false를 반환합니다.
+            ✔️ 성공시 success: true를 반환합니다. (204)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
             """)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "대회 수정 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/PostResponse"))),
@@ -197,7 +197,7 @@ public class CompetitionController {
     })
     @PutMapping("/{competitionId}")
     public ResponseEntity<Object> updateCompetition(
-            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH)
+            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH, example="2790")
             @PathVariable Long competitionId,
             @Parameter(name = "competitionDto", description = "대회 입력 객체", required = true)
             @RequestBody CompetitionDto.Form dto,
@@ -219,10 +219,39 @@ public class CompetitionController {
                 .body(ApiUtils.created(HttpStatus.NO_CONTENT.value())); // 201
     }
 
+    @Operation(summary = "대회 삭제 API", description = """
+            \uD83D\uDCCC 대회 ID로 대회를 취소합니다. (대회 삭제시 JoinCompetition 테스트 진행해야 됩니다.)\n\n
+            ✔️ 성공시 success: true를 반환합니다. (204)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "대회 삭제 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/PostResponse"))),
+            @ApiResponse(responseCode = "401", description = "(AUTH-001) Token이 비어있는 경우", content = @Content),
+            @ApiResponse(responseCode = "403", description = "(COMMON-004) 로그인한 사용자가 관리자나 해당 대회를 게시한 사용자가 아닐 경우\n\n" +
+                    "(AUTH-004) 대회가 이미 시작되었거나 종료된 경우", content = @Content),
+            @ApiResponse(responseCode = "404", description = "(COMPETITION-003) 해당 ID의 대회가 존재하지 않을 경우", content = @Content)
+    })
     @DeleteMapping("/{competitionId}")
-    public ResponseEntity<Void> deleteCompetition(@PathVariable Long competitionId) {
+    public ResponseEntity<CommonResponse<Object>> deleteCompetition(
+            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH, example="2790")
+            @PathVariable Long competitionId,
+            @AuthenticationPrincipal User user) throws Exception {
+
+        Competition competition = competitionService.findById(competitionId);
+
+        Member host = getMember(user);
+        log.info("대회 삭제 요청: {}", host.getUid());
+
+        if (!competition.getHost().getUid().equals(host.getUid()) && host.getMemberType().stream().noneMatch(
+                memberType -> memberType.getRoleName().equals("ROLE_ADMIN"))) {
+            throw new UnAuthorizedException(ErrorCode.ACCESS_DENIED, "관리자 또는 작성자 본인만 대회를 삭제할 수 있습니다.");
+        }
+
+        competitionService.checkCompetitionNotStarted(competition);
+
         competitionService.delete(competitionId);
-        return ResponseEntity.noContent().build(); // 204
+
+        return ResponseEntity.ok(ApiUtils.success(HttpStatus.NO_CONTENT.value(), null)); // 204
     }
     /*
         대회 참가
