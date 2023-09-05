@@ -1,10 +1,8 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.BodyInfo;
-import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.BodyInfoDto;
-import PlayMakers.SportsIT.dto.CompetitionDto;
 import PlayMakers.SportsIT.service.BodyInfoService;
 import PlayMakers.SportsIT.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.Optional;
 
 @Slf4j
