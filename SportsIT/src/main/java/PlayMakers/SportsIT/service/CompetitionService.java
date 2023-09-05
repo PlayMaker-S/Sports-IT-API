@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -269,5 +270,15 @@ public class CompetitionService {
         Competition competition = competitionRepository.findByCompetitionId(competitionId);
         return competition.getCategories();
 
+    }
+
+    // 대회가 수정 가능한지 체크
+    public void checkCompetitionNotStarted(Competition competition) {
+        if(competition.getEndDate().isBefore(LocalDateTime.now())) {
+            throw new UnAuthorizedException(ErrorCode.NOT_ADMIN, "대회가 종료되었습니다. 관리자에게 문의해주세요.");
+        }
+        else if(competition.getStartDate().isBefore(LocalDateTime.now())) {
+            throw new UnAuthorizedException(ErrorCode.NOT_ADMIN, "대회가 시작되었습니다. 관리자에게 문의해주세요.");
+        }
     }
 }
