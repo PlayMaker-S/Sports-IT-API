@@ -48,7 +48,7 @@ public class AuthController {
             ❌ 실패시 success: false를 반환합니다. (핸들러 추가 예정)
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "200", description = "로그인 성공 (Authorization 헤더에서 토큰 가져올 것)"),
             @ApiResponse(responseCode = "401", description = "로그인 실패")
     })
     @PostMapping("/authenticate")
