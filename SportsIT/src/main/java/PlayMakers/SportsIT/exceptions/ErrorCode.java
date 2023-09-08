@@ -18,6 +18,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN(401, "AUTH-002", "다시 로그인 해주세요."),
     NOT_HOST(403, "AUTH-003", "대회 개최자만 접근 가능합니다."),
     NOT_ADMIN(403, "AUTH-004", "관리자만 접근 가능합니다."),
+    NOT_PLAYER(403, "AUTH-005", "체육인만 접근 가능합니다."),
 
     // USER
     INVALID_INPUT_USERNAME(400, "USER-001", "닉네임을 3자 이상 입력하세요"),
@@ -33,6 +34,7 @@ public enum ErrorCode {
     CONTENT_NOT_COMPLETE(400, "COMPETITION-002", "대회 내용을 모두 입력해주세요."),
     COMPETITION_NOT_FOUND(404, "COMPETITION-003", "해당 대회가 존재하지 않습니다."),
     CONVERTING_FAILED(400, "COMPETITION-004", "파일 변환에 실패했습니다."),
+    COMPETITION_NOT_AVAILABLE(400, "COMPETITION-005", "대회 참가가 불가능합니다."),
     ;
 
     private final int status;

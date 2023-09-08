@@ -1,9 +1,6 @@
 package PlayMakers.SportsIT.utils.handler;
 
-import PlayMakers.SportsIT.exceptions.EntityNotFoundException;
-import PlayMakers.SportsIT.exceptions.ErrorCode;
-import PlayMakers.SportsIT.exceptions.InvalidValueException;
-import PlayMakers.SportsIT.exceptions.UnAuthorizedException;
+import PlayMakers.SportsIT.exceptions.*;
 import PlayMakers.SportsIT.utils.api.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -51,6 +48,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     protected final ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
         log.info("EntityNotFoundException", e);
+        final ErrorResponse response = ErrorResponse.of(e.getErrorCode(), e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
+    }
+
+    /**
+     * RequestDeniedException 핸들링
+     * @param e RequestDeniedException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(RequestDeniedException.class)
+    protected final ResponseEntity<ErrorResponse> handleRequestDeniedException(RequestDeniedException e) {
+        log.info("RequestDeniedException", e);
         final ErrorResponse response = ErrorResponse.of(e.getErrorCode(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
     }
