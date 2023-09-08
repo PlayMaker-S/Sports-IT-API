@@ -2,6 +2,9 @@ package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
+import PlayMakers.SportsIT.exceptions.EntityNotFoundException;
+import PlayMakers.SportsIT.exceptions.ErrorCode;
+import PlayMakers.SportsIT.exceptions.UnAuthorizedException;
 import PlayMakers.SportsIT.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -167,9 +170,10 @@ public class JoinCompetitionService {
 
     public Map<String, String> getJoinCounts(Long competitionId, Member member) throws Exception {
         Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        if (competition == null) throw new EntityNotFoundException(ErrorCode.COMPETITION_NOT_FOUND, "대회를 찾을 수 없습니다. : ");
         // ROLE_PLAYER가 아니라면 예외 발생
         if (isNotPlayer(member)) {
-            throw new IllegalAccessException("대회 참가 권한이 없는 회원입니다.");
+            throw new UnAuthorizedException(ErrorCode.NOT_PLAYER, "대회 참가 권한이 없는 회원입니다.");
         }
         // 이미 참가한 대회라면 예외 발생
         if (alreadyJoinedPlayer(competitionId, member)) {
