@@ -378,35 +378,46 @@ public class CompetitionController {
 
     /**
      * 선택한 부문과 체급에 맞는 대회 참가 신청서를 반환
-     * @param competitionId
-     * @param joinType
-     * @param formDto
-     * @param user
+     * @param competitionId Long
+     * @param joinType String
+     * @param formDto CompetitionFormDto
      * @return
      * @throws Exception
      */
+    @Operation(summary = "대회 참가 신청서 제출 API", description = """
+            \uD83D\uDCCC 선수 대회 참가 신청서를 제출하기 위한 API 입니다. 자세한 내용은 노션의 대회 참가 API를 참고해주세요. (https://www.notion.so/API-43945089ce72418588d85879e380c4ec) \n
+            ✔️ 성공시 success: true와 agreements, template을 result에 담아 반환합니다. (200) \n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "대회 참가 신청서 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/JoinFormSubmitResponse"))),
+            @ApiResponse(responseCode = "400", description = "(COMPETITION-005) 대회 모집 기간이 아니거나 이미 참가한 대회일 경우", content = @Content),
+            @ApiResponse(responseCode = "401", description = "(AUTH-001) Token이 비어있는 경우", content = @Content),
+            @ApiResponse(responseCode = "403", description = "(AUTH-005) 로그인한 사용자가 체육인 권한이 없을 경우", content = @Content),
+            @ApiResponse(responseCode = "404", description = "(COMPETITION-003) 해당 ID의 대회가 존재하지 않을 경우", content = @Content)
+    })
     @PostMapping("/{competitionId}/join/format")
-    public ResponseEntity<Object> postJoinForm(@PathVariable Long competitionId,
-                                               @RequestParam String joinType,
-                                               @RequestBody CompetitionFormDto formDto,
-                                               @AuthenticationPrincipal User user) throws Exception{
+    public ResponseEntity<Object> postJoinForm(
+            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH, example="2790") @PathVariable Long competitionId,
+            @Parameter(name = "joinType", description = "참가 타입", required = true, in = ParameterIn.QUERY, examples= {
+                    @ExampleObject(name = "선수", description = "선수로 참가할 경우", value="player"),
+                    @ExampleObject(name = "관람", description = "관람객으로 참가할 경우", value="viewer")})
+            @RequestParam String joinType,
+            @Parameter(name = "formDto", description = "대회 참가 신청서", required = true, schema = @Schema(implementation = CompetitionFormDto.class))
+            @RequestBody CompetitionFormDto formDto,
+            @AuthenticationPrincipal User user) throws Exception{
+
         Member member = getMember(user);
         Competition target = competitionService.findById(competitionId);
         Map<String, Object> res = new HashMap<>();
 
         if (joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId)) {
-            res.put("success", false);
-            res.put("message", "이미 참가한 대회입니다.");
-            return ResponseEntity.ok(res); // 200
+            throw new RequestDeniedException(ErrorCode.COMPETITION_NOT_AVAILABLE, "이미 참가한 대회입니다.");
         }
         JoinCompetition.joinType type = getJoinType(joinType);
-        try{
-            joinCompetitionService.checkJoinable(competitionId, type);
-        } catch (IllegalArgumentException e) {
-            res.put("success", false);
-            res.put("message", e.getMessage());
-            return ResponseEntity.ok(res); // 200
-        }
+
+        joinCompetitionService.checkJoinable(competitionId, type);
+
         // 결제 금액 계산
         String templateId = target.getTemplateID();
         CompetitionTemplate template = competitionTemplateService.getTemplate(templateId);
@@ -614,26 +625,48 @@ public class CompetitionController {
         템플릿 관련 API
      */
 
+    @Operation(summary = "대회 신청 템플릿 등록 API", description = """
+            \uD83D\uDCCC 대회 신청(선수) 템플릿을 등록합니다.\n\n
+            ✔️ 성공시 success: true와 result에 생성된 템플릿 ID를 반환합니다. (201)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "대회 템플릿(선수) 등록 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/TemplateIdResponse"))),
+    })
     @PostMapping("/template")
-    public ResponseEntity<Object> createTemplate(@RequestBody CompetitionTemplate template) throws Exception {
+    public ResponseEntity<CommonResponse> createTemplate(@RequestBody CompetitionTemplate template) throws Exception {
         log.info("템플릿 생성 요청 Controller: {}", template);
         String docId = competitionTemplateService.saveTemplate(template);
-        Object result = new HashMap<String, Object>() {{
-            put("success", true);
-            put("templateId", docId);
-        }};
+
         return ResponseEntity.created(URI.create("/api/competitions/template/" + docId)) // Location Header에 생성된 리소스의 URI를 담아서 보냄
-                .body(result); // 201
+                .body(ApiUtils.created(CREATED.value(), docId)); // 201
     }
+
+    @Operation(summary = "대회 신청 템플릿 수정 API", description = """
+            \uD83D\uDCCC 대회 신청(선수) 템플릿을 수정합니다.\n\n
+            ✔️ 성공시 success: true를 반환합니다. (204)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "대회 템플릿(선수) 수정 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/PostResponse"))),
+    })
     @PutMapping("/template/{templateId}")
-    public ResponseEntity<?> updateTemplate(@PathVariable String templateId, @RequestBody CompetitionTemplate template) throws Exception {
+    public ResponseEntity<CommonResponse> updateTemplate(@PathVariable String templateId, @RequestBody CompetitionTemplate template) throws Exception {
         log.info("템플릿 수정 요청 Controller: {}", template);
         competitionTemplateService.updateTemplate(templateId, template);
-        Object result = new HashMap<String, Object>() {{
-            put("success", true);
-        }};
-        return ResponseEntity.ok(result); // 200
+
+        return ResponseEntity.ok(ApiUtils.success(HttpStatus.NO_CONTENT.value(), null)); // 204
     }
+
+    @Operation(summary = "대회 신청 템플릿 조회 API", description = """
+            \uD83D\uDCCC 대회 신청(선수) 템플릿을 등록합니다.\n\n
+            ✔️ 성공시 success: true와 result에 생성된 템플릿 ID를 반환합니다. (200)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "대회 템플릿(선수) 등록 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/TemplateGetResponse"))),
+            @ApiResponse(responseCode = "404", description = "요청한 템플릿 ID를 찾을 수 없을 경우", content = @Content),
+    })
     @GetMapping("/template/{templateId}")
     public ResponseEntity<?> getTemplate(@PathVariable String templateId) throws Exception {
         log.info("템플릿 조회 요청 Controller: {}", templateId);
@@ -641,14 +674,34 @@ public class CompetitionController {
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
         result.put("result", template);
-        return ResponseEntity.ok(result); // 200
+        return ResponseEntity.ok(ApiUtils.success(HttpStatus.OK.value(), template)); // 200
     }
+
+    @Operation(summary = "대회 신청 템플릿 삭제 API", description = """
+            \uD83D\uDCCC 대회 신청(선수) 템플릿을 삭제합니다.\n\n
+            ✔️ 성공시 success: true를 반환합니다. (204)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "대회 템플릿(선수) 삭제 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/PostResponse"))),
+            @ApiResponse(responseCode = "404", description = "요청한 템플릿 ID를 찾을 수 없을 경우", content = @Content),
+    })
     @DeleteMapping("/template/{templateId}")
     public ResponseEntity<Void> deleteTemplate(@PathVariable String templateId) throws Exception {
         log.info("템플릿 삭제 요청 Controller: {}", templateId);
         competitionTemplateService.deleteTemplate(templateId);
         return ResponseEntity.noContent().build(); // 204
     }
+
+    @Operation(summary = "대회 신청서(선수) 조회 API", description = """
+            \uD83D\uDCCC 대회 신청(선수) 템플릿 목록을 조회합니다.\n\n
+            ✔️ 성공시 success: true와 result에 템플릿 목록을 반환합니다. (200)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "대회 신청서(선수) 조회 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/JoinCount"))),
+            @ApiResponse(responseCode = "404", description = "요청한 신청서 ID를 찾을 수 없을 경우", content = @Content),
+    })
     @GetMapping("/form/{formId}")
     public ResponseEntity<?> getForm(@PathVariable String formId) throws Exception {
         log.info("템플릿 조회 요청 Controller: {}", formId);

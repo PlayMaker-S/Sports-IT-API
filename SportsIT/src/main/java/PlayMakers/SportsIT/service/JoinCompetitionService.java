@@ -4,6 +4,7 @@ import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.exceptions.EntityNotFoundException;
 import PlayMakers.SportsIT.exceptions.ErrorCode;
+import PlayMakers.SportsIT.exceptions.RequestDeniedException;
 import PlayMakers.SportsIT.exceptions.UnAuthorizedException;
 import PlayMakers.SportsIT.repository.*;
 import jakarta.transaction.Transactional;
@@ -101,15 +102,14 @@ public class JoinCompetitionService {
     public void checkJoinable(Long competitionId, JoinCompetition.joinType type) {
         competitionRepository.findById(competitionId)
                 .ifPresent(competition -> {
+                    String reason = "";
                     if (!isJoinableToday(competition)) {
-                        throw new IllegalArgumentException("대회 참가/관람 신청 기간이 아닙니다.\n" +
-                                "대회 신청 기간: " + competition.getRecruitingStart().toLocalDate() + " " + competition.getRecruitingStart().toLocalTime() +
-                                " ~ " + competition.getRecruitingEnd().toLocalDate() + " " + competition.getRecruitingEnd().toLocalTime());
+                        reason = "대회 신청 기간이 아닙니다.";
                     }
-                    if (isAlreadyFull(competition, type)) {
-                        if(type.equals(JoinCompetition.joinType.PLAYER)) throw new IllegalArgumentException("대회 참가 인원이 마감되었습니다.");
-                        else throw new IllegalArgumentException("대회 관람 인원이 마감되었습니다.");
+                    else if (isAlreadyFull(competition, type)) {
+                        reason = type.equals(JoinCompetition.joinType.PLAYER) ? "선수 모집이 마감되었습니다." : "대회 참관인 모집이 마감되었습니다.";
                     }
+                    throw new RequestDeniedException(ErrorCode.COMPETITION_NOT_AVAILABLE, reason);
                 });
     }
 
