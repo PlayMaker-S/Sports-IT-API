@@ -28,23 +28,28 @@ public class JoinCompetitionService {
     final private ParticipantRepository participantRepository;
 
     public JoinCompetition join(JoinCompetitionDto dto) {
-        log.info("대회 참가 요청: {}", dto);
+        log.info("대회 참가 요청: 대회 아이디 {}", dto.getCompetitionId());
 
         Long uid = dto.getUid();
         Long competitionId = dto.getCompetitionId();
 
         // 대회 참가 요청을 보낸 회원이 해당 대회에 이미 참가한 회원인지 확인
         if (checkAlreadyJoined(uid, competitionId)) {
+            log.info("대회 참가 실패 (이미 참가한 회원)");
             throw new IllegalArgumentException("이미 해당 대회에 참가한 회원입니다.");
         }
         // 대회 참가 요청을 보낸 회원이 해당 대회에 참가할 수 있는 회원인지 확인
         checkPlayer(uid);
+
         // 대회 참가 요청을 받은 대회가 신청 가능한지 확인
         checkJoinable(competitionId, dto.getType());
+        log.info("test");
 
         JoinCompetition join = dto.toEntity();
         join.setMember(memberRepository.findById(dto.getUid()).get());
+        log.info("test");
         join.setCompetition(competitionRepository.findById(dto.getCompetitionId()).get());
+        log.info("test");
         log.info("대회 참가 정보: {}", join);
 
         return joinCompetitionRepository.save(join);
@@ -109,6 +114,9 @@ public class JoinCompetitionService {
                     else if (isAlreadyFull(competition, type)) {
                         reason = type.equals(JoinCompetition.joinType.PLAYER) ? "선수 모집이 마감되었습니다." : "대회 참관인 모집이 마감되었습니다.";
                     }
+                    else {
+                        return;
+                    }
                     throw new RequestDeniedException(ErrorCode.COMPETITION_NOT_AVAILABLE, reason);
                 });
     }
@@ -140,7 +148,7 @@ public class JoinCompetitionService {
                 .ifPresent(member -> {
                     // 회원이 대회에 참가할 수 있는 회원인지 확인
                     if (isNotPlayer(member)) {
-                        throw new IllegalArgumentException("대회 참가 권한이 없는 회원입니다.");
+                        throw new UnAuthorizedException(ErrorCode.NOT_PLAYER, "체육인 계정이 아닙니다.");
                     }
                 });
     }
@@ -148,10 +156,7 @@ public class JoinCompetitionService {
     public boolean checkAlreadyJoined(Long uid, Long competitionId) {
         JoinCompetition find = joinCompetitionRepository.findByIdUidAndIdCompetitionId(uid, competitionId).orElse(null);
         log.info("이미 참가한 대회인지 확인: {}", find);
-        if (find != null) {
-            return true;
-        }
-        return false;
+        return find != null;
     }
 
     private static boolean isNotPlayer(Member member) {
