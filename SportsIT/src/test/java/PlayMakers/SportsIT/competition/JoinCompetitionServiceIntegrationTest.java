@@ -5,6 +5,8 @@ import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import PlayMakers.SportsIT.enums.Subscribe;
+import PlayMakers.SportsIT.exceptions.RequestDeniedException;
+import PlayMakers.SportsIT.exceptions.UnAuthorizedException;
 import PlayMakers.SportsIT.repository.*;
 import PlayMakers.SportsIT.service.JoinCompetitionService;
 import lombok.extern.slf4j.Slf4j;
@@ -66,8 +68,7 @@ public class JoinCompetitionServiceIntegrationTest {
 
             int hostIdx = 1;
             MemberType hostMemberType = userTypeInst;
-            Subscribe hostSubscription = Subscribe.BASIC_HOST;
-            Member host = getMember(hostIdx, hostMemberType, hostSubscription);
+            Member host = getMember(hostIdx, hostMemberType, Subscribe.BASIC_HOST);
             host = memberRepository.save(host);
             Long hostId = host.getUid();
             log.info("host: {}", host);
@@ -177,7 +178,7 @@ public class JoinCompetitionServiceIntegrationTest {
                     .build();
 
             // then
-            Assertions.assertThrows(IllegalArgumentException.class, () -> joinCompetitionService.join(joinCompetitionDto));
+            Assertions.assertThrows(RequestDeniedException.class, () -> joinCompetitionService.join(joinCompetitionDto));
         }
         @Test
         @DisplayName("주최자는 대회에 참가할 수 없다.")
@@ -195,7 +196,7 @@ public class JoinCompetitionServiceIntegrationTest {
                     .build();
 
             // then
-            Assertions.assertThrows(IllegalArgumentException.class, () -> joinCompetitionService.join(joinCompetitionDto));
+            Assertions.assertThrows(UnAuthorizedException.class, () -> joinCompetitionService.join(joinCompetitionDto));
         }
     }
 
