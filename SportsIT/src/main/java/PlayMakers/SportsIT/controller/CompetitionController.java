@@ -3,6 +3,7 @@ package PlayMakers.SportsIT.controller;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.exceptions.ErrorCode;
+import PlayMakers.SportsIT.exceptions.RequestDeniedException;
 import PlayMakers.SportsIT.exceptions.UnAuthorizedException;
 import PlayMakers.SportsIT.service.*;
 import PlayMakers.SportsIT.utils.api.ApiUtils;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -127,23 +129,50 @@ public class CompetitionController {
     }
 
     /**
-     * @param keyword
-     * @param filteringConditions
-     * @param orderBy
-     * @param page
-     * @param size
+     * @param keyword String
+     * @param filteringConditions List<String>
+     * @param orderBy String
+     * @param page String
+     * @param size String
      * @return ResponseEntity<?> - 200 : success: true, result: Slice<Competition>
      */
+    @Operation(summary = "대회 슬라이스 조회 API", description = """
+            \uD83D\uDCCC 대회 목록을 불러옵니다. Pagination으로 구현되어 page 값이 필요합니다.
+            \n"keyword"는 검색시 대회의 {대회 제목, 주최자 이름, 종목 한글명}에 포함되어있을 경우 해당 대회를 검색 결과에 포함시킵니다. 전체 조회를 원할 경우 비워둡니다.
+            \n"orderBy"는 대회 목록 정렬시 사용합니다. 기본 값은 createdDate입니다.
+            \n"filteryBy"는 대회 목록을 필터링 할 경우 사용합니다. 대회 상태(PLANNING~END)는 OR 연산을, 일부 조건(recruitignEnd, totalPrize, recommend)는 AND 연산을 수행한 결과를 반환합니다. 복수 개의 필터링 사용이 가능합니다. (ex. filteringConditions=RECRUITING&filteringConditions=PLANNING)
+            \n"page"와 "size"는 Pagination 파라미터입니다. 매 요청마다 size는 고정시키고, page만 변경하여 새로운 대회 데이터를 받아올 수 있습니다.\n\n
+            ✔️ 성공시 result와 success: true를 반환합니다. result에는 대회 목록(content)와 page 정보(size, number, first, last, numberOfElements, empty)를 확인할 수 있습니다. (200)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "대회 슬라이스 조회 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/CompetitionSlice"))),
+    })
     @GetMapping("/slice")
-    public ResponseEntity<Slice<Competition>> getCompetitionSlice(@RequestParam(required = false) String keyword,
-                                                                  @RequestParam(value = "filterBy", required = false) List<String> filteringConditions,
-                                                                  @RequestParam String orderBy,
-                                                                  @RequestParam String page,
-                                                                  @RequestParam String size) {
+    public ResponseEntity<CommonResponse<Slice<Competition>>> getCompetitionSlice(
+            @Parameter(name="keyword", description="검색어(없으면 전체조회)", examples= {@ExampleObject(name="전체 조회"), @ExampleObject(name="검색", value="팔씨름")}) @RequestParam(required = false) String keyword,
+            @Parameter(name="filterBy", description="필터 조건", examples={
+                    @ExampleObject(name="PLANNING", value="PLANNING", description="모집 전 : 대회 모집일 전"),
+                    @ExampleObject(name="RECRUITING", value="RECRUITING", description="모집 중 : 대회 모집 시작 ~ 모집 종료 전"),
+                    @ExampleObject(name="RECRUITING_END", value="RECRUITING_END", description="시작 전 : 대회 모집 종료 ~ 대회 시작 전"),
+                    @ExampleObject(name="IN_PROGRESS", value="IN_PROGRESS", description="대회 중 : 대회 시작 ~ 대회 종료 전"),
+                    @ExampleObject(name="END", value="END", description="대회 종료 : 대회 종료 후"),
+                    @ExampleObject(name="recruitingEnd", value="recruitingEnd", description="모집 마감 임박 : 대회 모집 종료 7일 이내"),
+                    @ExampleObject(name="totalPrize", value="totalPrize", description="큰 상금 : 대회 상금 10만원 이상"),
+                    @ExampleObject(name="recommend", value="recommend", description="추천 대회 : 프리미엄 대회"),
+            }) @RequestParam(value = "filterBy", required = false) List<String> filteringConditions,
+            @Parameter(name="orderBy", description="정렬 조건", examples={
+                    @ExampleObject(name="등록순", value="createdDate"),
+                    @ExampleObject(name="조회수 순", value="viewCount"),
+            }) @RequestParam(required = false) String orderBy,
+            @Parameter(name="page", description="페이지 번호", examples= {@ExampleObject(name="0", value="0")})
+            @RequestParam String page,
+            @Parameter(name="size", description="한 페이지당 대회 수", examples= {@ExampleObject(name="10", value="10")})
+            @RequestParam String size) {
         log.info("대회 slice 요청: {} {} {} {} {}", keyword, filteringConditions, orderBy, page, size);
 
         Slice<Competition> competitions = competitionService.getCompetitionSlice(keyword, filteringConditions, orderBy, parseInt(page), parseInt(size));
-        return ResponseEntity.ok(competitions); // 200
+        return ResponseEntity.ok(ApiUtils.success(HttpStatus.OK.value(), competitions)); // 200
     }
 
     /**
@@ -237,10 +266,11 @@ public class CompetitionController {
             @PathVariable Long competitionId,
             @AuthenticationPrincipal User user) throws Exception {
 
+        log.info("대회 삭제 요청: {}", competitionId);
+
         Competition competition = competitionService.findById(competitionId);
 
         Member host = getMember(user);
-        log.info("대회 삭제 요청: {}", host.getUid());
 
         if (!competition.getHost().getUid().equals(host.getUid()) && host.getMemberType().stream().noneMatch(
                 memberType -> memberType.getRoleName().equals("ROLE_ADMIN"))) {
@@ -253,36 +283,43 @@ public class CompetitionController {
 
         return ResponseEntity.ok(ApiUtils.success(HttpStatus.NO_CONTENT.value(), null)); // 204
     }
-    /*
-        대회 참가
-     */
 
     /**
      * 대회 참가시 참가 가능한 인원 수를 반환, 대회 참가가 불가능할 경우 예외 발생
-     * @param competitionId
-     * @param user
-     * @return
-     * @throws Exception
+     *
+     * @param competitionId Long
+     * @param user          AuthenticationPrincipal User
+     * @return ResponseEntity<Object>
+     * @throws Exception 대회 참가가 불가능할 경우 예외 발생
      */
+    @Operation(summary = "대회 여석 조회 API", description = """
+            \uD83D\uDCCC 대회 ID로 현재 참가 가능한 선수 및 참관자 수를 반환합니다. \n\n
+            ✔️ 성공시 success: true와 availablePlayer, availableViewr를 result에 담아 반환합니다. (200)\n\n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "대회 참가 여석 조회 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/JoinCount"))),
+            @ApiResponse(responseCode = "400", description = "(COMPETITION-005) 대회 모집 기간이 아니거나 이미 참가한 대회일 경우", content = @Content),
+            @ApiResponse(responseCode = "401", description = "(AUTH-001) Token이 비어있는 경우", content = @Content),
+            @ApiResponse(responseCode = "403", description = "(AUTH-005) 로그인한 사용자가 체육인 권한이 없을 경우", content = @Content),
+            @ApiResponse(responseCode = "404", description = "(COMPETITION-003) 해당 ID의 대회가 존재하지 않을 경우", content = @Content)
+    })
     @GetMapping("/{competitionId}/join/init")
-    public ResponseEntity<Object> initJoin(@PathVariable Long competitionId,
-                                           @AuthenticationPrincipal User user) throws Exception{
+    public CommonResponse<Map<String, String>> initJoin(
+            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH, example="2790")
+            @PathVariable Long competitionId,
+            @AuthenticationPrincipal User user) throws Exception{
         Member member = getMember(user);
 
-        Map<String, Object> res = new HashMap<>();
         try {
             Map<String, String> result = joinCompetitionService.getJoinCounts(competitionId, member);
-            res.put("success", true);
-            res.put("result", result);
 
-            return ResponseEntity.ok(res); // 200
-        } catch (Exception e) {
-            res.put("success", false);
-            res.put("message", e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res); // 400
+            return ApiUtils.success(HttpStatus.OK.value(), result);
+        } catch (PlayMakers.SportsIT.exceptions.EntityNotFoundException e) {
+            throw new PlayMakers.SportsIT.exceptions.EntityNotFoundException(ErrorCode.COMPETITION_NOT_FOUND, e.getMessage()+competitionId);
+        } catch(IllegalAccessException e) {
+            throw new RequestDeniedException(ErrorCode.COMPETITION_NOT_AVAILABLE, e.getMessage());
         }
-
     }
 
     /**
@@ -293,10 +330,26 @@ public class CompetitionController {
      * @return success: true, agreements: 규약, template: 신청서 템플릿
      * @throws Exception
      */
+    @Operation(summary = "대회 참가 양식 조회 API", description = """
+            \uD83D\uDCCC 대회 ID와 참가 타입으로 대회 참가 양식을 반환합니다. \n
+            ✔️ 성공시 success: true와 agreements, template을 result에 담아 반환합니다. (200) \n
+            ❌ 실패시 HTTP Status Code와 에러 코드를 반환합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "대회 참가 양식 조회 성공", content = @Content(schema = @Schema(ref = "#/components/schemas/JoinFormat"))),
+            @ApiResponse(responseCode = "400", description = "(COMPETITION-005) 대회 모집 기간이 아니거나 이미 참가한 대회일 경우", content = @Content),
+            @ApiResponse(responseCode = "401", description = "(AUTH-001) Token이 비어있는 경우", content = @Content),
+            @ApiResponse(responseCode = "403", description = "(AUTH-005) 로그인한 사용자가 체육인 권한이 없을 경우", content = @Content),
+            @ApiResponse(responseCode = "404", description = "(COMPETITION-003) 해당 ID의 대회가 존재하지 않을 경우", content = @Content)
+    })
     @GetMapping("/{competitionId}/join/format")
-    public ResponseEntity<Object> getCompetitionContents(@PathVariable Long competitionId,
-                                                         @RequestParam String joinType,
-                                                         @AuthenticationPrincipal User user) throws Exception{
+    public ResponseEntity<Object> getCompetitionContents(
+            @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH, example="2790") @PathVariable Long competitionId,
+            @Parameter(name = "joinType", description = "참가 타입", required = true, in = ParameterIn.QUERY, examples= {
+                    @ExampleObject(name = "선수", description = "선수로 참가할 경우", value="player"),
+                    @ExampleObject(name = "관람", description = "관람객으로 참가할 경우", value="viewer")})
+            @RequestParam String joinType,
+            @AuthenticationPrincipal User user) throws Exception{
         Member member = getMember(user);
 
         Map<String, Object> res = new HashMap<>();
@@ -368,21 +421,7 @@ public class CompetitionController {
         return ResponseEntity.ok(res); // 200
     }
 
-    private Member getMember(User user) {
-        Member member = memberService.findOne(getUserEmailFromAuthenticationToken(user));
-        return member;
-    }
 
-    private static JoinCompetition.joinType getJoinType(String joinType) {
-        JoinCompetition.joinType type = null;
-        if (joinType.equals("player")) {
-            return JoinCompetition.joinType.PLAYER;
-        } else if (joinType.equals("viewer")) {
-            return JoinCompetition.joinType.VIEWER;
-        } else {
-            throw new IllegalArgumentException("joinType은 player 또는 viewer이어야 합니다.");
-        }
-    }
     @GetMapping("/{competitionId}/participants")
     public ResponseEntity<Object> loadParticipants(@PathVariable Long competitionId) throws Exception{
         Map<String, Object> res = new HashMap<>();
@@ -662,6 +701,22 @@ public class CompetitionController {
             put("message", exception.getMessage());
         }};
         return ResponseEntity.badRequest().body(res); // 400
+    }
+
+    private static JoinCompetition.joinType getJoinType(String joinType) {
+        JoinCompetition.joinType type = null;
+        if (joinType.equals("player")) {
+            return JoinCompetition.joinType.PLAYER;
+        } else if (joinType.equals("viewer")) {
+            return JoinCompetition.joinType.VIEWER;
+        } else {
+            throw new IllegalArgumentException("joinType은 player 또는 viewer이어야 합니다.");
+        }
+    }
+
+    private Member getMember(User user) {
+        Member member = memberService.findOne(getUserEmailFromAuthenticationToken(user));
+        return member;
     }
 
 }
