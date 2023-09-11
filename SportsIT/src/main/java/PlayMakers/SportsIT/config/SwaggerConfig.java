@@ -64,6 +64,11 @@ public class SwaggerConfig {
 
     public OpenApiCustomizer registerSchemas() {
         return openApi -> openApi.getComponents()
+                .addSchemas("TemplateGetResponse", TemplateGetResponse)
+                .addSchemas("TemplateIdResponse", TemplateIdResponse)
+                .addSchemas("JoinFormSubmitResponse", JoinFormSubmitResponse)
+                .addSchemas("JoinForm", JoinForm)
+                .addSchemas("JoinFormat", JoinFormat)
                 .addSchemas("JoinCount", JoinCount)
                 .addSchemas("PostResponse", PostResponse)
                 .addSchemas("CompetitionForm", CompetitionForm)
