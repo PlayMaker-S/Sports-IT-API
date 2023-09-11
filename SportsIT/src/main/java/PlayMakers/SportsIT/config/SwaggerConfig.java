@@ -66,7 +66,8 @@ public class SwaggerConfig {
         return openApi -> openApi.getComponents()
                 .addSchemas("JoinCount", JoinCount)
                 .addSchemas("PostResponse", PostResponse)
-                .addSchemas("CompetitionForm", CompetitionForm);
+                .addSchemas("CompetitionForm", CompetitionForm)
+                .addSchemas("CompetitionSlice", CompetitionSlice);
     }
 
 }
