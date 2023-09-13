@@ -122,7 +122,7 @@ class JoinCompetitionServiceUnitTest {
                 .uid(player.getUid())
                 .competitionId(newCompetition.getCompetitionId())
                 .type(JoinCompetition.joinType.PLAYER)
-                .formId("1")
+                .formId("FORM1")
                 .build();
 
         JoinCompetition mockJoin = joinCompetitionDto.toEntity();
@@ -142,7 +142,7 @@ class JoinCompetitionServiceUnitTest {
                 .uid(player.getUid())
                 .competitionId(newCompetition.getCompetitionId())
                 .type(JoinCompetition.joinType.PLAYER)
-                .formId("2")
+                .formId("FORM2")
                 .build();
 
         JoinCompetition updateJoinCompetition = updateJoinCompetitionDto.toEntity();

@@ -66,7 +66,7 @@ public class Competition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CompetitionType competitionType = CompetitionType.FREE; // 대회 타입 FREE, PREMIUM, VIP
 
-    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
     @JoinTable(
             name = "competition_host",
             joinColumns = @JoinColumn(name = "competition_id"),
@@ -123,7 +123,7 @@ public class Competition extends BaseEntity {
     @OneToMany(mappedBy = "competition")
     private List<CompetitionResult> competitionResults;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = Category.class)
+    @ManyToMany(targetEntity = Category.class, fetch = FetchType.LAZY)
     @JoinTable(
             name = "competition_category",
             joinColumns = {@JoinColumn(name = "competitionId")},
