@@ -55,7 +55,7 @@ public class SecurityConfiguration {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/favicion.io/**");
+        return (web) -> web.ignoring().requestMatchers("/favicion.io/**", "/.well-known/**");
     }
 
     @Bean
