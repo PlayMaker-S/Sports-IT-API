@@ -1,5 +1,7 @@
 package PlayMakers.SportsIT.domain;
 
+import PlayMakers.SportsIT.auth.security.userinfo.OAuth2UserInfo;
+import PlayMakers.SportsIT.auth.security.enums.AuthProvider;
 import PlayMakers.SportsIT.enums.Subscribe;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -46,6 +48,12 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private boolean activated = true;
 
+    @Column
+    private AuthProvider authProvider;
+
+    @Column
+    private String providerId;
+
     @ManyToMany
     @JoinTable(
             name = "member_authority",
@@ -77,4 +85,11 @@ public class Member extends BaseEntity {
             joinColumns = {@JoinColumn(name = "member_uid", referencedColumnName = "uid")},
             inverseJoinColumns = {@JoinColumn(name = "category", referencedColumnName = "category")})
     private Set<Category> categories;
+
+    public Member update(OAuth2UserInfo oAuth2UserInfo) {
+        this.name = oAuth2UserInfo.getName();
+        this.providerId = oAuth2UserInfo.getOAuth2Id();
+
+        return this;
+    }
 }
