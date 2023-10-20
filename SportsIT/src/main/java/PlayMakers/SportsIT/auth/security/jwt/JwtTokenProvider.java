@@ -15,10 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
@@ -61,7 +58,6 @@ public class JwtTokenProvider implements InitializingBean {
 
     // JWT 토큰 생성 (Deprecate 예정)
     public String createToken(Authentication authentication) {
-        PrincipalUser principalUser = (PrincipalUser) authentication.getPrincipal();
 
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -70,7 +66,6 @@ public class JwtTokenProvider implements InitializingBean {
         Date expiryDate = new Date(now + this.tokenValidityInMilliSeconds); // 토큰 유효 기간
 
         return Jwts.builder()
-                // .setSubject(Long.toString(principalUser.getId())) // 유저 정보를 담는다.
                 .setSubject(authentication.getName()) // 유저 정보를 담는다.
                 .claim(AUTHORITIES_KEY, authorities) // 권한 정보를 담는다.
                 .setIssuedAt(new Date()) // 토큰 발행 시간 정보
@@ -137,8 +132,7 @@ public class JwtTokenProvider implements InitializingBean {
                         .collect(Collectors.toList());
         User principal = new User(claims.getSubject(), "", authorities);
 
-        //return new UsernamePasswordAuthenticationToken(principal, accessToken, authorities);
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, accessToken, authorities);
     }
 
     // JWT 토큰에서 유저 아이디 추출
