@@ -1,6 +1,7 @@
 package PlayMakers.SportsIT.config;
 
 import PlayMakers.SportsIT.auth.CustomOAuth2UserService;
+import PlayMakers.SportsIT.auth.PrincipalDetailsService;
 import PlayMakers.SportsIT.auth.security.cookie.CookieAuthorizationRequestRepository;
 import PlayMakers.SportsIT.auth.security.handler.OAuth2AuthenticationFailureHandler;
 import PlayMakers.SportsIT.auth.security.handler.OAuth2AuthenticationSuccessHandler;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+    private final PrincipalDetailsService principalDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -59,19 +61,19 @@ public class SecurityConfiguration {
 
                 // 인가 설정
                 .and()
-                .authorizeHttpRequests()
+                .authorizeHttpRequests() // HttpServletRequest를 사용하는 요청들에 대한 접근제한 설정
                 .requestMatchers("/api/login").permitAll()  // 로그인은 누구나 가능
                 .requestMatchers("/api/*").permitAll()
                 .requestMatchers("/oauth2/**").permitAll()
                 .requestMatchers("/members/**").authenticated()  // 인증만 필요
                 .requestMatchers("/institution/**").hasAnyRole("ROLE_INSTITUTION", "ROLE_ADMIN")
                 .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")  // 권한도 필요
-                .requestMatchers("/**").permitAll()
+                .anyRequest().permitAll()
                 .and()
         // filter 설정
 
-                //.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)  // cors 필터 추가
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)  // jwt 필터 추가
+                .userDetailsService(principalDetailsService)
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
@@ -100,10 +102,10 @@ public class SecurityConfiguration {
 
         // JWT 설정
                 .and()
-//                .requiresChannel(channel ->
-//                        channel.anyRequest().requiresSecure())
-//                .authorizeHttpRequests(authorize ->
-//                        authorize.anyRequest().permitAll())
+                .requiresChannel(channel ->
+                        channel.anyRequest().requiresSecure())
+                .authorizeHttpRequests(authorize ->
+                        authorize.anyRequest().permitAll())
                 .apply(new JwtSecurityConfig(tokenProvider));
 
 
