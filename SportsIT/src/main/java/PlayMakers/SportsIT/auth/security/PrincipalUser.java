@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -21,9 +20,6 @@ public class PrincipalUser implements UserDetails, OAuth2User {
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-//    public PrincipalDetails(Member member) {
-//        this.member = member;
-//    }
 
     public PrincipalUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         //super(username, password, authorities);
@@ -54,6 +50,14 @@ public class PrincipalUser implements UserDetails, OAuth2User {
 
         return userPrincipal;
     }
+
+    public static PrincipalUser create(Member member, Map<String, Object> attributes, Collection<? extends GrantedAuthority> authorities) {
+        PrincipalUser userPrincipal = PrincipalUser.create(member);
+        userPrincipal.setAttributes(attributes);
+        userPrincipal.setAuthorities(authorities);
+
+        return userPrincipal;
+    }
 //
 //    public PrincipalUser(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
 //        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
@@ -67,6 +71,10 @@ public class PrincipalUser implements UserDetails, OAuth2User {
 //        collect.add((GrantedAuthority) () -> member.getMemberType().toString());
 //        return null;
         return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
     }
 
     // User 의 password 리턴
