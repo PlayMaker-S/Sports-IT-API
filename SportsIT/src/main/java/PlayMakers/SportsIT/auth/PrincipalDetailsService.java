@@ -4,6 +4,7 @@ import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import java.util.List;
  * Spring Security에서 사용자 정보를 가져오기 위한 인터페이스
  * 참고 : User는 UserDetails를 구현한 클래스, Spring Security에서 사용자 정보를 담는 인터페이스
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PrincipalDetailsService implements UserDetailsService {
@@ -27,7 +29,6 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Member memberEntity = memberRepository.findByEmail(email);
 
         return memberRepository.findOneWithMemberTypeByEmail(email)
                 .map(member -> createUser(email, member))
@@ -41,8 +42,8 @@ public class PrincipalDetailsService implements UserDetailsService {
         List<GrantedAuthority> grantedAuthorities = member.getMemberType().stream()
                 .map(memberType -> (GrantedAuthority) () -> memberType.getRoleName())
                 .toList();
-        return new User(
-                member.getEmail(),
+
+        return new User(member.getUid().toString(),
                 member.getPw(),
                 grantedAuthorities);
     }

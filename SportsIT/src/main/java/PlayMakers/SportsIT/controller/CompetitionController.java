@@ -196,7 +196,7 @@ public class CompetitionController {
             @PathVariable Long competitionId,
             @AuthenticationPrincipal User user) throws Exception {
         Competition competition = competitionService.findById(competitionId);
-        boolean joined = (user != null) && joinCompetitionService.checkAlreadyJoined(memberService.findOne(getUserEmailFromAuthenticationToken(user)).getUid(), competitionId);
+        boolean joined = (user != null) && joinCompetitionService.checkAlreadyJoined(Long.parseLong(user.getUsername()), competitionId);
 
         CompetitionDto.Info dto = CompetitionDto.Info.entityToInfo(competition);
         dto.setJoined(joined);
