@@ -104,8 +104,6 @@ public class SecurityConfiguration {
                 .and()
                 .requiresChannel(channel ->
                         channel.anyRequest().requiresSecure())
-                .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().permitAll())
                 .apply(new JwtSecurityConfig(tokenProvider));
 
 
