@@ -57,6 +57,7 @@ public class AuthController {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getLoginId(), loginDto.getPw());
 
+        // authenticate 메서드 실행 시 PrincipalDetailsService의 loadUserByUsername 메서드 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
