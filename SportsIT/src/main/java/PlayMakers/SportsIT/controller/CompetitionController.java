@@ -748,7 +748,7 @@ public class CompetitionController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Object> NullPoniterException(NullPointerException exception) {
+    public ResponseEntity<Object> NullPointerException(NullPointerException exception) {
         Map<String, Object> res = new HashMap<>(){{
             put("success", false);
             put("message", exception.getMessage());
@@ -768,8 +768,7 @@ public class CompetitionController {
     }
 
     private Member getMember(User user) {
-        Member member = memberService.findOne(getUserEmailFromAuthenticationToken(user));
-        return member;
+        return memberService.findByUid(Long.parseLong(user.getUsername())).orElse(null);
     }
 
 }
