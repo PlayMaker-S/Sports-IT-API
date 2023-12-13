@@ -81,12 +81,12 @@ public class CompetitionController {
         String hostEmail = null;
         Member host;
         try {
-            host = getMember(user);
+            host = memberService.getMember(user);
         } catch (BadCredentialsException e) {
             log.error("로그인 에러");
             throw new PlayMakers.SportsIT.exceptions.EntityNotFoundException(ErrorCode.EMPTY_TOKEN, "Access Token이 비어있거나 잘못 되었습니다.");
         } catch (EntityNotFoundException e) {
-            log.error("User Not Found : {}", hostEmail);
+            log.error("User Not Found : {}", user.getUsername());
             throw new PlayMakers.SportsIT.exceptions.EntityNotFoundException(ErrorCode.USER_NOT_FOUND, "로그인한 사용자가 존재하지 않습니다.");
         }
 
@@ -233,7 +233,7 @@ public class CompetitionController {
             @AuthenticationPrincipal User user) throws Exception {
 
         Competition competition = competitionService.findById(competitionId);
-        Member host = getMember(user);
+        Member host = memberService.getMember(user);
         log.info("대회 수정 요청: {}", host.getUid());
         if (!competition.getHost().getUid().equals(host.getUid()) && host.getMemberType().stream().noneMatch(
                 memberType -> memberType.getRoleName().equals("ROLE_ADMIN"))) {
@@ -270,7 +270,7 @@ public class CompetitionController {
 
         Competition competition = competitionService.findById(competitionId);
 
-        Member host = getMember(user);
+        Member host = memberService.getMember(user);
 
         if (!competition.getHost().getUid().equals(host.getUid()) && host.getMemberType().stream().noneMatch(
                 memberType -> memberType.getRoleName().equals("ROLE_ADMIN"))) {
@@ -309,7 +309,7 @@ public class CompetitionController {
             @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH, example="2790")
             @PathVariable Long competitionId,
             @AuthenticationPrincipal User user) throws Exception{
-        Member member = getMember(user);
+        Member member = memberService.getMember(user);
 
         try {
             Map<String, String> result = joinCompetitionService.getJoinCounts(competitionId, member);
@@ -350,7 +350,7 @@ public class CompetitionController {
                     @ExampleObject(name = "관람", description = "관람객으로 참가할 경우", value="viewer")})
             @RequestParam String joinType,
             @AuthenticationPrincipal User user) throws Exception{
-        Member member = getMember(user);
+        Member member = memberService.getMember(user);
 
         Map<String, Object> res = new HashMap<>();
 
@@ -407,7 +407,7 @@ public class CompetitionController {
             @RequestBody CompetitionFormDto formDto,
             @AuthenticationPrincipal User user) throws Exception{
 
-        Member member = getMember(user);
+        Member member = memberService.getMember(user);
         Competition target = competitionService.findById(competitionId);
         Map<String, Object> res = new HashMap<>();
 
@@ -469,7 +469,7 @@ public class CompetitionController {
     @GetMapping("/join/{competitionId}/viewer/checkJoinable")
     public ResponseEntity<String> isJoinableViewer(@PathVariable Long competitionId,
                                              @AuthenticationPrincipal User user) throws Exception{
-        Member member = getMember(user);
+        Member member = memberService.getMember(user);
 
         joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId);
         joinCompetitionService.checkJoinable(competitionId, JoinCompetition.joinType.VIEWER);
@@ -486,7 +486,7 @@ public class CompetitionController {
         Map<String, Object> res = new HashMap<>();
 
         log.info("대회 참가 요청 Controller: {}", joinCompetitionDto);
-        Member member = getMember(user);
+        Member member = memberService.getMember(user);
         joinCompetitionDto.setUid(member.getUid());
         Competition competition = competitionService.findById(competitionId);
         joinCompetitionDto.setCompetitionId(competitionId);
@@ -767,8 +767,6 @@ public class CompetitionController {
         }
     }
 
-    private Member getMember(User user) {
-        return memberService.findByUid(Long.parseLong(user.getUsername())).orElse(null);
-    }
+
 
 }
