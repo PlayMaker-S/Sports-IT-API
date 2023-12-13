@@ -20,18 +20,46 @@ import java.util.Set;
 @Builder
 @DynamicInsert // null인 필드는
 @Entity(name="competition") // 대회 엔티티 이름 지정
+/**
+ * 필드
+ * competitionId: 대회 ID Long
+ * name: 대회 이름 String
+ * viewCount: 조회수 Integer
+ * scrapCount: 스크랩 수 Integer
+ * startDate: 대회 시작일 LocalDateTime
+ * endDate: 대회 종료일 LocalDateTime
+ * recruitingStart: 모집 시작일 LocalDateTime
+ * recruitingEnd: 모집 마감일 LocalDateTime
+ * totalPrize: 총 상금 Integer
+ * prizeDetail: 시상 내역 String
+ * content: 대회 내용 String
+ * location: 대회 장소 String
+ * locationDetail: 대회 장소 상세 String
+ * latitude: 위도 Double
+ * longitude: 경도 Double
+ * state: 대회 상태 CompetitionState
+ * stateDetail: 대회 상세 상태 String
+ * competitionType: 대회 타입 CompetitionType
+ * host: 대회 주최자 Member
+ * category: 대회 카테고리 SportsCategory
+ * templateId: 대회 템플릿 ID Long
+ * maxPlayers: 최대 인원 Integer
+ * maxViewers: 최대 관람자 Integer
+ * posters: 대회 포스터 List<Poster>
+ * agreements: 대회 약관 List<Agreement>
+ * competitionResults: 대회 결과 List<CompetitionResult>
+ * categories: 대회 카테고리 List<Category>
+ */
 public class Competition extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) // MySQL에서는 AI 해제할 것
     private Long competitionId;
     @Column(nullable = false, length = 100)
     private String name; // 대회 이름
     @Builder.Default // Builder의 default 설정 : viewCount = 0;
-    @Column(nullable = false)
-    @ColumnDefault("0") // MySQL에서의 default 0으로 설정
+    @Column(nullable = false) @ColumnDefault("0") // MySQL에서의 default 0으로 설정
     private Integer viewCount = 0; // 조회수
     @Builder.Default
-    @Column(nullable = false)
-    @ColumnDefault("0")
+    @Column(nullable = false) @ColumnDefault("0")
     private Integer scrapCount = 0; // 스크랩 수
     @Column(nullable = false)
     private LocalDateTime startDate; // 대회 시작일 - HH:MM:SS'T'YYYYMMDD -> 시간 기준이 뭔지 확인해 볼 필요
@@ -43,9 +71,10 @@ public class Competition extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime recruitingEnd; // 모집 마감일
     @Builder.Default
-    @Column(nullable = false)
-    @ColumnDefault("0")
+    @Column(nullable = false) @ColumnDefault("0")
     private Integer totalPrize = 0; // 총 상금
+    @Column(nullable = false, length = 200)
+    private String prizeDetail; // 시상 내역
     @Column(nullable = false, length=2000)
     private String content; // 대회 내용
     @Column(nullable = false, length = 100)
@@ -98,7 +127,7 @@ public class Competition extends BaseEntity {
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true) // orphanRemoval : 대회 삭제 시, 대회 규정도 삭제, cascade : 대회 삭제 시, 대회 규정도 삭제
     private List<Agreement> agreements = new ArrayList<>(); // 대회 규정
 
-    @Scheduled(fixedDelay = 1000*60) // 1분마다 실행
+    @Scheduled(fixedDelay = 1000*60*60) // 1분마다 실행
     public void updateState() {
         LocalDateTime now = LocalDateTime.now();
         boolean isChanged = false;

@@ -144,6 +144,9 @@ public class CompetitionDto {
         private LocalDateTime endDate;
         @Schema(description = "총 상금", example = "1000000")
         private Integer totalPrize;
+        @Schema(description = "시상", example = "1등 100만원 \n2등 50만원 \n3등 10만원")
+        @NonNull
+        private String prizeDetail;
         @Schema(description = "대회 상세 정보", example = "스포츠잇 팔씨름 대회를 개최합니다.")
         @NonNull
         private String content;
@@ -183,6 +186,26 @@ public class CompetitionDto {
                     .latitude(latitude)
                     .longitude(longitude)
                     .templateId(templateId)
+                    .maxPlayer(maxPlayer)
+                    .maxViewer(maxViewer)
+                    .build();
+        }
+
+        public Competition toEntity() {
+            return Competition.builder()
+                    .name(name)
+                    .category(sportCategory)
+                    .recruitingStart(recruitingStart)
+                    .recruitingEnd(recruitingEnd)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .totalPrize(totalPrize)
+                    .content(content)
+                    .location(location)
+                    .locationDetail(locationDetail)
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .templateID(templateId)
                     .maxPlayer(maxPlayer)
                     .maxViewer(maxViewer)
                     .build();
