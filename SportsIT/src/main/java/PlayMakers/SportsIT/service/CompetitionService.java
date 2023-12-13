@@ -76,6 +76,50 @@ public class CompetitionService {
 
         return competitionRepository.save(newCompetition);
     }
+
+    public Competition createCompetition(CompetitionDto.Form dto, Member host) {
+        log.info("대회 생성 요청: {}", dto);
+
+        // host의 memberType이 ROLE_INSTITUTION 또는 ROLE_ADMIN이 아니면 예외 발생
+        if (host.getMemberType().stream().noneMatch(memberType ->
+                memberType.getRoleName().equals("ROLE_INSTITUTION") ||
+                        memberType.getRoleName().equals("ROLE_ADMIN"))) {
+            throw new UnAuthorizedException(ErrorCode.NOT_HOST, "대회 주최 권한이 없습니다.");
+        }
+
+        Competition newCompetition = dto.toAllArgsDto().toEntity();
+        newCompetition.setHost(host);
+        Set<Category> categories = new HashSet<>();
+        if (dto.getCategories() == null) {
+            dto.setCategories(new ArrayList<>(){{add("ETC");}});
+        }
+        for (String categoryId : dto.getCategories()) {
+            categories.add(categoryRepository.findById(categoryId).orElseThrow(
+                    () -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.")));
+        }
+        newCompetition.setCategories(categories);
+        newCompetition.setViewCount(0);
+        newCompetition.setScrapCount(0);
+
+        // 시간 정보가 유효하지 않으면 예외 발생
+        checkTimeValidity(newCompetition);
+
+        // 대회 상태 설정 (PLANNING, RECRUITING, RECRUITING_END, IN_PROGRESS) : competition.state == null 일 경우
+        if (newCompetition.getState() == null) {
+            newCompetition.setState(competitionPolicy.getCompetitionState(newCompetition)); // 일정정보가 비정상적이면 IllegalArgumentException 발생
+        }
+        // 대회 타입 설정 (FREE, PREMIUM, VIP) : competition.type == null 일 경우
+        if (newCompetition.getCompetitionType() == null) {
+            newCompetition.setCompetitionType(competitionPolicy.getCompetitionType(host));
+        }
+
+        // 필수 정보가 없으면 예외 발생
+        checkRequiredInfo(newCompetition);
+
+        log.info("대회 생성 완료: {}", newCompetition);
+
+        return competitionRepository.save(newCompetition);
+    }
     public Competition findById(Long competitionId) {
         log.info("대회 조회 요청: {}", competitionId);
         Competition competition = competitionRepository.findById(competitionId).orElseThrow(() -> new PlayMakers.SportsIT.exceptions.EntityNotFoundException(
