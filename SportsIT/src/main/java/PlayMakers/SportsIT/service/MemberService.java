@@ -6,9 +6,11 @@ import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -141,5 +143,21 @@ public class MemberService {
             return null;
         }
         return member.getCategories();
+    }
+
+    // User 객체로부터 username을 추출해 회원 조회
+    public Member getMember(User user) {
+        // user에 저장된 username이 uid일 경우 uid로 조회, string일 경우 email로 조회
+        String username = user.getUsername();
+        try {
+            Long uid = Long.parseLong(username);
+            return findByUid(uid).orElse(null);
+        } catch (NumberFormatException e) {
+            try {
+                return findOne(username);
+            } catch (EntityNotFoundException ex) {
+                return null;
+            }
+        }
     }
 }
