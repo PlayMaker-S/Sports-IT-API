@@ -38,27 +38,20 @@ class CompetitionRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
 
-    @Autowired
-    TestEntityManager em;
-
-    JPAQueryFactory jpaQueryFactory;
-
     MemberType hostType = MemberType.builder()
             .roleName("ROLE_INSTITUTION")
             .build();
 
     @BeforeEach
     public void before() {
-        jpaQueryFactory = new JPAQueryFactory(em.getEntityManager());
-
         competitionRepository.deleteAll();
         // 호스트 생성
         Member member = createHost("test99@gmail.com", "010-1234-5678");
-        em.persistAndFlush(member);
 
         // 대회 생성
         Competition competition = createCompetition(member, SportCategory.SOCCER);
-        em.persistAndFlush(competition);
+        memberRepository.save(member);
+        competitionRepository.save(competition);
     }
     public Member createHost(String email, String phone) {
         Member member = Member.builder()
