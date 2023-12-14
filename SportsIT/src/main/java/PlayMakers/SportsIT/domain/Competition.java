@@ -73,7 +73,7 @@ public class Competition extends BaseEntity {
     @Builder.Default
     @Column(nullable = false) @ColumnDefault("0")
     private Integer totalPrize = 0; // 총 상금
-    @Column(nullable = false, length = 200)
+    @Column(length = 200)
     private String prizeDetail; // 시상 내역
     @Column(nullable = false, length=2000)
     private String content; // 대회 내용

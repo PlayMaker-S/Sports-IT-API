@@ -99,7 +99,6 @@ public class CompetitionController {
 
         // 대회 생성
         Competition competition = competitionService.create(temp);
-        //CommonResponse<Object> res = new CommonResponse<>(CREATED.value(), true, null);
         CommonResponse<Object> res = ApiUtils.success(CREATED.value(), null);
 
         return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
