@@ -29,7 +29,7 @@ public class CompetitionScheduler {
     }
 
     @Async
-    @Scheduled(fixedDelay = 1000 * 60) // 1분마다
+    @Scheduled(fixedDelay = 1000 * 60 * 60) // 60분마다
     public void updateCompetitionState() {
         log.info("실시간 대회 상태 조회() start");
         LocalDateTime now = LocalDateTime.now();
