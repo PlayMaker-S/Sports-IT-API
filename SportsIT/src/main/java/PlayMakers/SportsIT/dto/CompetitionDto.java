@@ -2,6 +2,7 @@ package PlayMakers.SportsIT.dto;
 
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.enums.CompetitionType;
+import com.amazonaws.services.ec2.model.Image;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -169,6 +170,7 @@ public class CompetitionDto {
         private Integer maxPlayer;
         @Schema(description = "최대 관람자 수, Null일 경우 999명", example = "999")
         private Integer maxViewer;
+        private Image poster;
 
         public CompetitionDto toAllArgsDto() {
             return CompetitionDto.builder()
