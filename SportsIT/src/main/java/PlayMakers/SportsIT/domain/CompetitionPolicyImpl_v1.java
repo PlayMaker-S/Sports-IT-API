@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.domain;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import PlayMakers.SportsIT.enums.Subscribe;
 import org.springframework.beans.factory.annotation.Qualifier;

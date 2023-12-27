@@ -1,6 +1,9 @@
-package PlayMakers.SportsIT.dto;
+package PlayMakers.SportsIT.competitions.dto;
 
+import PlayMakers.SportsIT.competitions.domain.Category;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.*;
+import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import com.amazonaws.services.ec2.model.Image;
 import io.swagger.v3.oas.annotations.media.Schema;

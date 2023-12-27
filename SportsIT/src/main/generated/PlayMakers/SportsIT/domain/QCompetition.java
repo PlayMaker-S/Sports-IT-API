@@ -2,6 +2,8 @@ package PlayMakers.SportsIT.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import PlayMakers.SportsIT.competitions.domain.Category;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

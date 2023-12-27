@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.dto;
 
+import PlayMakers.SportsIT.competitions.dto.CompetitionDto;
 import PlayMakers.SportsIT.domain.JoinCompetition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

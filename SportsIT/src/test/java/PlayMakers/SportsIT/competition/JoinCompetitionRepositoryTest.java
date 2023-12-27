@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.competition;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
@@ -7,7 +8,6 @@ import PlayMakers.SportsIT.repository.JoinCompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

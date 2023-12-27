@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.repository;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import com.querydsl.core.BooleanBuilder;

@@ -2,6 +2,7 @@ package PlayMakers.SportsIT.domain;
 
 import PlayMakers.SportsIT.auth.security.userinfo.OAuth2UserInfo;
 import PlayMakers.SportsIT.auth.security.enums.AuthProvider;
+import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.enums.Subscribe;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

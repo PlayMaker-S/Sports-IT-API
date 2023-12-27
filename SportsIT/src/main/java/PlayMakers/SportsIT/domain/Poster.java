@@ -1,11 +1,9 @@
 package PlayMakers.SportsIT.domain;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 @Entity
 @Data // getter, setter, toString, equals, hashCode 자동 생성

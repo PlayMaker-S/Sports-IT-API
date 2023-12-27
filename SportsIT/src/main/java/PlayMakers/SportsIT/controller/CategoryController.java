@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.controller;
 
-import PlayMakers.SportsIT.domain.Category;
+import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.service.CategoryService;
 import PlayMakers.SportsIT.service.CompetitionService;

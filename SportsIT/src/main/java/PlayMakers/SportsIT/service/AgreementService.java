@@ -1,11 +1,9 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.domain.Agreement;
-import PlayMakers.SportsIT.domain.Competition;
-import PlayMakers.SportsIT.domain.Poster;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.dto.AgreementDto;
 import PlayMakers.SportsIT.repository.AgreementRepository;
-import PlayMakers.SportsIT.repository.PosterRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service

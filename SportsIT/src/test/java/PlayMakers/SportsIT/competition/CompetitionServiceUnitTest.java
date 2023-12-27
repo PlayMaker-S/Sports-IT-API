@@ -1,12 +1,13 @@
 package PlayMakers.SportsIT.competition;
 
 import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
+import PlayMakers.SportsIT.competitions.domain.Category;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.*;
-import PlayMakers.SportsIT.dto.CompetitionDto;
+import PlayMakers.SportsIT.competitions.dto.CompetitionDto;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import PlayMakers.SportsIT.exceptions.InvalidValueException;
 import PlayMakers.SportsIT.exceptions.UnAuthorizedException;
-import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
 import PlayMakers.SportsIT.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;

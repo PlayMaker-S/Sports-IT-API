@@ -1,10 +1,5 @@
 package PlayMakers.SportsIT.utils.api;
 
-import PlayMakers.SportsIT.dto.CompetitionDto;
-import org.springframework.validation.FieldError;
-
-import java.util.List;
-
 public class ApiUtils {
     public static <T> CommonResponse<T> success(int code, T resource) {
         return new CommonResponse<>(code, true, resource);

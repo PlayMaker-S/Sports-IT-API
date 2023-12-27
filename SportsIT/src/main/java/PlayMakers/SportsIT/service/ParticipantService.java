@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.service;
 
-import PlayMakers.SportsIT.domain.Competition;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.CompetitionForm;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.Participant;

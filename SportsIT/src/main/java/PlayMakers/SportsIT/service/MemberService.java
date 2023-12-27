@@ -1,6 +1,7 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.auth.security.SecurityUtil;
+import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;

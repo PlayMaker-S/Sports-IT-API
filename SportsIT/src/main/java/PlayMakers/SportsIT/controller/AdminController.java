@@ -1,8 +1,7 @@
 package PlayMakers.SportsIT.controller;
 
-import PlayMakers.SportsIT.domain.Competition;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.Member;
-import PlayMakers.SportsIT.domain.Payment;
 import PlayMakers.SportsIT.dto.PaymentDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;

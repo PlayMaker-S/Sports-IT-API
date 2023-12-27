@@ -1,5 +1,7 @@
-package PlayMakers.SportsIT.controller;
+package PlayMakers.SportsIT.competitions.controller;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.dto.CompetitionDto;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.exceptions.ErrorCode;

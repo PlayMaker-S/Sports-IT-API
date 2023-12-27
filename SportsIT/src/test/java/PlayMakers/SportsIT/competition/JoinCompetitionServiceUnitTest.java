@@ -1,6 +1,7 @@
 package PlayMakers.SportsIT.competition;
 
 import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
 import PlayMakers.SportsIT.repository.CompetitionRepository;

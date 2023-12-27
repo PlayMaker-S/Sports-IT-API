@@ -1,12 +1,10 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.domain.Agreement;
-import PlayMakers.SportsIT.domain.Competition;
-import PlayMakers.SportsIT.domain.Poster;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.dto.AgreementDto;
 import PlayMakers.SportsIT.service.AgreementService;
 import PlayMakers.SportsIT.service.CompetitionService;
-import PlayMakers.SportsIT.service.PosterService;
 import PlayMakers.SportsIT.service.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

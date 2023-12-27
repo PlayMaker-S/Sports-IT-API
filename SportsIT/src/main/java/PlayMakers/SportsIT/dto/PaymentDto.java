@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.dto;
 
-import PlayMakers.SportsIT.domain.Competition;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.Payment;
 import PlayMakers.SportsIT.enums.PaymentStatus;

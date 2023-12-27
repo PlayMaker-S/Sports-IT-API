@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.competition;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
@@ -12,7 +13,6 @@ import PlayMakers.SportsIT.service.JoinCompetitionService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.internal.matchers.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

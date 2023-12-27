@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.domain;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.enums.CompetitionType;
 
 public interface CompetitionPolicy {

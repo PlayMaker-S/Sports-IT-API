@@ -1,11 +1,10 @@
 package PlayMakers.SportsIT.domain;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter @Setter

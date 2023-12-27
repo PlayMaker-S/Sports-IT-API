@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.utils.api;
 
-import PlayMakers.SportsIT.dto.CompetitionDto;
+import PlayMakers.SportsIT.competitions.dto.CompetitionDto;
 
 public class CompetitionResponse extends CommonResponse<CompetitionDto>{
     public CompetitionResponse(int code, boolean success, CompetitionDto result) {

@@ -1,8 +1,6 @@
 package PlayMakers.SportsIT.bodyInfo;
 
-import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.BodyInfo;
-import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.MemberType;
 import PlayMakers.SportsIT.dto.BodyInfoDto;
@@ -10,17 +8,11 @@ import PlayMakers.SportsIT.repository.BodyInfoRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.service.BodyInfoService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 import java.util.Optional;

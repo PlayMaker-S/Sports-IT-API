@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.domain;
 
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.enums.PaymentStatus;
 import PlayMakers.SportsIT.enums.PaymentType;
 import jakarta.persistence.*;

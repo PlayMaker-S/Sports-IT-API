@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.aop;
 
-import PlayMakers.SportsIT.domain.Competition;
+import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.CompetitionResult;
 import PlayMakers.SportsIT.domain.JoinCompetition;
 import PlayMakers.SportsIT.domain.Member;
@@ -13,8 +13,6 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Aspect

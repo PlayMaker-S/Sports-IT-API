@@ -1,7 +1,6 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.domain.BodyInfo;
-import PlayMakers.SportsIT.domain.Competition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.dto.BodyInfoDto;
 import PlayMakers.SportsIT.repository.BodyInfoRepository;
