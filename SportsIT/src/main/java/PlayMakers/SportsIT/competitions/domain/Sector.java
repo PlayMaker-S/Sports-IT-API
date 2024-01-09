@@ -1,6 +1,5 @@
-package PlayMakers.SportsIT.domain;
+package PlayMakers.SportsIT.competitions.domain;
 
-import PlayMakers.SportsIT.competitions.domain.Competition;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
