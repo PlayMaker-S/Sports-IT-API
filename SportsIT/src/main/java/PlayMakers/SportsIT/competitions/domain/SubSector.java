@@ -18,8 +18,11 @@ public class SubSector {
     @Getter
     @AllArgsConstructor @NoArgsConstructor
     public static class SubSectorId implements Serializable {
+        @Column(name = "cmp_id")
         private Long competitionId;
+        @Column(name = "sector_index")
         private Long sectorIndex;
+        @Column(name = "subsector_index")
         private Long subSectorIndex;
     }
 
@@ -30,6 +33,9 @@ public class SubSector {
 
     @MapsId("sector_id")
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Sector.class)
-    @JoinColumn(name = "sector_id")
+    @JoinColumns({
+            @JoinColumn(name = "cmp_id", referencedColumnName = "competition_id"),
+            @JoinColumn(name = "sector_index", referencedColumnName = "sector_index")
+    })
     private Sector sector;
 }

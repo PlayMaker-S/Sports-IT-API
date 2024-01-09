@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.service;
+package PlayMakers.SportsIT.competitions.service;
 
 import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
 import PlayMakers.SportsIT.competitions.domain.Category;
@@ -9,7 +9,7 @@ import PlayMakers.SportsIT.dto.CompetitionFormDto;
 import PlayMakers.SportsIT.dto.CompetitionResultDto;
 import PlayMakers.SportsIT.exceptions.ErrorCode;
 import PlayMakers.SportsIT.exceptions.*;
-import PlayMakers.SportsIT.repository.CategoryRepository;
+import PlayMakers.SportsIT.competitions.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;

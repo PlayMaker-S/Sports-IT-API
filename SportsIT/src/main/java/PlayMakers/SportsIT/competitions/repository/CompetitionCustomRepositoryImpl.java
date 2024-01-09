@@ -1,6 +1,8 @@
 package PlayMakers.SportsIT.repository;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.domain.QCompetition;
+import PlayMakers.SportsIT.competitions.enums.CompetitionState;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import com.querydsl.core.BooleanBuilder;
@@ -18,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static PlayMakers.SportsIT.domain.QCompetition.competition;
+import static PlayMakers.SportsIT.competitions.domain.QCompetition.competition;
 
 @Slf4j
 @RequiredArgsConstructor

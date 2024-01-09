@@ -1,7 +1,7 @@
 package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.competitions.domain.Category;
-import PlayMakers.SportsIT.repository.CategoryRepository;
+import PlayMakers.SportsIT.competitions.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +26,8 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
-    public Category create(String category, String name) {
+    public Category create(String name) {
         Category newCategory = Category.builder()
-                .category(category)
                 .name(name)
                 .build();
         return categoryRepository.save(newCategory);

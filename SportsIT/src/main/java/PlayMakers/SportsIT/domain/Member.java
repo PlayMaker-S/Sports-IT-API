@@ -84,7 +84,7 @@ public class Member extends BaseEntity {
     @JoinTable(
             name = "member_category",
             joinColumns = {@JoinColumn(name = "member_uid", referencedColumnName = "uid")},
-            inverseJoinColumns = {@JoinColumn(name = "category", referencedColumnName = "category")})
+            inverseJoinColumns = {@JoinColumn(name = "cat_code", referencedColumnName = "code")})
     private Set<Category> categories;
 
     public Member update(OAuth2UserInfo oAuth2UserInfo) {

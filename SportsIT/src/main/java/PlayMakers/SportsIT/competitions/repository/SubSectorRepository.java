@@ -1,7 +1,7 @@
 package PlayMakers.SportsIT.repository;
 
-import PlayMakers.SportsIT.domain.Sector;
-import PlayMakers.SportsIT.domain.SubSector;
+import PlayMakers.SportsIT.competitions.domain.Sector;
+import PlayMakers.SportsIT.competitions.domain.SubSector;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
