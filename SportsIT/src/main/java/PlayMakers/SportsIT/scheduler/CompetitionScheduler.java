@@ -1,8 +1,8 @@
 package PlayMakers.SportsIT.scheduler;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
-import PlayMakers.SportsIT.domain.CompetitionState;
-import PlayMakers.SportsIT.repository.CompetitionRepository;
+import PlayMakers.SportsIT.competitions.enums.CompetitionState;
+import PlayMakers.SportsIT.competitions.repository.CompetitionRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
