@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.repository;
+package PlayMakers.SportsIT.competitions.repository;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
 import org.springframework.data.domain.Pageable;
