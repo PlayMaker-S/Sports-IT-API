@@ -2,6 +2,7 @@ package PlayMakers.SportsIT.competitions.dto;
 
 import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.enums.CompetitionState;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.enums.CompetitionType;
@@ -131,9 +132,12 @@ public class CompetitionDto {
         @Schema(description = "대회 종목 리스트", example = "[\"ARM_WRESTLING\"]")
         @NonNull
         private List<String> categories;
-        @Schema(description = "대회 종목, deprecate 예정", example = "ARM_WRESTLING")
-        @NonNull
-        private SportCategory sportCategory;
+        //@Schema(description = "대회 종목, deprecate 예정", example = "ARM_WRESTLING")
+        //@NonNull
+        //private SportCategory sportCategory;
+        @Schema(description = "대회 주최 기관", example = "대한팔씨름연맹(KAF)")
+        private String management;
+
         @Schema(description = "대회 모집 시작일", type = "string", format = "date-time", example = "2023-09-15T00:00:00Z")
         @NonNull
         private LocalDateTime recruitingStart;
@@ -173,12 +177,15 @@ public class CompetitionDto {
         private Integer maxPlayer;
         @Schema(description = "최대 관람자 수, Null일 경우 999명", example = "999")
         private Integer maxViewer;
+        @Schema(description = "관람 비용", example = "5000")
+        private Integer viewerFee;
+
         private Image poster;
 
         public CompetitionDto toAllArgsDto() {
             return CompetitionDto.builder()
                     .name(name)
-                    .sportCategory(sportCategory)
+                    //.sportCategory(sportCategory)
                     .categories(categories)
                     .recruitingStart(recruitingStart)
                     .recruitingEnd(recruitingEnd)
@@ -199,12 +206,14 @@ public class CompetitionDto {
         public Competition toEntity() {
             return Competition.builder()
                     .name(name)
-                    .category(sportCategory)
+                    //.category(sportCategory)
+                    .management(management)
                     .recruitingStart(recruitingStart)
                     .recruitingEnd(recruitingEnd)
                     .startDate(startDate)
                     .endDate(endDate)
                     .totalPrize(totalPrize)
+                    .prizeDetail(prizeDetail)
                     .content(content)
                     .location(location)
                     .locationDetail(locationDetail)
@@ -227,6 +236,8 @@ public class CompetitionDto {
         private String name;
         @Schema(description = "대회 주최자 객체")
         private MemberDto.Summary host;
+        @Schema(description = "대회 주관 단체")
+        private String management;
         @Schema(description = "대회 종목 코드 리스트 / 현재는 대회 생성시 필요 X", example = "{\"ARM_WRESTLING\"}")
         private Set<Category> categories;
         @Schema(description = "종목 코드", example = "ARM_WRESTLING")
