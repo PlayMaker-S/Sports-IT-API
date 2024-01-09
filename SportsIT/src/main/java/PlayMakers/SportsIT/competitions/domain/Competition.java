@@ -1,5 +1,6 @@
 package PlayMakers.SportsIT.competitions.domain;
 
+import PlayMakers.SportsIT.competitions.enums.CompetitionState;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -7,10 +8,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +59,8 @@ public class Competition extends BaseEntity {
     private Long competitionId;
     @Column(nullable = false, length = 100)
     private String name; // 대회 이름
+    @Column(length = 100)
+    private String management; // 대회 주관
     @Builder.Default // Builder의 default 설정 : viewCount = 0;
     @Column(nullable = false) @ColumnDefault("0") // MySQL에서의 default 0으로 설정
     private Integer viewCount = 0; // 조회수
@@ -96,11 +102,8 @@ public class Competition extends BaseEntity {
     private CompetitionType competitionType = CompetitionType.FREE; // 대회 타입 FREE, PREMIUM, VIP
 
     @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "competition_host",
-            joinColumns = @JoinColumn(name = "competition_id"),
-            inverseJoinColumns = @JoinColumn(name = "host_id"))
     @JsonIgnoreProperties({"pw", "email", "phone", "birth", "subscription", "activated", "authorities", "createdDate", "updatedDate", "memberType"})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member host; // 주최자 uid
 
     @Enumerated(EnumType.STRING) // enum 타입을 DB에 저장할 때, enum의 이름을 저장하도록 설정
@@ -152,12 +155,17 @@ public class Competition extends BaseEntity {
     @OneToMany(mappedBy = "competition")
     private List<CompetitionResult> competitionResults;
 
-    @ManyToMany(targetEntity = Category.class, fetch = FetchType.LAZY)
+    @Builder.Default
+    @ManyToMany(targetEntity = Category.class, fetch = FetchType.LAZY, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE,
+    })
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(
             name = "competition_category",
-            joinColumns = {@JoinColumn(name = "competitionId")},
-            inverseJoinColumns = {@JoinColumn(name = "category", referencedColumnName = "category")})
-    private Set<Category> categories;
+            joinColumns = {@JoinColumn(name = "cmp_id")},
+            inverseJoinColumns = {@JoinColumn(name = "cat_code", referencedColumnName = "code")})
+    private Set<Category> categories = new HashSet<>();
 
     @Override
     public String toString() {
@@ -183,4 +191,41 @@ public class Competition extends BaseEntity {
                 '}';
     }
 
+    public Competition update(Competition updated) {
+        this.name = updated.name;
+        this.startDate = updated.startDate;
+        this.endDate = updated.endDate;
+        this.recruitingStart = updated.recruitingStart;
+        this.recruitingEnd = updated.recruitingEnd;
+        this.totalPrize = updated.totalPrize;
+        this.content = updated.content;
+        this.location = updated.location;
+        this.locationDetail = updated.locationDetail;
+        this.latitude = updated.latitude;
+        this.longitude = updated.longitude;
+        this.stateDetail = updated.stateDetail;
+        //this.competitionType = updated.competitionType;
+        this.maxPlayer = updated.maxPlayer;
+        this.maxViewer = updated.maxViewer;
+        return this;
+    }
+
+    public void addHost(Member host) {
+        this.host = host;
+    }
+
+    public void addCategories(Set<Category> categories) {
+        for (Category category : categories) {
+            if (this.categories.contains(category))
+                continue;
+            this.categories.add(category);
+        }
+    }
+
+    public void addCategory(Category category) {
+        if (this.categories.contains(category))
+            return;
+        this.categories.add(category);
+        category.getCompetitions().add(this);
+    }
 }

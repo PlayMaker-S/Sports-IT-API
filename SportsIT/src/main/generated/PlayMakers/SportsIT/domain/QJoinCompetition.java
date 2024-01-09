@@ -24,7 +24,7 @@ public class QJoinCompetition extends EntityPathBase<JoinCompetition> {
 
     public final QBaseEntity _super = new QBaseEntity(this);
 
-    public final QCompetition competition;
+    public final PlayMakers.SportsIT.competitions.domain.QCompetition competition;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
@@ -58,7 +58,7 @@ public class QJoinCompetition extends EntityPathBase<JoinCompetition> {
 
     public QJoinCompetition(Class<? extends JoinCompetition> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.competition = inits.isInitialized("competition") ? new QCompetition(forProperty("competition"), inits.get("competition")) : null;
+        this.competition = inits.isInitialized("competition") ? new PlayMakers.SportsIT.competitions.domain.QCompetition(forProperty("competition"), inits.get("competition")) : null;
         this.id = inits.isInitialized("id") ? new QJoinCompetition_JoinCompetitionId(forProperty("id")) : null;
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
     }
