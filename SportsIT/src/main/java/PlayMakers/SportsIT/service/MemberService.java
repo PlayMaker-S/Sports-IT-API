@@ -5,7 +5,7 @@ import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.MemberDto;
 import PlayMakers.SportsIT.exceptions.competition.IllegalMemberTypeException;
-import PlayMakers.SportsIT.repository.CategoryRepository;
+import PlayMakers.SportsIT.competitions.repository.CategoryRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -40,12 +40,13 @@ public class MemberService {
                 .build();
 
         Set<Category> categories = new HashSet<>();
-        if (dto.getCategories() == null) {
-            dto.setCategories(new ArrayList<>(){{add("ETC");}});
+        // 선택한 관심 종목이 있을 경우
+        if (dto.getCategories() != null && !dto.getCategories().isEmpty()) {
+            for (String category : dto.getCategories()) {
+                categories.add(categoryRepository.findById(Long.parseLong(category)).get());
+            }
         }
-        for (String category : dto.getCategories()) {
-            categories.add(categoryRepository.findById(category).get());
-        }
+
         log.info("memberType: {}", memberType);
         Member member = Member.builder()
                 .pw(passwordEncoder.encode(dto.getPw()))
