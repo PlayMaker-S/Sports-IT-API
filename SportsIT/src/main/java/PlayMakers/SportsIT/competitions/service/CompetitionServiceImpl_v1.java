@@ -3,6 +3,7 @@ package PlayMakers.SportsIT.competitions.service;
 import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
 import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.policy.CompetitionPolicy;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.competitions.dto.CompetitionDto;
 import PlayMakers.SportsIT.dto.CompetitionFormDto;
@@ -10,7 +11,7 @@ import PlayMakers.SportsIT.dto.CompetitionResultDto;
 import PlayMakers.SportsIT.exceptions.ErrorCode;
 import PlayMakers.SportsIT.exceptions.*;
 import PlayMakers.SportsIT.competitions.repository.CategoryRepository;
-import PlayMakers.SportsIT.repository.CompetitionRepository;
+import PlayMakers.SportsIT.competitions.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,7 +28,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class CompetitionService {
+public class CompetitionServiceImpl_v1 {
     private final CompetitionRepository competitionRepository;
     private final MemberRepository memberRepository;
     private final @MainCompetitionPolicy CompetitionPolicy competitionPolicy;
@@ -51,7 +52,7 @@ public class CompetitionService {
             dto.setCategories(new ArrayList<>(){{add("ETC");}});
         }
         for (String categoryId : dto.getCategories()) {
-            categories.add(categoryRepository.findById(categoryId).orElseThrow(
+            categories.add(categoryRepository.findById(Long.parseLong(categoryId)).orElseThrow(
                     () -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.")));
         }
         newCompetition.setCategories(categories);
@@ -95,7 +96,7 @@ public class CompetitionService {
             dto.setCategories(new ArrayList<>(){{add("ETC");}});
         }
         for (String categoryId : dto.getCategories()) {
-            categories.add(categoryRepository.findById(categoryId).orElseThrow(
+            categories.add(categoryRepository.findById(Long.parseLong(categoryId)).orElseThrow(
                     () -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.")));
         }
         newCompetition.setCategories(categories);
@@ -208,7 +209,7 @@ public class CompetitionService {
     }
 
     public List<CompetitionResultDto> getAllResultsByCompetition(Long competitionId) {
-        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        Competition competition = competitionRepository.findByCompetitionId(competitionId).get();
         List<CompetitionResult> competitionResults = competition.getCompetitionResults();
         List<CompetitionResultDto> competitionResultDtos = new ArrayList<>();
         for(CompetitionResult cr : competitionResults){
@@ -312,7 +313,7 @@ public class CompetitionService {
     }
 
     public Object getCategoriesByCompetition(Long competitionId) {
-        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        Competition competition = competitionRepository.findByCompetitionId(competitionId).get();
         return competition.getCategories();
 
     }
