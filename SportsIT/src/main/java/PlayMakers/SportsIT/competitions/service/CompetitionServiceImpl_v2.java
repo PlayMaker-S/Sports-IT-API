@@ -34,8 +34,6 @@ public class CompetitionServiceImpl_v2 implements CompetitionService {
         competition.addHost(host);
         competition.addCategories(categories);
         competition.setState(CompetitionState.getCompetitionState(competition.getRecruitingStart(), competition.getRecruitingEnd(), competition.getStartDate(), competition.getEndDate()));
-        //competition.setHost(host);
-        //competition.setCategories(categories);
         return competitionRepository.save(competition);
     }
 

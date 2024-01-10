@@ -48,9 +48,7 @@ public class CompetitionServiceImpl_v1 {
 
         Competition newCompetition = dto.toEntity();
         Set<Category> categories = new HashSet<>();
-        if (dto.getCategories() == null) {
-            dto.setCategories(new ArrayList<>(){{add("ETC");}});
-        }
+
         for (String categoryId : dto.getCategories()) {
             categories.add(categoryRepository.findById(Long.parseLong(categoryId)).orElseThrow(
                     () -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다.")));

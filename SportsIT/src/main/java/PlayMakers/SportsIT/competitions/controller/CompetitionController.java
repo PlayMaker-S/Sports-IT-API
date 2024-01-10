@@ -1,7 +1,11 @@
 package PlayMakers.SportsIT.competitions.controller;
 
+import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.competitions.dto.CompetitionDto;
+import PlayMakers.SportsIT.competitions.service.CategoryService;
+import PlayMakers.SportsIT.competitions.service.CompetitionServiceImpl_v1;
+import PlayMakers.SportsIT.competitions.service.CompetitionServiceImpl_v2;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.exceptions.ErrorCode;
@@ -45,13 +49,15 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/api/competitions")
 public class CompetitionController {
 
-    private final CompetitionService competitionService;
+    private final CompetitionServiceImpl_v1 competitionServiceImpl_v1;
+    private final CompetitionServiceImpl_v2 competitionService;
     private final MemberService memberService;
     private final JoinCompetitionService joinCompetitionService;
     private final CompetitionTemplateService competitionTemplateService;
     private final AgreementService agreementService;
     private final CompetitionFormService competitionFormService;
     private final ParticipantService participantService;
+    private final CategoryService categoryService;
 
     /*
         대회 생성
@@ -79,8 +85,8 @@ public class CompetitionController {
             @Parameter(name = "competitionDto", description = "대회 정보 객체", required = true)
             @RequestBody CompetitionDto.Form dto,
             @AuthenticationPrincipal User user) throws Exception {
-        // 주최자 ID 설정 - 일단 dto에 memberId가 포함된다고 가정
-        String hostEmail = null;
+
+        // host 추출
         Member host;
         try {
             host = memberService.getMember(user);
@@ -96,14 +102,18 @@ public class CompetitionController {
         CompetitionDto -> CompetitionDto.Form으로 동작하도록 Refactoring 필요
         2023.08.29 - MyeongQ
         * */
-        CompetitionDto temp = dto.toAllArgsDto();
-        temp.setHost(host);
+        // categories 추출
+        Set<Category> categories = new HashSet<>();
+        for (String categoryString : dto.getCategories()) {
+            categories.add(categoryService.findById(categoryString));
+        }
+
 
         // 대회 생성
-        Competition competition = competitionService.create(temp);
+        Competition created = competitionService.createCompetition(host, dto.toEntity(), categories);
         CommonResponse<Object> res = ApiUtils.success(CREATED.value(), null);
 
-        return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
+        return ResponseEntity.created(URI.create("/api/competitions/" + created.getCompetitionId())) // Location Header에 생성된 리소스의 URI를 담아서 보냄
                 .body(res); // 201
     }
 
@@ -125,7 +135,7 @@ public class CompetitionController {
      */
     @GetMapping("/all")
     public ResponseEntity<List<Competition>> getCompetitions() {
-        List<Competition> competitions = competitionService.findAll();
+        List<Competition> competitions = competitionServiceImpl_v1.findAll();
         return ResponseEntity.ok(competitions); // 200
     }
 
@@ -172,7 +182,7 @@ public class CompetitionController {
             @RequestParam String size) {
         log.info("대회 slice 요청: {} {} {} {} {}", keyword, filteringConditions, orderBy, page, size);
 
-        Slice<Competition> competitions = competitionService.getCompetitionSlice(keyword, filteringConditions, orderBy, parseInt(page), parseInt(size));
+        Slice<Competition> competitions = competitionServiceImpl_v1.getCompetitionSlice(keyword, filteringConditions, orderBy, parseInt(page), parseInt(size));
         return ResponseEntity.ok(ApiUtils.success(HttpStatus.OK.value(), competitions)); // 200
     }
 
@@ -196,7 +206,7 @@ public class CompetitionController {
             @Parameter(name = "competitionId", description = "대회 ID", required = true, in = ParameterIn.PATH)
             @PathVariable Long competitionId,
             @AuthenticationPrincipal User user) throws Exception {
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImpl_v1.findById(competitionId);
         boolean joined = (user != null) && joinCompetitionService.checkAlreadyJoined(Long.parseLong(user.getUsername()), competitionId);
 
         CompetitionDto.Info dto = CompetitionDto.Info.entityToInfo(competition);
@@ -233,7 +243,7 @@ public class CompetitionController {
             @RequestBody CompetitionDto.Form dto,
             @AuthenticationPrincipal User user) throws Exception {
 
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImpl_v1.findById(competitionId);
         Member host = memberService.getMember(user);
         log.info("대회 수정 요청: {}", host.getUid());
         if (!competition.getHost().getUid().equals(host.getUid()) && host.getMemberType().stream().noneMatch(
@@ -241,9 +251,9 @@ public class CompetitionController {
             throw new UnAuthorizedException(ErrorCode.ACCESS_DENIED, "관리자 또는 작성자 본인만 대회 정보를 수정할 수 있습니다.");
         }
 
-        competitionService.checkCompetitionNotStarted(competition);
+        competitionServiceImpl_v1.checkCompetitionNotStarted(competition);
 
-        competitionService.update(competitionId, dto);
+        competitionServiceImpl_v1.update(competitionId, dto);
 
         return ResponseEntity.created(URI.create("/api/competitions/" + competition.getCompetitionId()))
                 .body(ApiUtils.created(HttpStatus.NO_CONTENT.value())); // 201
@@ -269,7 +279,7 @@ public class CompetitionController {
 
         log.info("대회 삭제 요청: {}", competitionId);
 
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImpl_v1.findById(competitionId);
 
         Member host = memberService.getMember(user);
 
@@ -278,9 +288,9 @@ public class CompetitionController {
             throw new UnAuthorizedException(ErrorCode.ACCESS_DENIED, "관리자 또는 작성자 본인만 대회를 삭제할 수 있습니다.");
         }
 
-        competitionService.checkCompetitionNotStarted(competition);
+        competitionServiceImpl_v1.checkCompetitionNotStarted(competition);
 
-        competitionService.delete(competitionId);
+        competitionServiceImpl_v1.delete(competitionId);
 
         return ResponseEntity.ok(ApiUtils.success(HttpStatus.NO_CONTENT.value(), null)); // 204
     }
@@ -368,7 +378,7 @@ public class CompetitionController {
             res.put("message", e.getMessage());
             return ResponseEntity.ok(res); // 200
         }
-        Competition target = competitionService.findById(competitionId);
+        Competition target = competitionServiceImpl_v1.findById(competitionId);
         res.put("success", true);
         res.put("agreements", target.getAgreements());
         String templateId = target.getTemplateID();
@@ -409,7 +419,7 @@ public class CompetitionController {
             @AuthenticationPrincipal User user) throws Exception{
 
         Member member = memberService.getMember(user);
-        Competition target = competitionService.findById(competitionId);
+        Competition target = competitionServiceImpl_v1.findById(competitionId);
         Map<String, Object> res = new HashMap<>();
 
         if (joinCompetitionService.checkAlreadyJoined(member.getUid(), competitionId)) {
@@ -422,7 +432,7 @@ public class CompetitionController {
         // 결제 금액 계산
         String templateId = target.getTemplateID();
         CompetitionTemplate template = competitionTemplateService.getTemplate(templateId);
-        Long amount = competitionService.calculatePrice(template, formDto);
+        Long amount = competitionServiceImpl_v1.calculatePrice(template, formDto);
 
         String formId = competitionFormService.createForm(formDto.toEntity());
 
@@ -454,7 +464,7 @@ public class CompetitionController {
     public ResponseEntity<Object> getAgreements(@PathVariable Long competitionId) throws Exception{
         Map<String, Object> res = new HashMap<>();
         try {
-            List<Agreement> agreements = agreementService.findAgreementsByCompetition(competitionService.findById(competitionId));
+            List<Agreement> agreements = agreementService.findAgreementsByCompetition(competitionServiceImpl_v1.findById(competitionId));
             res.put("success", true);
             res.put("result", agreements);
 
@@ -489,7 +499,7 @@ public class CompetitionController {
         log.info("대회 참가 요청 Controller: {}", joinCompetitionDto);
         Member member = memberService.getMember(user);
         joinCompetitionDto.setUid(member.getUid());
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImpl_v1.findById(competitionId);
         joinCompetitionDto.setCompetitionId(competitionId);
         if (joinType.equals("viewer")) {
             joinCompetitionDto.setType(JoinCompetition.joinType.VIEWER);
@@ -593,7 +603,7 @@ public class CompetitionController {
         page = page == null ? 0 : page;
         size = size == null ? 15 : size;
         try {
-            List<Competition> competitions = competitionService.getCompetitionSliceByHostId(hostId, page.intValue(), size.intValue()).getContent();
+            List<Competition> competitions = competitionServiceImpl_v1.getCompetitionSliceByHostId(hostId, page.intValue(), size.intValue()).getContent();
             result = new SliceImpl<>(competitions.stream().map(competition -> CompetitionDto.Summary.builder()
                     .competitionId(competition.getCompetitionId())
                     .name(competition.getName())
@@ -715,7 +725,7 @@ public class CompetitionController {
     @GetMapping("/result/{competitionId}")
     public ResponseEntity<List<CompetitionResultDto>> getCompetitionResult(@PathVariable Long competitionId){
         log.info("대회 결과 조회");
-        return ResponseEntity.ok(competitionService.getAllResultsByCompetition(competitionId));
+        return ResponseEntity.ok(competitionServiceImpl_v1.getAllResultsByCompetition(competitionId));
     }
 
 
