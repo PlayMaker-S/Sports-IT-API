@@ -2,6 +2,9 @@ package PlayMakers.SportsIT.service;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.competitions.dto.CompetitionDto;
+import PlayMakers.SportsIT.competitions.enums.CompetitionState;
+import PlayMakers.SportsIT.competitions.repository.CompetitionCustomRepository;
+import PlayMakers.SportsIT.competitions.repository.CompetitionRepository;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.*;
 import PlayMakers.SportsIT.exceptions.EntityNotFoundException;
@@ -124,7 +127,7 @@ public class JoinCompetitionService {
     }
 
     public JoinCountDto countJoinCompetition(Long competitionId){
-        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        Competition competition = competitionRepository.findByCompetitionId(competitionId).get();
         JoinCountDto countResult = JoinCountDto.builder()
                 .maxPlayerCount(competition.getMaxPlayer())
                 .playerCount(countCurrentPlayer(competitionId))
@@ -176,7 +179,7 @@ public class JoinCompetitionService {
     }
 
     public Map<String, String> getJoinCounts(Long competitionId, Member member) throws Exception {
-        Competition competition = competitionRepository.findByCompetitionId(competitionId);
+        Competition competition = competitionRepository.findByCompetitionId(competitionId).get();
         if (competition == null) throw new EntityNotFoundException(ErrorCode.COMPETITION_NOT_FOUND, "대회를 찾을 수 없습니다. : ");
         // ROLE_PLAYER가 아니라면 예외 발생
         if (isNotPlayer(member)) {
