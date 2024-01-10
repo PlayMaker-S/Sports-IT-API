@@ -92,7 +92,7 @@ public class Competition extends BaseEntity {
     @Column
     private Double longitude; // 경도
     @Builder.Default
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private CompetitionState state = CompetitionState.RECRUITING; // 대회 상태 - enum으로 구현했을 때
 
     @Column(length = 50)

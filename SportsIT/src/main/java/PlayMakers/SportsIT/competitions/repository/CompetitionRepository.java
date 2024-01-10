@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.repository;
+package PlayMakers.SportsIT.competitions.repository;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.competitions.enums.CompetitionState;
@@ -14,7 +14,7 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long>,
     // 대회 이름으로 찾기
     Optional<Competition> findByName(String name);
     // 대회 상태로 찾기
-    Optional<Competition> findByState(String state);
+    List<Competition> findByState(CompetitionState state);
 
     List<Competition> findAllByStateIn(List<CompetitionState> state);
 
