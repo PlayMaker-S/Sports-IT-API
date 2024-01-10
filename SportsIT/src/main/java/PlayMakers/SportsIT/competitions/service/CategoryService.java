@@ -1,4 +1,4 @@
-package PlayMakers.SportsIT.service;
+package PlayMakers.SportsIT.competitions.service;
 
 import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.competitions.repository.CategoryRepository;
@@ -20,7 +20,7 @@ public class CategoryService {
         return categoryRepository.findByName(name).orElse(null);
     }
     public Category findById(String category) {
-        return categoryRepository.findById(category).orElse(null);
+        return categoryRepository.findById(Long.parseLong(category)).orElse(null);
     }
     public List<Category> findAll() {
         return categoryRepository.findAll();
@@ -33,6 +33,6 @@ public class CategoryService {
         return categoryRepository.save(newCategory);
     }
     public void delete(String category) {
-        categoryRepository.deleteById(category);
+        categoryRepository.deleteById(Long.parseLong(category));
     }
 }
