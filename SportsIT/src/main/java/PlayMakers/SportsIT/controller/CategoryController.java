@@ -2,8 +2,8 @@ package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.competitions.domain.Category;
 import PlayMakers.SportsIT.domain.Member;
-import PlayMakers.SportsIT.service.CategoryService;
-import PlayMakers.SportsIT.service.CompetitionService;
+import PlayMakers.SportsIT.competitions.service.CategoryService;
+import PlayMakers.SportsIT.competitions.service.CompetitionServiceImpl_v1;
 import PlayMakers.SportsIT.service.CustomCategoryService;
 import PlayMakers.SportsIT.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final CustomCategoryService customCategoryService;
     private final MemberService memberService;
-    private final CompetitionService competitionService;
+    private final CompetitionServiceImpl_v1 competitionServiceImplv1;
 
     /**
      * 모든 카테고리를 가져온다.
@@ -59,7 +59,7 @@ public class CategoryController {
     @GetMapping("/competition/{competitionId}")
     public ResponseEntity<Object> getCategoriesByCompetition(@PathVariable Long competitionId){
         Map<String, Object> result = new HashMap<>();
-        result.put("result", competitionService.getCategoriesByCompetition(competitionId));
+        result.put("result", competitionServiceImplv1.getCategoriesByCompetition(competitionId));
         result.put("success", true);
         return ResponseEntity.ok(result);
     }
@@ -74,7 +74,7 @@ public class CategoryController {
         Map<String, Object> result = new HashMap<>();
         String category = String.valueOf(data.get("category"));
         String name = String.valueOf(data.get("name"));
-        result.put("result", categoryService.create(category, name));
+        result.put("result", categoryService.create(name));
         result.put("success", true);
 
         return ResponseEntity.ok(result);

@@ -2,9 +2,10 @@ package PlayMakers.SportsIT.competition;
 
 import PlayMakers.SportsIT.annotation.MainCompetitionPolicy;
 import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.policy.CompetitionPolicy;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
-import PlayMakers.SportsIT.repository.CompetitionRepository;
+import PlayMakers.SportsIT.competitions.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.JoinCompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.service.JoinCompetitionService;
@@ -27,7 +28,7 @@ import static org.mockito.BDDMockito.given;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-class JoinCompetitionServiceUnitTest {
+class JoinCompetitionServiceImplv1UnitTest {
     @Mock
     private CompetitionRepository competitionRepository;
     @Mock

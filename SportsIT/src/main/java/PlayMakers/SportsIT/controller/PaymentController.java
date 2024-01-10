@@ -4,7 +4,7 @@ import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.Payment;
 import PlayMakers.SportsIT.dto.PaymentDto;
-import PlayMakers.SportsIT.service.CompetitionService;
+import PlayMakers.SportsIT.competitions.service.CompetitionServiceImpl_v1;
 import PlayMakers.SportsIT.service.MemberService;
 import PlayMakers.SportsIT.service.PaymentService;
 import com.nimbusds.jose.shaded.gson.JsonObject;
@@ -27,7 +27,7 @@ import java.util.Map;
 public class PaymentController {
     private final PaymentService paymentService;
     private final MemberService memberService;
-    private final CompetitionService competitionService;
+    private final CompetitionServiceImpl_v1 competitionServiceImplv1;
 
     @PostMapping("/record")
     public ResponseEntity<?> preValidation(@RequestBody PaymentDto.PreRequest preRequestDto,
@@ -52,7 +52,7 @@ public class PaymentController {
                                            @AuthenticationPrincipal User user) throws Exception {
         log.info("결제이력 저장 / 클라이언트: {}", user.getUsername());
         Member client = memberService.findOne(user.getUsername());
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImplv1.findById(competitionId);
 
         // 결제 내역 사후 검증
         PaymentDto.PreRequest preRequestDto = requestDto.toPreRequest();

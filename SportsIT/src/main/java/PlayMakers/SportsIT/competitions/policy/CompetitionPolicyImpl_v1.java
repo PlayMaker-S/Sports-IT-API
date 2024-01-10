@@ -1,6 +1,8 @@
-package PlayMakers.SportsIT.domain;
+package PlayMakers.SportsIT.competitions.policy;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.enums.CompetitionState;
+import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.enums.CompetitionType;
 import PlayMakers.SportsIT.enums.Subscribe;
 import org.springframework.beans.factory.annotation.Qualifier;

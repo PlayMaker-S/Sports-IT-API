@@ -4,7 +4,7 @@ import PlayMakers.SportsIT.domain.Agreement;
 import PlayMakers.SportsIT.competitions.domain.Competition;
 import PlayMakers.SportsIT.dto.AgreementDto;
 import PlayMakers.SportsIT.service.AgreementService;
-import PlayMakers.SportsIT.service.CompetitionService;
+import PlayMakers.SportsIT.competitions.service.CompetitionServiceImpl_v1;
 import PlayMakers.SportsIT.service.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +25,12 @@ import java.util.Map;
 public class AgreementController {
     private final S3Uploader s3Uploader;
     private final AgreementService agreementService;
-    private final CompetitionService competitionService;
+    private final CompetitionServiceImpl_v1 competitionServiceImplv1;
 
     @PostMapping("/upload/{competitionId}") // 대회 규정 S3 저장 후 저장된 URL 리스트 반환
     public ResponseEntity<Object> uploadAgreements (@RequestBody List<MultipartFile> agreements,
                                                     @PathVariable Long competitionId) throws IOException {
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImplv1.findById(competitionId);
 
         List<String> savedUrls = s3Uploader.uploadImages(agreements, "agreement/"+competitionId);
 
@@ -47,7 +47,7 @@ public class AgreementController {
                                                   @RequestBody List<AgreementDto> agreements) {
 
 
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImplv1.findById(competitionId);
 
         List<Agreement> saved = agreementService.saveAgreements(agreements, competition);
 
@@ -60,7 +60,7 @@ public class AgreementController {
     }
     @GetMapping()
     public ResponseEntity<Object> getAllAgreements(@RequestParam Long competitionId) {
-        Competition target = competitionService.findById(competitionId);
+        Competition target = competitionServiceImplv1.findById(competitionId);
         List<Agreement> agreements = agreementService.findAgreementsByCompetition(target);
 
         Object res = new HashMap<String, Object>() {{

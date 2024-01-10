@@ -1,6 +1,7 @@
 package PlayMakers.SportsIT.controller;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.service.CompetitionServiceImpl_v1;
 import PlayMakers.SportsIT.domain.Poster;
 import PlayMakers.SportsIT.service.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class ImageController {
     private final S3Uploader s3Uploader;
     private final PosterService posterService;
     private final AgreementService agreementService;
-    private final CompetitionService competitionService;
+    private final CompetitionServiceImpl_v1 competitionServiceImplv1;
     private final MemberService memberService;
 
     @PostMapping
@@ -35,7 +36,7 @@ public class ImageController {
     @PostMapping("/poster/{competitionId}")
     public ResponseEntity<Object> uploadPoster(@RequestBody List<MultipartFile> posters,
                                                      @PathVariable Long competitionId) throws IOException{
-        Competition competition = competitionService.findById(competitionId);
+        Competition competition = competitionServiceImplv1.findById(competitionId);
 
         List<String> savedUrls = s3Uploader.uploadImages(posters, "poster/"+competitionId);
 

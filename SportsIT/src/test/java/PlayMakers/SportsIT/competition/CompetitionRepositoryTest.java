@@ -3,7 +3,7 @@ package PlayMakers.SportsIT.competition;
 import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.competitions.domain.Competition;
-import PlayMakers.SportsIT.repository.CompetitionRepository;
+import PlayMakers.SportsIT.competitions.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;

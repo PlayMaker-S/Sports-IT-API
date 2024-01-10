@@ -1,6 +1,9 @@
 package PlayMakers.SportsIT.competition;
 
 import PlayMakers.SportsIT.competitions.domain.Competition;
+import PlayMakers.SportsIT.competitions.enums.CompetitionState;
+import PlayMakers.SportsIT.competitions.repository.CompetitionCustomRepository;
+import PlayMakers.SportsIT.competitions.repository.CompetitionRepository;
 import PlayMakers.SportsIT.config.TestConfig;
 import PlayMakers.SportsIT.domain.*;
 import PlayMakers.SportsIT.dto.JoinCompetitionDto;
@@ -31,7 +34,7 @@ import static PlayMakers.SportsIT.domain.JoinCompetition.*;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 실제 DB로 테스트
 @Import(TestConfig.class)
-public class JoinCompetitionServiceIntegrationTest {
+public class JoinCompetitionServiceImplv1IntegrationTest {
     @Autowired
     CompetitionRepository competitionRepository;
     @Autowired

@@ -5,7 +5,7 @@ import PlayMakers.SportsIT.domain.CompetitionForm;
 import PlayMakers.SportsIT.domain.Member;
 import PlayMakers.SportsIT.domain.Participant;
 import PlayMakers.SportsIT.dto.ParticipantDto;
-import PlayMakers.SportsIT.repository.CompetitionRepository;
+import PlayMakers.SportsIT.competitions.repository.CompetitionRepository;
 import PlayMakers.SportsIT.repository.MemberRepository;
 import PlayMakers.SportsIT.repository.ParticipantRepository;
 import jakarta.transaction.Transactional;

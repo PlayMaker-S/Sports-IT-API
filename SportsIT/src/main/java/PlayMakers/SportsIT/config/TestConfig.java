@@ -1,6 +1,6 @@
 package PlayMakers.SportsIT.config;
 
-import PlayMakers.SportsIT.repository.CompetitionCustomRepositoryImpl;
+import PlayMakers.SportsIT.competitions.repository.CompetitionCustomRepositoryImpl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
